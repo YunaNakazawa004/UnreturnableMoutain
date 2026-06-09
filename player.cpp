@@ -217,7 +217,7 @@ void CPlayer::Update(void)
 		}
 	}
 
-	if (pInputKeyboard->GetTrigger(DIK_BACKSPACE) == true)
+	if (pInputKeyboard->GetTrigger(DIK_BACKSPACE) == true || pInputJoypad->GetTrigger(0, CInputJoypad::JOYKEY_START) == true)
 	{// 位置回転リセット
 		pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 		rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
