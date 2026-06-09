@@ -1,0 +1,588 @@
+//=============================================================================
+// 
+// カメラ [camera.cpp]
+// Author : Nakazawa Yuna
+// 
+//=============================================================================
+#include "camera.h"
+
+#include "renderer.h"
+#include "manager.h"
+#include "debugproc.h"
+#include "input.h"
+
+#include "player.h"
+
+//*****************************************************************************
+// マクロ定義
+//*****************************************************************************
+#define CAMERA_POS				(D3DXVECTOR3(0.0f, 100.0f, -200.0f))	// 初期座標
+#define FIRST_ROT_X				(200.0f)								// 視点と注視点間の距離
+#define HEIGHT					(0.0f)									// 視点の高さ
+#define MOVEMENT				(D3DXVECTOR3(5.0f, 5.0f, 5.0f))			// 移動量
+#define ROT						(D3DXVECTOR3(0.035f, 0.035f, 0.035f))	// 向き移動量
+#define AUTO_ROT				(D3DXVECTOR3(0.005f, 0.005f, 0.005f))	// 自動回転移動量
+#define DEFAULT_VIEW_ANGLE		(45.0f)									// 規定の視野角
+#define INERTIA_VIEW_ANGLE		(0.05f)									// 視野角の慣性
+#define INERTIA_POSR			(0.6f)									// 注視点の慣性
+#define INERTIA_POSV			(0.6f)									// 視点の慣性
+#define MAX_Y					(300.0f)								// 上の制限
+#define MIN_Y					(-300.0f)								// 下の制限
+
+//=============================================================================
+// カメラクラスのコンストラクタ
+//=============================================================================
+CCamera::CCamera()
+{
+	m_posV = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_posR = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_posVDest = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_posRDest = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_vecU = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_fAngle = 0.0f;
+	m_fDistance = 0.0f;
+	m_fRDistance = 0.0f;
+	m_fViewAngle = 0.0f;
+	m_fMoveVA = 0.0f;
+	m_type = TYPE_STOP;
+}
+
+//=============================================================================
+// カメラクラスのデストラクタ
+//=============================================================================
+CCamera::~CCamera()
+{
+}
+
+//=============================================================================
+// カメラの初期化処理
+//=============================================================================
+HRESULT CCamera::Init(void)
+{
+	// カメラ情報の初期化
+	m_posV = CAMERA_POS;
+	m_posR = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_posVDest = CAMERA_POS;
+	m_posRDest = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_vecU = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
+	m_rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+
+	D3DXVECTOR3 dist = m_posV - m_posR;
+	D3DXVECTOR2 distXZ = D3DXVECTOR2(dist.x, dist.z);
+	float fDistXZ = D3DXVec2Length(&distXZ);
+
+	m_fAngle = atan2f(dist.y, fDistXZ);
+	m_fDistance = D3DXVec3Length(&dist);
+	m_fRDistance = 0.0f;
+	m_fViewAngle = DEFAULT_VIEW_ANGLE;
+	m_fMoveVA = 0.0f;
+	m_type = TYPE_PLAYER;
+
+	m_viewport.X = 0;
+	m_viewport.Y = 0;
+	m_viewport.Width = SCREEN_WIDTH;
+	m_viewport.Height = SCREEN_HEIGHT;
+	m_viewport.MinZ = 0.0f;
+	m_viewport.MaxZ = 1.0f;
+
+	return S_OK;
+}
+
+//=============================================================================
+// カメラの終了処理
+//=============================================================================
+void CCamera::Uninit(void)
+{
+}
+
+//=============================================================================
+// カメラの更新処理
+//=============================================================================
+void CCamera::Update(void)
+{
+	// ローカル変数
+	CInputKeyboard* pInputKeyboard = CManager::GetInputKeyboard();		// キーボード入力の取得
+	CInputMouse* pInputMouse = CManager::GetInputMouse();				// マウス入力の取得
+	CInputJoypad* pInputJoypad = CManager::GetInputJoypad();			// ジョイパッド入力の取得
+	CDebugProc* pDebugProc = CManager::GetDebugProc();					// デバッグ表示の取得
+	CPlayer* pPlayer = CManager::GetPlayer();							// プレイヤー取得
+	D3DXVECTOR3 MousePos;
+	static D3DXVECTOR3 ClickPos, CameraRot;		// クリックされた位置、クリックされた瞬間のカメラの向き
+	static float fCameraAngle;					// クリックされた瞬間のカメラの上下角度
+	D3DXVECTOR3 pos = pPlayer->GetPosition();
+	D3DXVECTOR3 rot = pPlayer->GetRotation();
+
+	// マウス移動用
+	MousePos.x = (float)pInputMouse->GetPosition().x;
+	MousePos.y = (float)pInputMouse->GetPosition().y;
+	MousePos.z = 0.0f;
+
+	if (pInputMouse->GetTrigger(CInputMouse::MOUSEBUTTON_LEFT) == true ||
+		pInputMouse->GetTrigger(CInputMouse::MOUSEBUTTON_RIGHT) == true)
+	{// クリックされた瞬間
+		// クリックされた瞬間の情報を保存
+		ClickPos = MousePos;
+		CameraRot = m_rot;
+		fCameraAngle = m_fAngle;
+	}
+
+	// それぞれのカメラの処理
+	switch (m_type)
+	{
+#if 1
+	case TYPE_PLAYER:
+		int nValueH, nValueV;
+
+		// プレイヤー向きを調整
+		CorrectAngle(&rot.y, ((rot.y - D3DX_PI) - m_rot.y));
+
+		// 目的の注視点を設定
+		m_posRDest.x = pos.x + sinf(D3DX_PI + rot.y) * m_fRDistance;
+		m_posRDest.y = pos.y + HEIGHT;
+		m_posRDest.z = pos.z + cosf(D3DX_PI + rot.y) * m_fRDistance;
+
+		// 目的の視点を設定
+		m_posVDest.x = m_posRDest.x + sinf(D3DX_PI + m_rot.y) * m_fDistance * sinf((D3DX_PI * 0.5f) - m_fAngle);
+		m_posVDest.y = m_posRDest.y + cosf((D3DX_PI * 0.5f) - m_fAngle) * m_fDistance;
+		m_posVDest.z = m_posRDest.z + cosf(D3DX_PI + m_rot.y) * m_fDistance * sinf((D3DX_PI * 0.5f) - m_fAngle);
+
+		if (pInputKeyboard->GetPress(DIK_J) == true || 
+			pInputJoypad->GetStick(0, CInputJoypad::JOYKEY_RIGHTSTICK_LEFT, &nValueH, &nValueV) == true)
+		{// 右に旋回
+			m_rot.y += -ROT.y;
+
+			m_posVDest.x = m_posRDest.x + sinf(D3DX_PI + m_rot.y) * m_fDistance * sinf((D3DX_PI * 0.5f) - m_fAngle);
+			m_posVDest.y = m_posRDest.y + cosf((D3DX_PI * 0.5f) - m_fAngle) * m_fDistance;
+			m_posVDest.z = m_posRDest.z + cosf(D3DX_PI + m_rot.y) * m_fDistance * sinf((D3DX_PI * 0.5f) - m_fAngle);
+		}
+		else if (pInputKeyboard->GetPress(DIK_L) == true || 
+			pInputJoypad->GetStick(0, CInputJoypad::JOYKEY_RIGHTSTICK_RIGHT, &nValueH, &nValueV) == true)
+		{// 左に旋回
+			m_rot.y += ROT.y;
+
+			m_posVDest.x = m_posRDest.x + sinf(D3DX_PI + m_rot.y) * m_fDistance * sinf((D3DX_PI * 0.5f) - m_fAngle);
+			m_posVDest.y = m_posRDest.y + cosf((D3DX_PI * 0.5f) - m_fAngle) * m_fDistance;
+			m_posVDest.z = m_posRDest.z + cosf(D3DX_PI + m_rot.y) * m_fDistance * sinf((D3DX_PI * 0.5f) - m_fAngle);
+		}
+
+		// 視点移動
+		if (pInputKeyboard->GetPress(DIK_K) == true || 
+			pInputJoypad->GetStick(0, CInputJoypad::JOYKEY_RIGHTSTICK_DOWN, &nValueH, &nValueV) == true)
+		{// 上に移動
+			m_fAngle += ROT.y;
+
+			if (m_fAngle > D3DX_PI * 0.4f)
+			{// 上の制限
+				m_fAngle = D3DX_PI * 0.4f;
+			}
+
+			CorrectAngle(&m_fAngle, m_fAngle);
+
+			m_posVDest.x = m_posRDest.x + sinf(D3DX_PI + m_rot.y) * m_fDistance * sinf((D3DX_PI * 0.5f) - m_fAngle);
+			m_posVDest.y = m_posRDest.y + cosf((D3DX_PI * 0.5f) - m_fAngle) * m_fDistance;
+			m_posVDest.z = m_posRDest.z + cosf(D3DX_PI + m_rot.y) * m_fDistance * sinf((D3DX_PI * 0.5f) - m_fAngle);
+		}
+		else if (pInputKeyboard->GetPress(DIK_I) == true || 
+			pInputJoypad->GetStick(0, CInputJoypad::JOYKEY_RIGHTSTICK_UP, &nValueH, &nValueV) == true)
+		{// 下に移動
+			m_fAngle += -ROT.y;
+
+			if (m_fAngle < -D3DX_PI * 0.4f)
+			{// 下の制限
+				m_fAngle = -D3DX_PI * 0.4f;
+			}
+
+			CorrectAngle(&m_fAngle, m_fAngle);
+
+			m_posVDest.x = m_posRDest.x + sinf(D3DX_PI + m_rot.y) * m_fDistance * sinf((D3DX_PI * 0.5f) - m_fAngle);
+			m_posVDest.y = m_posRDest.y + cosf((D3DX_PI * 0.5f) - m_fAngle) * m_fDistance;
+			m_posVDest.z = m_posRDest.z + cosf(D3DX_PI + m_rot.y) * m_fDistance * sinf((D3DX_PI * 0.5f) - m_fAngle);
+		}
+
+		// 視点移動
+		if (pInputMouse->GetPress(CInputMouse::MOUSEBUTTON_LEFT) == true &&
+			pInputMouse->GetPress(CInputMouse::MOUSEBUTTON_RIGHT) == false)
+		{// クリックされている間
+			// 最初にクリックされた位置から今の位置までの距離を求める
+			D3DXVECTOR3 dist = MousePos - ClickPos;
+
+			// 視点移動
+			m_rot.y = CameraRot.y + dist.x * 0.005f;
+			m_fAngle = fCameraAngle + dist.y * 0.005f;
+
+			if (m_fAngle > D3DX_PI * 0.4f)
+			{// 上の制限
+				m_fAngle = D3DX_PI * 0.4f;
+			}
+
+			if (m_fAngle < -D3DX_PI * 0.4f)
+			{// 下の制限
+				m_fAngle = -D3DX_PI * 0.4f;
+			}
+
+			m_posVDest.x = m_posRDest.x + sinf(D3DX_PI + m_rot.y) * m_fDistance * sinf((D3DX_PI * 0.5f) - m_fAngle);
+			m_posVDest.y = m_posRDest.y + cosf((D3DX_PI * 0.5f) - m_fAngle) * m_fDistance;
+			m_posVDest.z = m_posRDest.z + cosf(D3DX_PI + m_rot.y) * m_fDistance * sinf((D3DX_PI * 0.5f) - m_fAngle);
+		}
+
+		// カメラ向きを調整
+		CorrectAngle(&m_rot.y, m_rot.y);
+
+		// 注視点の補正
+		m_posR += (m_posRDest - m_posR) * INERTIA_POSR;
+
+		// 視点の補正
+		m_posV += (m_posVDest - m_posV) * INERTIA_POSV;
+
+		break;
+#endif
+	case TYPE_SOLO:			// 単体カメラ
+		// 視点移動
+		if (pInputMouse->GetPress(CInputMouse::MOUSEBUTTON_LEFT) == true &&
+			pInputMouse->GetPress(CInputMouse::MOUSEBUTTON_RIGHT) == false)
+		{// クリックされている間
+			// 最初にクリックされた位置から今の位置までの距離を求める
+			D3DXVECTOR3 dist = MousePos - ClickPos;
+
+			// 視点移動
+			m_rot.y = CameraRot.y + dist.x * 0.005f;
+			m_fAngle = fCameraAngle + dist.y * 0.005f;
+
+			if (m_fAngle > D3DX_PI * 0.4f)
+			{// 上の制限
+				m_fAngle = D3DX_PI * 0.4f;
+			}
+
+			if (m_fAngle < -D3DX_PI * 0.4f)
+			{// 下の制限
+				m_fAngle = -D3DX_PI * 0.4f;
+			}
+
+			m_posVDest.x = m_posRDest.x + sinf(D3DX_PI + m_rot.y) * m_fDistance * sinf((D3DX_PI * 0.5f) - m_fAngle);
+			m_posVDest.y = m_posRDest.y + cosf((D3DX_PI * 0.5f) - m_fAngle) * m_fDistance;
+			m_posVDest.z = m_posRDest.z + cosf(D3DX_PI + m_rot.y) * m_fDistance * sinf((D3DX_PI * 0.5f) - m_fAngle);
+		}
+
+		// 注視点移動
+		if (pInputMouse->GetPress(CInputMouse::MOUSEBUTTON_RIGHT) == true &&
+			pInputMouse->GetPress(CInputMouse::MOUSEBUTTON_LEFT) == false)
+		{// クリックされている間
+			// 最初にクリックされた位置から今の位置までの距離を求める
+			D3DXVECTOR3 dist = MousePos - ClickPos;
+
+			// 注視点移動
+			m_rot.y = CameraRot.y + dist.x * 0.003f;
+			m_fAngle = fCameraAngle + dist.y * 0.003f;
+
+			if (m_fAngle > D3DX_PI * 0.4f)
+			{// 上の制限
+				m_fAngle = D3DX_PI * 0.4f;
+			}
+
+			if (m_fAngle < -D3DX_PI * 0.4f)
+			{// 下の制限
+				m_fAngle = -D3DX_PI * 0.4f;
+			}
+
+			m_posRDest.x = m_posVDest.x + sinf(m_rot.y) * m_fDistance * sinf((D3DX_PI * 0.5f) - m_fAngle);
+			m_posRDest.y = m_posVDest.y + cosf((D3DX_PI * 0.5f) - m_fAngle) * -m_fDistance;
+			m_posRDest.z = m_posVDest.z + cosf(m_rot.y) * m_fDistance * sinf((D3DX_PI * 0.5f) - m_fAngle);
+		}
+
+		pDebugProc->Print("*** カメラ ***\n");
+		pDebugProc->Print("視点の位置 : ( %f %f %f )\n", m_posV.x, m_posV.y, m_posV.z);
+		pDebugProc->Print("注視点の位置 : ( %f %f %f )\n", m_posR.x, m_posR.y, m_posR.z);
+
+		// 並行移動
+		if (pInputKeyboard->GetPress(DIK_UP) == true)		// キーボード移動
+		{// 奥に移動
+			if (pInputKeyboard->GetPress(DIK_LEFT) == true)
+			{// 左奥に移動
+				m_posVDest.x += sinf(-D3DX_PI * 0.75f - m_rot.y) * MOVEMENT.x * sinf((D3DX_PI * 0.5f) - m_fAngle);
+				m_posVDest.z += cosf(-D3DX_PI * 0.25f + m_rot.y) * MOVEMENT.z * sinf((D3DX_PI * 0.5f) - m_fAngle);
+			}
+			else if (pInputKeyboard->GetPress(DIK_RIGHT) == true)
+			{// 右奥に移動
+				m_posVDest.x += sinf(D3DX_PI * 0.75f - m_rot.y) * MOVEMENT.x * sinf((D3DX_PI * 0.5f) - m_fAngle);
+				m_posVDest.z += cosf(D3DX_PI * 0.25f + m_rot.y) * MOVEMENT.z * sinf((D3DX_PI * 0.5f) - m_fAngle);
+			}
+			else if (pInputKeyboard->GetPress(DIK_UP) == true)
+			{// 奥に移動
+				m_posVDest.x += sinf(D3DX_PI * 0.0f + m_rot.y) * MOVEMENT.x * sinf((D3DX_PI * 0.5f) - m_fAngle);
+				m_posVDest.z += cosf(D3DX_PI * 0.0f + m_rot.y) * MOVEMENT.z * sinf((D3DX_PI * 0.5f) - m_fAngle);
+			}
+
+			m_posRDest.x = m_posVDest.x + sinf(m_rot.y) * m_fDistance * sinf((D3DX_PI * 0.5f) - m_fAngle);
+			m_posRDest.z = m_posVDest.z + cosf(m_rot.y) * m_fDistance * sinf((D3DX_PI * 0.5f) - m_fAngle);
+		}
+		else if (pInputKeyboard->GetPress(DIK_DOWN) == true)
+		{// 手前に移動
+			if (pInputKeyboard->GetPress(DIK_LEFT) == true)
+			{// 左手前に移動
+				m_posVDest.x += sinf(-D3DX_PI * 0.25f - m_rot.y) * MOVEMENT.x * sinf((D3DX_PI * 0.5f) - m_fAngle);
+				m_posVDest.z += cosf(-D3DX_PI * 0.75f + m_rot.y) * MOVEMENT.z * sinf((D3DX_PI * 0.5f) - m_fAngle);
+			}
+			else if (pInputKeyboard->GetPress(DIK_RIGHT) == true)
+			{// 右手前に移動
+				m_posVDest.x += sinf(D3DX_PI * 0.25f - m_rot.y) * MOVEMENT.x * sinf((D3DX_PI * 0.5f) - m_fAngle);
+				m_posVDest.z += cosf(D3DX_PI * 0.75f + m_rot.y) * MOVEMENT.z * sinf((D3DX_PI * 0.5f) - m_fAngle);
+			}
+			else if (pInputKeyboard->GetPress(DIK_DOWN) == true)
+			{// 手前に移動
+				m_posVDest.x += sinf(D3DX_PI * 1.0f + m_rot.y) * MOVEMENT.x * sinf((D3DX_PI * 0.5f) - m_fAngle);
+				m_posVDest.z += cosf(D3DX_PI * 1.0f + m_rot.y) * MOVEMENT.z * sinf((D3DX_PI * 0.5f) - m_fAngle);
+			}
+
+			m_posRDest.x = m_posVDest.x + sinf(m_rot.y) * m_fDistance * sinf((D3DX_PI * 0.5f) - m_fAngle);
+			m_posRDest.z = m_posVDest.z + cosf(m_rot.y) * m_fDistance * sinf((D3DX_PI * 0.5f) - m_fAngle);
+		}
+		else if (pInputKeyboard->GetPress(DIK_LEFT) == true)
+		{// 左に移動
+			m_posVDest.x += sinf(-D3DX_PI * 0.5f + m_rot.y) * MOVEMENT.x * sinf((D3DX_PI * 0.5f) - m_fAngle);
+			m_posVDest.z += cosf(-D3DX_PI * 0.5f + m_rot.y) * MOVEMENT.z * sinf((D3DX_PI * 0.5f) - m_fAngle);
+
+			m_posRDest.x = m_posVDest.x + sinf(m_rot.y) * m_fDistance * sinf((D3DX_PI * 0.5f) - m_fAngle);
+			m_posRDest.z = m_posVDest.z + cosf(m_rot.y) * m_fDistance * sinf((D3DX_PI * 0.5f) - m_fAngle);
+		}
+		else if (pInputKeyboard->GetPress(DIK_RIGHT) == true)
+		{// 右に移動
+			m_posVDest.x += sinf(D3DX_PI * 0.5f + m_rot.y) * MOVEMENT.x * sinf((D3DX_PI * 0.5f) - m_fAngle);
+			m_posVDest.z += cosf(D3DX_PI * 0.5f + m_rot.y) * MOVEMENT.z * sinf((D3DX_PI * 0.5f) - m_fAngle);
+
+			m_posRDest.x = m_posVDest.x + sinf(m_rot.y) * m_fDistance * sinf((D3DX_PI * 0.5f) - m_fAngle);
+			m_posRDest.z = m_posVDest.z + cosf(m_rot.y) * m_fDistance * sinf((D3DX_PI * 0.5f) - m_fAngle);
+		}
+
+		// 注視点移動
+		if (pInputKeyboard->GetPress(DIK_T) == true)
+		{// 上に移動
+			m_fAngle += ROT.y;
+
+			if (m_fAngle > D3DX_PI * 0.4f)
+			{// 上の制限
+				m_fAngle = D3DX_PI * 0.4f;
+			}
+
+			CorrectAngle(&m_fAngle, m_fAngle);
+
+			m_posRDest.x = m_posVDest.x + sinf(m_rot.y) * m_fDistance * sinf((D3DX_PI * 0.5f) - m_fAngle);
+			m_posRDest.y = m_posVDest.y + cosf((D3DX_PI * 0.5f) - m_fAngle) * -m_fDistance;
+			m_posRDest.z = m_posVDest.z + cosf(m_rot.y) * m_fDistance * sinf((D3DX_PI * 0.5f) - m_fAngle);
+		}
+		else if (pInputKeyboard->GetPress(DIK_B) == true)
+		{// 下に移動
+			m_fAngle += -ROT.y;
+
+			if (m_fAngle < -D3DX_PI * 0.4f)
+			{// 下の制限
+				m_fAngle = -D3DX_PI * 0.4f;
+			}
+
+			CorrectAngle(&m_fAngle, m_fAngle);
+
+			m_posRDest.x = m_posVDest.x + sinf(m_rot.y) * m_fDistance * sinf((D3DX_PI * 0.5f) - m_fAngle);
+			m_posRDest.y = m_posVDest.y + cosf((D3DX_PI * 0.5f) - m_fAngle) * -m_fDistance;
+			m_posRDest.z = m_posVDest.z + cosf(m_rot.y) * m_fDistance * sinf((D3DX_PI * 0.5f) - m_fAngle);
+		}
+
+		if (pInputKeyboard->GetPress(DIK_Q) == true)
+		{// 左に旋回
+			m_rot.y += -ROT.y;
+
+			m_posRDest.x = m_posV.x + sinf(m_rot.y) * m_fDistance * sinf((D3DX_PI * 0.5f) - m_fAngle);
+			m_posRDest.z = m_posV.z + cosf(m_rot.y) * m_fDistance * sinf((D3DX_PI * 0.5f) - m_fAngle);
+		}
+		else if (pInputKeyboard->GetPress(DIK_E) == true)
+		{// 右に旋回
+			m_rot.y += ROT.y;
+
+			m_posRDest.x = m_posV.x + sinf(m_rot.y) * m_fDistance * sinf((D3DX_PI * 0.5f) - m_fAngle);
+			m_posRDest.z = m_posV.z + cosf(m_rot.y) * m_fDistance * sinf((D3DX_PI * 0.5f) - m_fAngle);
+		}
+
+		// 視点移動
+		if (pInputKeyboard->GetPress(DIK_Y) == true)
+		{// 上に移動
+			m_fAngle += ROT.y;
+
+			if (m_fAngle > D3DX_PI * 0.4f)
+			{// 上の制限
+				m_fAngle = D3DX_PI * 0.4f;
+			}
+
+			CorrectAngle(&m_fAngle, m_fAngle);
+
+			m_posVDest.x = m_posRDest.x + sinf(D3DX_PI + m_rot.y) * m_fDistance * sinf((D3DX_PI * 0.5f) - m_fAngle);
+			m_posVDest.y = m_posRDest.y + cosf((D3DX_PI * 0.5f) - m_fAngle) * m_fDistance;
+			m_posVDest.z = m_posRDest.z + cosf(D3DX_PI + m_rot.y) * m_fDistance * sinf((D3DX_PI * 0.5f) - m_fAngle);
+		}
+		else if (pInputKeyboard->GetPress(DIK_N) == true)
+		{// 下に移動
+			m_fAngle += -ROT.y;
+
+			if (m_fAngle < -D3DX_PI * 0.4f)
+			{// 下の制限
+				m_fAngle = -D3DX_PI * 0.4f;
+			}
+
+			CorrectAngle(&m_fAngle, m_fAngle);
+
+			m_posVDest.x = m_posRDest.x + sinf(D3DX_PI + m_rot.y) * m_fDistance * sinf((D3DX_PI * 0.5f) - m_fAngle);
+			m_posVDest.y = m_posRDest.y + cosf((D3DX_PI * 0.5f) - m_fAngle) * m_fDistance;
+			m_posVDest.z = m_posRDest.z + cosf(D3DX_PI + m_rot.y) * m_fDistance * sinf((D3DX_PI * 0.5f) - m_fAngle);
+		}
+
+		if (pInputKeyboard->GetPress(DIK_Z) == true)
+		{// 左に旋回
+			m_rot.y += ROT.y;
+
+			m_posVDest.x = m_posR.x + sinf(D3DX_PI + m_rot.y) * m_fDistance * sinf((D3DX_PI * 0.5f) - m_fAngle);
+			m_posVDest.z = m_posR.z + cosf(D3DX_PI + m_rot.y) * m_fDistance * sinf((D3DX_PI * 0.5f) - m_fAngle);
+		}
+		else if (pInputKeyboard->GetPress(DIK_C) == true)
+		{// 右に旋回
+			m_rot.y += -ROT.y;
+
+			m_posVDest.x = m_posR.x + sinf(D3DX_PI + m_rot.y) * m_fDistance * sinf((D3DX_PI * 0.5f) - m_fAngle);
+			m_posVDest.z = m_posR.z + cosf(D3DX_PI + m_rot.y) * m_fDistance * sinf((D3DX_PI * 0.5f) - m_fAngle);
+		}
+
+		// リセット
+		if (pInputKeyboard->GetPress(DIK_RETURN) == true)
+		{
+			m_posV = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+			m_posR = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+			m_posVDest = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+			m_posRDest = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+			m_rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+		}
+
+		// カメラ向きを調整
+		CorrectAngle(&m_rot.y, m_rot.y);
+
+		// 注視点の補正
+		m_posR += (m_posRDest - m_posR) * INERTIA_POSR;
+
+		// 視点の補正
+		m_posV += (m_posVDest - m_posV) * INERTIA_POSV;
+
+		break;
+
+	case TYPE_ROTATION:		// 自動回転カメラ
+		m_rot.y += -AUTO_ROT.y;
+
+		// カメラ向きを調整
+		CorrectAngle(&m_rot.y, m_rot.y);
+
+		m_posV.x = m_posR.x + sinf(D3DX_PI + m_rot.y) * m_fDistance;
+		m_posV.z = m_posR.z + cosf(D3DX_PI + m_rot.y) * m_fDistance;
+
+		m_fViewAngle = DEFAULT_VIEW_ANGLE;
+		m_fMoveVA = DEFAULT_VIEW_ANGLE;
+
+		break;
+
+	case TYPE_STOP:			// 定点カメラ
+		// カメラ向きを調整
+		CorrectAngle(&m_rot.y, m_rot.y);
+
+		m_posV.x = m_posR.x + sinf(D3DX_PI + m_rot.y) * m_fDistance;
+		m_posV.z = m_posR.z + cosf(D3DX_PI + m_rot.y) * m_fDistance;
+
+		m_fViewAngle = DEFAULT_VIEW_ANGLE;
+		m_fMoveVA = DEFAULT_VIEW_ANGLE;
+
+		break;
+	}
+
+	if (m_fMoveVA != 0.0f)
+	{// 視野角
+		m_fViewAngle += (m_fMoveVA - m_fViewAngle) * INERTIA_VIEW_ANGLE;
+	}
+}
+
+//=============================================================================
+// カメラの設定処理
+//=============================================================================
+void CCamera::SetCamera(void)
+{
+	// デバイスの取得
+	CRenderer* pRenderer = CManager::GetRenderer();			// レンダラーへのポインタ
+	LPDIRECT3DDEVICE9 pDevice = pRenderer->GetDevice();			// デバイスへのポインタ
+
+	// ビューポートの設定
+	pDevice->SetViewport(&m_viewport);
+
+	// プロジェクションマトリックスの初期化
+	D3DXMatrixIdentity(&m_mtxProjection);
+
+#if 1		// 透視投影
+	// プロジェクションマトリックスを作成
+	D3DXMatrixPerspectiveFovLH(&m_mtxProjection,
+		D3DXToRadian(m_fViewAngle),								// 視野角
+		(float)m_viewport.Width / (float)m_viewport.Height,		// 画面のアスペクト比
+		10.0f,													// カメラから一番近い描画距離
+		80000.0f);												// 最大描画距離
+
+#else		// 平行投影
+	// プロジェクションマトリックスを作成
+	D3DXMatrixOrthoLH(&m_mtxProjection,
+		(float)m_viewport.Width,		// ビューボリュームの幅
+		(float)m_viewport.Height,		// ビューボリュームの高さ
+		10.0f,							// ビューボリュームの近平面までの距離
+		80000.0f);						// ビューボリュームの遠平面までの距離
+#endif
+
+	// プロジェクションマトリックスの設定
+	pDevice->SetTransform(D3DTS_PROJECTION, &m_mtxProjection);
+
+	// ビューマトリックスの初期化
+	D3DXMatrixIdentity(&m_mtxView);
+
+	// ビューマトリックスを作成
+	D3DXMatrixLookAtLH(&m_mtxView,
+		&m_posV,			// 視点
+		&m_posR,			// 注視点
+		&m_vecU);		// 上方向ベクトル
+
+	// ビューマトリックスの設定
+	pDevice->SetTransform(D3DTS_VIEW, &m_mtxView);
+}
+
+//=============================================================================
+// カメラの位置設定
+//=============================================================================
+void CCamera::SetPosition(D3DXVECTOR3 posV, D3DXVECTOR3 posR, D3DXVECTOR3 rot, TYPE type)
+{
+	m_posV = posV;
+	m_posVDest = posV;
+	m_posR = posR;
+	m_posRDest = posR;
+	m_rot = rot;
+	m_type = type;
+}
+
+//=============================================================================
+// カメラの視野角設定処理
+//=============================================================================
+void CCamera::SetViewAngle(float fViewAngle)
+{
+	m_fMoveVA = fViewAngle;
+}
+
+//=============================================================================
+// 角度を修正
+//=============================================================================
+void CCamera::CorrectAngle(float* pAngle, float fAngle)
+{
+	// 向きを調整
+	if (fAngle > D3DX_PI)
+	{
+		*pAngle -= D3DX_PI * 2.0f;
+	}
+	else if (fAngle < -D3DX_PI)
+	{
+		*pAngle += D3DX_PI * 2.0f;
+	}
+}

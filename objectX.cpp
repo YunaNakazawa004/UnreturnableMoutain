@@ -1,0 +1,447 @@
+//========================================================================
+// 
+// オブジェクトX [objectX.cpp]
+// Author : Nakazawa Yuna
+// 
+//========================================================================
+#include "objectX.h"
+
+#include "renderer.h"
+#include "manager.h"
+#include "input.h"
+#include "texture.h"
+
+#include "camera.h"
+
+//************************************************************************
+// マクロ定義
+//************************************************************************
+#define MODEL_FILE				"data\\MODEL\\car000.x"					// モデルのファイル名(デバッグ用)
+#define MOVEMENT				(D3DXVECTOR3(0.6f, 0.6f, 0.6f))			// 移動量
+#define ROT						(D3DXVECTOR3(0.05f, 0.05f, 0.05f))		// 向き移動量
+
+//========================================================================
+// オブジェクトXクラスの生成処理
+//========================================================================
+CObjectX* CObjectX::Create(const D3DXVECTOR3 pos, const CObject::TYPE type, const int nPriority)
+{
+	if (CObject::GetNumAll() >= MAX_OBJECT)
+	{// 最大数のオブジェクトが存在する
+		OutputDebugStringA("! ! ! オブジェクトの最大数に達しています ! ! !\n");
+
+		return NULL;
+	}
+
+	CObjectX* pObjectX = NULL;
+
+	if (pObjectX == NULL)
+	{// NULLチェック
+		// オブジェクトXの生成
+		pObjectX = new CObjectX(nPriority);
+	}
+
+	if (pObjectX != NULL)
+	{// NULLチェック
+		// モデルファイル設定(デバッグ用)
+		pObjectX->BindModel(MODEL_FILE);
+
+		// 初期化処理
+		if (FAILED(pObjectX->Init(pos)))
+		{// もし失敗した場合
+			OutputDebugStringA("! ! ! オブジェクトXの初期化に失敗しました ! ! !\n");
+
+			return NULL;
+		}
+
+		// 種類を設定
+		pObjectX->SetType(type);
+
+		return pObjectX;
+	}
+
+	OutputDebugStringA("! ! ! オブジェクトXの生成に失敗しました ! ! !\n");
+
+	return NULL;
+}
+
+//========================================================================
+// オブジェクトXクラスのコンストラクタ
+//========================================================================
+CObjectX::CObjectX(const int nPriority) :CObject(nPriority)
+{
+	// オブジェクトXクラスの値をクリア
+	m_pMesh = NULL;
+	m_pBuffMat = NULL;
+	memset(&m_apTexture[0], -1, sizeof m_apTexture);
+	m_pStrFileName = NULL;
+	m_dwNumMat = 0;
+	m_VtxMax = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_VtxMin = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_scale = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+	m_bDisp = true;
+}
+
+//========================================================================
+// オブジェクトXクラスのデストラクタ
+//========================================================================
+CObjectX::~CObjectX()
+{
+}
+
+//========================================================================
+// オブジェクトXクラスの初期化処理(オーバーロード)
+//========================================================================
+HRESULT CObjectX::Init(const D3DXVECTOR3 pos)
+{
+	// ローカル変数宣言
+	CRenderer* pRenderer = CManager::GetRenderer();			// レンダラーへのポインタ
+	LPDIRECT3DDEVICE9 pDevice = pRenderer->GetDevice();		// デバイスへのポインタ
+	CTexture* pTexture = CManager::GetTexture();			// テクスチャへのポインタ
+	D3DXMATERIAL* pMat;
+	int nNumVtx;			// 頂点数
+	DWORD dwSizeFVF;		// 頂点フォーマットのサイズ
+	BYTE* pVtxBuff;			// 頂点バッファへのポインタ
+
+	// モデルの情報の初期化
+	m_pos = pos;
+	m_scale = D3DXVECTOR3(1.0f, 1.0f, 1.0f);
+
+	// 最大値最小値の初期化
+	m_VtxMax = D3DXVECTOR3(-10000.0f, -10000.0f, -10000.0f);
+	m_VtxMin = D3DXVECTOR3(10000.0f, 10000.0f, 10000.0f);
+
+	// Xファイルの読み込み
+	if (FAILED(D3DXLoadMeshFromX(m_pStrFileName,
+		D3DXMESH_SYSTEMMEM,
+		pDevice,
+		NULL,
+		&m_pBuffMat,
+		NULL,
+		&m_dwNumMat,
+		&m_pMesh)))
+	{// ファイルの読み込みに失敗
+		OutputDebugStringA("! ! ! Xファイルの読み込みに失敗しました ! ! !\n");
+
+		return E_FAIL;
+	}
+
+	// マテリアルデータへのポインタを取得
+	pMat = (D3DXMATERIAL*)m_pBuffMat->GetBufferPointer();
+
+	// 色を保存
+	m_col = pMat->MatD3D.Diffuse;
+
+	for (int nCntMat = 0; nCntMat < (int)m_dwNumMat; nCntMat++)
+	{
+		if (pMat[nCntMat].pTextureFilename != NULL)
+		{// テクスチャファイルが存在する
+			m_apTexture[nCntMat] = pTexture->Register(pMat[nCntMat].pTextureFilename);
+		}
+	}
+
+	// 頂点数を取得
+	nNumVtx = m_pMesh->GetNumVertices();
+
+	// 頂点フォーマットのサイズを取得
+	dwSizeFVF = D3DXGetFVFVertexSize(m_pMesh->GetFVF());
+
+	// 頂点バッファをロック
+	m_pMesh->LockVertexBuffer(D3DLOCK_READONLY, (void**)&pVtxBuff);
+
+	for (int nCntVtx = 0; nCntVtx < nNumVtx; nCntVtx++)
+	{
+		D3DXVECTOR3 vtx = *(D3DXVECTOR3*)pVtxBuff;		// 頂点座標の代入
+
+		if (vtx.x > m_VtxMax.x)
+		{// Xの最大値
+			m_VtxMax.x = vtx.x;
+		}
+
+		if (vtx.x < m_VtxMin.x)
+		{// Xの最小値
+			m_VtxMin.x = vtx.x;
+		}
+
+		if (vtx.y > m_VtxMax.y)
+		{// Yの最大値
+			m_VtxMax.y = vtx.y;
+		}
+
+		if (vtx.y < m_VtxMin.y)
+		{// Yの最小値
+			m_VtxMin.y = vtx.y;
+		}
+
+		if (vtx.z > m_VtxMax.z)
+		{// Zの最大値
+			m_VtxMax.z = vtx.z;
+		}
+
+		if (vtx.z < m_VtxMin.z)
+		{// Zの最小値
+			m_VtxMin.z = vtx.z;
+		}
+
+		pVtxBuff += dwSizeFVF;		// 頂点バッファのサイズ分ポインタを進める
+	}
+
+	// 頂点バッファをアンロック
+	m_pMesh->UnlockVertexBuffer();
+
+	return S_OK;
+}
+
+//========================================================================
+// オブジェクトXクラスの終了処理
+//========================================================================
+void CObjectX::Uninit(void)
+{
+	// メッシュの破棄
+	if (m_pMesh != NULL)
+	{
+		m_pMesh->Release();
+		m_pMesh = NULL;
+	}
+
+	// マテリアルの破棄
+	if (m_pBuffMat != NULL)
+	{
+		m_pBuffMat->Release();
+		m_pBuffMat = NULL;
+	}
+
+	// テクスチャの破棄
+	for (int nCntModel = 0; nCntModel < MAX_MODEL_TEXTURE; nCntModel++)
+	{
+		m_apTexture[nCntModel] = -1;
+	}
+
+	// 自分自身を破棄
+	CObject::Release();
+}
+
+//========================================================================
+// オブジェクトXクラスの更新処理
+//========================================================================
+void CObjectX::Update(void)
+{
+	// ローカル変数
+	CCamera* pCamera = CManager::GetCamera();							// カメラの取得
+	CInputKeyboard* pInputKeyboard = CManager::GetInputKeyboard();		// キーボード入力の取得
+	D3DXVECTOR3 pos = CObjectX::GetPosition();
+	D3DXVECTOR3 rot = CObjectX::GetRotation();
+	D3DXVECTOR3 CameraRot = pCamera->GetRotation();
+	static D3DXVECTOR3 move = {};
+
+	if (pInputKeyboard->GetPress(DIK_W) == true)		// キーボード移動
+	{// 奥に移動
+		if (pInputKeyboard->GetPress(DIK_A) == true)
+		{// 左奥に移動
+			move.x += sinf(-D3DX_PI * 0.75f - CameraRot.y) * MOVEMENT.x;
+			move.z += cosf(-D3DX_PI * 0.25f + CameraRot.y) * MOVEMENT.z;
+		}
+		else if (pInputKeyboard->GetPress(DIK_D) == true)
+		{// 右奥に移動
+			move.x += sinf(D3DX_PI * 0.75f - CameraRot.y) * MOVEMENT.x;
+			move.z += cosf(D3DX_PI * 0.25f + CameraRot.y) * MOVEMENT.z;
+		}
+		else if (pInputKeyboard->GetPress(DIK_W) == true)
+		{// 奥に移動
+			move.x += sinf(D3DX_PI * 0.0f + CameraRot.y) * MOVEMENT.x;
+			move.z += cosf(D3DX_PI * 0.0f + CameraRot.y) * MOVEMENT.z;
+		}
+
+		// 進んだ方向に角度を向ける
+		rot.y = atan2f(move.x, move.z) + D3DX_PI;
+	}
+	else if (pInputKeyboard->GetPress(DIK_S) == true)
+	{// 手前に移動
+		if (pInputKeyboard->GetPress(DIK_A) == true)
+		{// 左手前に移動
+			move.x += sinf(-D3DX_PI * 0.25f - CameraRot.y) * MOVEMENT.x;
+			move.z += cosf(-D3DX_PI * 0.75f + CameraRot.y) * MOVEMENT.z;
+		}
+		else if (pInputKeyboard->GetPress(DIK_D) == true)
+		{// 右手前に移動
+			move.x += sinf(D3DX_PI * 0.25f - CameraRot.y) * MOVEMENT.x;
+			move.z += cosf(D3DX_PI * 0.75f + CameraRot.y) * MOVEMENT.z;
+		}
+		else if (pInputKeyboard->GetPress(DIK_S) == true)
+		{// 手前に移動
+			move.x += sinf(D3DX_PI * 1.0f + CameraRot.y) * MOVEMENT.x;
+			move.z += cosf(D3DX_PI * 1.0f + CameraRot.y) * MOVEMENT.z;
+		}
+
+		// 進んだ方向に角度を向ける
+		rot.y = atan2f(move.x, move.z) + D3DX_PI;
+	}
+	else if (pInputKeyboard->GetPress(DIK_A) == true)
+	{// 左に移動
+		move.x += sinf(-D3DX_PI * 0.5f + CameraRot.y) * MOVEMENT.x;
+		move.z += cosf(-D3DX_PI * 0.5f + CameraRot.y) * MOVEMENT.z;
+
+		// 進んだ方向に角度を向ける
+		rot.y = atan2f(move.x, move.z) + D3DX_PI;
+	}
+	else if (pInputKeyboard->GetPress(DIK_D) == true)
+	{// 右に移動
+		move.x += sinf(D3DX_PI * 0.5f + CameraRot.y) * MOVEMENT.x;
+		move.z += cosf(D3DX_PI * 0.5f + CameraRot.y) * MOVEMENT.z;
+
+		// 進んだ方向に角度を向ける
+		rot.y = atan2f(move.x, move.z) + D3DX_PI;
+	}
+
+	if (pInputKeyboard->GetTrigger(DIK_BACKSPACE) == true)
+	{// 位置回転リセット
+		pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+		rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+		move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	}
+
+	// 位置に移動量を加算
+	pos += move;
+
+	// 移動量に慣性
+	move.x += (0.0f - move.x) * 0.3f;
+	move.z += (0.0f - move.z) * 0.3f;
+
+	// 位置/向きを適用
+	SetPosition(pos);
+	SetRotation(rot);
+}
+
+//========================================================================
+// オブジェクトXクラスの描画処理
+//========================================================================
+void CObjectX::Draw(void)
+{
+	if (m_bDisp == false)
+	{// 表示しない場合
+		return;
+	}
+
+	// ローカル変数宣言
+	CRenderer* pRenderer = CManager::GetRenderer();			// レンダラーへのポインタ
+	LPDIRECT3DDEVICE9 pDevice = pRenderer->GetDevice();		// デバイスへのポインタ
+	CTexture* pTexture = CManager::GetTexture();			// テクスチャへのポインタ
+	D3DXMATRIX mtxRot, mtxTrans, mtxScale;		// 計算用マトリックス
+	D3DMATERIAL9 matDef;						// 現在のマテリアル保存用
+	D3DXMATERIAL* pMat;							// マテリアルデータへのポインタ
+
+	// ワールドマトリックスの初期化
+	D3DXMatrixIdentity(&m_mtxWorld);
+
+	// 向きを反映
+	D3DXMatrixRotationYawPitchRoll(&mtxRot, m_rot.y, m_rot.x, m_rot.z);
+	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxRot);
+
+	// 位置を反映
+	D3DXMatrixTranslation(&mtxTrans, m_pos.x, m_pos.y, m_pos.z);
+	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxTrans);
+
+	// スケールを反映
+	D3DXMatrixScaling(&mtxScale, m_scale.x, m_scale.y, m_scale.z);
+	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxScale);
+
+	// ワールドマトリックスの設定
+	pDevice->SetTransform(D3DTS_WORLD, &m_mtxWorld);
+
+	// 現在のマテリアルを取得
+	pDevice->GetMaterial(&matDef);
+
+	// マテリアルデータへのポインタを取得
+	pMat = (D3DXMATERIAL*)m_pBuffMat->GetBufferPointer();
+
+	for (int nCntMat = 0; nCntMat < (int)m_dwNumMat; nCntMat++)
+	{
+		// 色保存用
+		D3DXCOLOR MatCol = pMat->MatD3D.Diffuse;
+
+		// マテリアルの色を変更
+		pMat->MatD3D.Diffuse = m_col;
+
+		// マテリアルの設定
+		pDevice->SetMaterial(&pMat[nCntMat].MatD3D);
+
+		// 色を戻す
+		pMat->MatD3D.Diffuse = MatCol;
+
+		// テクスチャの設定
+		pDevice->SetTexture(0, pTexture->GetAddress(m_apTexture[nCntMat]));
+
+		// モデルパーツの描画
+		m_pMesh->DrawSubset(nCntMat);
+	}
+
+	// 保存していたマテリアルを戻す
+	pDevice->SetMaterial(&matDef);
+}
+
+//========================================================================
+// 位置設定
+//========================================================================
+void CObjectX::SetPosition(const D3DXVECTOR3 pos)
+{
+	// 位置を変更
+	m_pos = pos;
+}
+
+//========================================================================
+// スケール設定
+//========================================================================
+void CObjectX::SetScale(const D3DXVECTOR3 scale)
+{
+	// スケールを変更
+	m_scale = scale;
+}
+
+//========================================================================
+// 角度設定
+//========================================================================
+void CObjectX::SetRotation(const D3DXVECTOR3 rot)
+{
+	// X向きを調整
+	if (m_rot.x > D3DX_PI)
+	{
+		m_rot.x -= D3DX_PI * 2.0f;
+	}
+	else if (m_rot.x < -D3DX_PI)
+	{
+		m_rot.x += D3DX_PI * 2.0f;
+	}
+
+	// Y向きを調整
+	if (m_rot.y > D3DX_PI)
+	{
+		m_rot.y -= D3DX_PI * 2.0f;
+	}
+	else if (m_rot.y < -D3DX_PI)
+	{
+		m_rot.y += D3DX_PI * 2.0f;
+	}
+
+	// Z向きを調整
+	if (m_rot.z > D3DX_PI)
+	{
+		m_rot.z -= D3DX_PI * 2.0f;
+	}
+	else if (m_rot.z < -D3DX_PI)
+	{
+		m_rot.z += D3DX_PI * 2.0f;
+	}
+
+	// 向きを変更
+	m_rot = rot;
+}
+
+//========================================================================
+// 頂点カラー設定
+//========================================================================
+void CObjectX::SetColor(const D3DXCOLOR col)
+{
+	m_col = col;
+}
