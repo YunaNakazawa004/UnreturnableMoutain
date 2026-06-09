@@ -20,7 +20,7 @@
 // オブジェクトビルボードクラスの生成処理
 //========================================================================
 CObjectBillboard* CObjectBillboard::Create(const D3DXVECTOR3 pos, const float fWidth, const float fHeight,
-	const CObject::TYPE type, const int nPriority)
+	const CObject::TYPE type, const char* pFilename, const int nPriority)
 {
 	if (CObject::GetNumAll() >= MAX_OBJECT)
 	{// 最大数のオブジェクトが存在する
@@ -47,9 +47,9 @@ CObjectBillboard* CObjectBillboard::Create(const D3DXVECTOR3 pos, const float fW
 			return NULL;
 		}
 
-		// テクスチャを設定(そのうち派生クラスに移動)
+		// テクスチャを設定
 		CTexture* pTexture = CManager::GetTexture();			// テクスチャへのポインタ
-		pObjectBillboard->m_nTextureIdx = pTexture->Register("data\\TEXTURE\\tree000.png");
+		pObjectBillboard->m_nTextureIdx = pTexture->Register(pFilename);
 
 		// 種類を設定
 		pObjectBillboard->SetType(type);

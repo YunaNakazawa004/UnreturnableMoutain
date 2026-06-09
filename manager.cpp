@@ -189,10 +189,10 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	CNumber::Load();
 
 	// 3Dオブジェクトを生成
-	CObject3D::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), 100.0f, 100.0f, CObject::TYPE_OBJECT3D, 3);
+	CObject3D::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), 100.0f, 100.0f, CObject::TYPE_OBJECT3D, "data\\TEXTURE\\field000.jpg", 3);
 
 	// ビルボードオブジェクトを生成
-	CObjectBillboard::Create(D3DXVECTOR3(50.0f, 50.0f, 0.0f), 50.0f, 50.0f, CObject::TYPE_OBJECTBILLBOARD, 3);
+	CObjectBillboard::Create(D3DXVECTOR3(50.0f, 50.0f, 0.0f), 50.0f, 50.0f, CObject::TYPE_OBJECTBILLBOARD, "data\\TEXTURE\\tree000.png", 3);
 
 	// プレイヤーを生成
 	if (m_pPlayer == NULL)

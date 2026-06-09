@@ -24,7 +24,8 @@ public:
 	CObjectX(const int nPriority);
 	virtual ~CObjectX();
 
-	static CObjectX* Create(const D3DXVECTOR3 pos, const CObject::TYPE type, const int nPriority = BG_PRIORITY);
+	static CObjectX* Create(const D3DXVECTOR3 pos, const CObject::TYPE type, const char* pFilename, 
+		const int nPriority = BG_PRIORITY);
 	HRESULT Init(void) { return S_OK; }
 	HRESULT Init(const D3DXVECTOR3 pos);
 	void Uninit(void);

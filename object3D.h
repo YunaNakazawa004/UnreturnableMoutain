@@ -19,8 +19,8 @@ public:
 	CObject3D(const int nPriority);
 	virtual ~CObject3D();
 
-	static CObject3D* Create(const D3DXVECTOR3 pos, const float fWidth, const float fDepth, const CObject::TYPE type,
-		const int nPriority = BG_PRIORITY);
+	static CObject3D* Create(const D3DXVECTOR3 pos, const float fWidth, const float fDepth, 
+		const CObject::TYPE type, const char *pFilename, const int nPriority = BG_PRIORITY);
 	HRESULT Init(void) { return S_OK; }
 	HRESULT Init(const D3DXVECTOR3 pos, const float fWidth, const float fDepth);
 	void Uninit(void);

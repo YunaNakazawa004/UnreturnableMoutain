@@ -16,14 +16,13 @@
 //************************************************************************
 // マクロ定義
 //************************************************************************
-#define MODEL_FILE				"data\\MODEL\\car000.x"					// モデルのファイル名(デバッグ用)
 #define MOVEMENT				(D3DXVECTOR3(0.6f, 0.6f, 0.6f))			// 移動量
 #define ROT						(D3DXVECTOR3(0.05f, 0.05f, 0.05f))		// 向き移動量
 
 //========================================================================
 // オブジェクトXクラスの生成処理
 //========================================================================
-CObjectX* CObjectX::Create(const D3DXVECTOR3 pos, const CObject::TYPE type, const int nPriority)
+CObjectX* CObjectX::Create(const D3DXVECTOR3 pos, const CObject::TYPE type, const char* pFilename, const int nPriority)
 {
 	if (CObject::GetNumAll() >= MAX_OBJECT)
 	{// 最大数のオブジェクトが存在する
@@ -42,8 +41,8 @@ CObjectX* CObjectX::Create(const D3DXVECTOR3 pos, const CObject::TYPE type, cons
 
 	if (pObjectX != NULL)
 	{// NULLチェック
-		// モデルファイル設定(デバッグ用)
-		pObjectX->BindModel(MODEL_FILE);
+		// モデルファイル設定
+		pObjectX->BindModel(pFilename);
 
 		// 初期化処理
 		if (FAILED(pObjectX->Init(pos)))

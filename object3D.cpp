@@ -20,7 +20,7 @@
 // オブジェクト3Dクラスの生成処理
 //========================================================================
 CObject3D* CObject3D::Create(const D3DXVECTOR3 pos, const float fWidth, const float fDepth,
-	const CObject::TYPE type, const int nPriority)
+	const CObject::TYPE type, const char* pFilename, const int nPriority)
 {
 	if (CObject::GetNumAll() >= MAX_OBJECT)
 	{// 最大数のオブジェクトが存在する
@@ -47,9 +47,9 @@ CObject3D* CObject3D::Create(const D3DXVECTOR3 pos, const float fWidth, const fl
 			return NULL;
 		}
 
-		// テクスチャを設定(そのうち派生クラスに移動)
+		// テクスチャを設定
 		CTexture* pTexture = CManager::GetTexture();			// テクスチャへのポインタ
-		pObject3D->m_nIdxTexture = pTexture->Register("data\\TEXTURE\\field000.jpg");
+		pObject3D->m_nIdxTexture = pTexture->Register(pFilename);
 
 		// 種類を設定
 		pObject3D->SetType(type);
