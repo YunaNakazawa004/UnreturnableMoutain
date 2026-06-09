@@ -147,8 +147,8 @@ void CCamera::Update(void)
 		m_posVDest.y = m_posRDest.y + cosf((D3DX_PI * 0.5f) - m_fAngle) * m_fDistance;
 		m_posVDest.z = m_posRDest.z + cosf(D3DX_PI + m_rot.y) * m_fDistance * sinf((D3DX_PI * 0.5f) - m_fAngle);
 
-		if (pInputKeyboard->GetPress(DIK_J) == true || 
-			pInputJoypad->GetStick(0, CInputJoypad::JOYKEY_RIGHTSTICK_LEFT, &nValueH, &nValueV) == true)
+		// 視点移動(キーボード)
+		if (pInputKeyboard->GetPress(DIK_J) == true)
 		{// 右に旋回
 			m_rot.y += -ROT.y;
 
@@ -156,8 +156,7 @@ void CCamera::Update(void)
 			m_posVDest.y = m_posRDest.y + cosf((D3DX_PI * 0.5f) - m_fAngle) * m_fDistance;
 			m_posVDest.z = m_posRDest.z + cosf(D3DX_PI + m_rot.y) * m_fDistance * sinf((D3DX_PI * 0.5f) - m_fAngle);
 		}
-		else if (pInputKeyboard->GetPress(DIK_L) == true || 
-			pInputJoypad->GetStick(0, CInputJoypad::JOYKEY_RIGHTSTICK_RIGHT, &nValueH, &nValueV) == true)
+		else if (pInputKeyboard->GetPress(DIK_L) == true)
 		{// 左に旋回
 			m_rot.y += ROT.y;
 
@@ -166,9 +165,7 @@ void CCamera::Update(void)
 			m_posVDest.z = m_posRDest.z + cosf(D3DX_PI + m_rot.y) * m_fDistance * sinf((D3DX_PI * 0.5f) - m_fAngle);
 		}
 
-		// 視点移動
-		if (pInputKeyboard->GetPress(DIK_K) == true || 
-			pInputJoypad->GetStick(0, CInputJoypad::JOYKEY_RIGHTSTICK_DOWN, &nValueH, &nValueV) == true)
+		if (pInputKeyboard->GetPress(DIK_K) == true)
 		{// 上に移動
 			m_fAngle += ROT.y;
 
@@ -183,8 +180,7 @@ void CCamera::Update(void)
 			m_posVDest.y = m_posRDest.y + cosf((D3DX_PI * 0.5f) - m_fAngle) * m_fDistance;
 			m_posVDest.z = m_posRDest.z + cosf(D3DX_PI + m_rot.y) * m_fDistance * sinf((D3DX_PI * 0.5f) - m_fAngle);
 		}
-		else if (pInputKeyboard->GetPress(DIK_I) == true || 
-			pInputJoypad->GetStick(0, CInputJoypad::JOYKEY_RIGHTSTICK_UP, &nValueH, &nValueV) == true)
+		else if (pInputKeyboard->GetPress(DIK_I) == true)
 		{// 下に移動
 			m_fAngle += -ROT.y;
 
@@ -200,7 +196,7 @@ void CCamera::Update(void)
 			m_posVDest.z = m_posRDest.z + cosf(D3DX_PI + m_rot.y) * m_fDistance * sinf((D3DX_PI * 0.5f) - m_fAngle);
 		}
 
-		// 視点移動
+		// 視点移動(マウス)
 		if (pInputMouse->GetPress(CInputMouse::MOUSEBUTTON_LEFT) == true &&
 			pInputMouse->GetPress(CInputMouse::MOUSEBUTTON_RIGHT) == false)
 		{// クリックされている間
@@ -225,6 +221,35 @@ void CCamera::Update(void)
 			m_posVDest.y = m_posRDest.y + cosf((D3DX_PI * 0.5f) - m_fAngle) * m_fDistance;
 			m_posVDest.z = m_posRDest.z + cosf(D3DX_PI + m_rot.y) * m_fDistance * sinf((D3DX_PI * 0.5f) - m_fAngle);
 		}
+
+		// 視点移動(ジョイパッド)
+		if (pInputJoypad->GetStick(0, CInputJoypad::JOYKEY_RIGHTSTICK, &nValueH, &nValueV) == true)
+		{// クリックされている間
+			// 最初にクリックされた位置から今の位置までの距離を求める
+			D3DXVECTOR3 dist = MousePos - ClickPos;
+
+			// 視点移動
+			m_rot.y += (float)(nValueH) * 0.000002f;
+			m_fAngle -= (float)(nValueV) * 0.000002f;
+
+			if (m_fAngle > D3DX_PI * 0.4f)
+			{// 上の制限
+				m_fAngle = D3DX_PI * 0.4f;
+			}
+
+			if (m_fAngle < -D3DX_PI * 0.4f)
+			{// 下の制限
+				m_fAngle = -D3DX_PI * 0.4f;
+			}
+
+			m_posVDest.x = m_posRDest.x + sinf(D3DX_PI + m_rot.y) * m_fDistance * sinf((D3DX_PI * 0.5f) - m_fAngle);
+			m_posVDest.y = m_posRDest.y + cosf((D3DX_PI * 0.5f) - m_fAngle) * m_fDistance;
+			m_posVDest.z = m_posRDest.z + cosf(D3DX_PI + m_rot.y) * m_fDistance * sinf((D3DX_PI * 0.5f) - m_fAngle);
+		}
+
+		pDebugProc->Print("*** カメラ ***\n");
+		pDebugProc->Print("視点の位置 : ( %f %f %f )\n", m_posV.x, m_posV.y, m_posV.z);
+		pDebugProc->Print("注視点の位置 : ( %f %f %f )\n", m_posR.x, m_posR.y, m_posR.z);
 
 		// カメラ向きを調整
 		CorrectAngle(&m_rot.y, m_rot.y);
@@ -289,10 +314,6 @@ void CCamera::Update(void)
 			m_posRDest.y = m_posVDest.y + cosf((D3DX_PI * 0.5f) - m_fAngle) * -m_fDistance;
 			m_posRDest.z = m_posVDest.z + cosf(m_rot.y) * m_fDistance * sinf((D3DX_PI * 0.5f) - m_fAngle);
 		}
-
-		pDebugProc->Print("*** カメラ ***\n");
-		pDebugProc->Print("視点の位置 : ( %f %f %f )\n", m_posV.x, m_posV.y, m_posV.z);
-		pDebugProc->Print("注視点の位置 : ( %f %f %f )\n", m_posR.x, m_posR.y, m_posR.z);
 
 		// 並行移動
 		if (pInputKeyboard->GetPress(DIK_UP) == true)		// キーボード移動

@@ -17,11 +17,13 @@
 #include "motion.h"
 #include "effect3D.h"
 #include "particle3D.h"
+#include "energyrock.h"
 
 //************************************************************************
 // マクロ定義
 //************************************************************************
-#define MOVEMENT		(D3DXVECTOR3(0.6f, 0.6f, 0.6f))			// 移動量
+#define LAND_MOVEMENT	(D3DXVECTOR3(0.6f, 0.6f, 0.6f))			// 移動量(地上)
+#define AIR_MOVEMENT	(D3DXVECTOR3(0.1f, 0.1f, 0.1f))			// 移動量(空中)
 #define MOVE_INERTIA	(0.1f)									// 移動量の慣性
 #define ROT				(D3DXVECTOR3(0.05f, 0.05f, 0.05f))		// 向き移動量
 #define ONE_LINE		(100)									// ファイルの一行として読み取る文字数
@@ -174,132 +176,21 @@ void CPlayer::Uninit(void)
 void CPlayer::Update(void)
 {
 	// ローカル変数
-	CCamera* pCamera = CManager::GetCamera();							// カメラの取得
 	CInputKeyboard* pInputKeyboard = CManager::GetInputKeyboard();		// キーボード入力の取得
+	CInputJoypad* pInputJoypad = CManager::GetInputJoypad();			// ジョイパッド入力の取得
 	CDebugProc* pDebugProc = CManager::GetDebugProc();					// デバッグ表示の取得
 	D3DXVECTOR3 pos = CPlayer::GetPosition();				// プレイヤーの位置	
 	D3DXVECTOR3 rot = CPlayer::GetRotation();				// プレイヤーの向き
-	D3DXVECTOR3 CameraRot = pCamera->GetRotation();			// カメラの向き
 
-	D3DXVECTOR3 UnderRotOff = m_apModel[0]->GetRotOffC();	// 下半身の傾き(オフセット保存)
-	D3DXVECTOR3 UnderRot = m_apModel[0]->GetRotOff();		// 下半身の傾き(オフセットをいじる)
 	D3DXVECTOR3 UpperPosOff = m_apModel[1]->GetPosOffC();	// 上半身の位置(オフセット保存)
 	D3DXVECTOR3 UpperPos = m_apModel[1]->GetPosOff();		// 上半身の位置(オフセットをいじる)
-	D3DXVECTOR3 UpperRotOff = m_apModel[1]->GetRotOffC();	// 上半身の傾き(オフセット保存)
-	D3DXVECTOR3 UpperRot = m_apModel[1]->GetRotOff();		// 上半身の傾き(オフセットをいじる)
-	D3DXVECTOR3 TireRotOff = m_apModel[2]->GetRotOffC();	// タイヤの傾き(オフセット保存)
-	D3DXVECTOR3 TireRot = m_apModel[2]->GetRotOff();		// タイヤの傾き(オフセットをいじる)
 
-	// 8方向移動
-	if (pInputKeyboard->GetPress(DIK_W) == true)
-	{// 奥に移動
-		if (pInputKeyboard->GetPress(DIK_A) == true)
-		{// 左奥に移動
-			m_move.x += sinf(D3DX_PI * 0.25f - rot.y) * MOVEMENT.x;
-			m_move.z += cosf(D3DX_PI * 0.75f + rot.y) * MOVEMENT.z;
-
-			// 進んだ方向にモデルを傾ける
-			UnderRot.z = -MODEL_ROT;
-			UpperRot.z = -MODEL_ROT;
-
-			// 進んだ方向に角度を向ける
-			m_rotDest.y = rot.y + (-D3DX_PI * 0.15f);
-		}
-		else if (pInputKeyboard->GetPress(DIK_D) == true)
-		{// 右奥に移動
-			m_move.x += sinf(-D3DX_PI * 0.25f - rot.y) * MOVEMENT.x;
-			m_move.z += cosf(-D3DX_PI * 0.75f + rot.y) * MOVEMENT.z;
-
-			// 進んだ方向にモデルを傾ける
-			UnderRot.z = MODEL_ROT;
-			UpperRot.z = MODEL_ROT;
-
-			// 進んだ方向に角度を向ける
-			m_rotDest.y = rot.y + (D3DX_PI * 0.15f);
-		}
-		else if (pInputKeyboard->GetPress(DIK_W) == true)
-		{// 奥に移動
-			m_move.x += sinf(D3DX_PI * 1.0f + rot.y) * MOVEMENT.x;
-			m_move.z += cosf(D3DX_PI * 1.0f + rot.y) * MOVEMENT.z;
-		}
-
-		// 進んだ方向にモデルを傾ける
-		UnderRot.x = -MODEL_ROT;
-		UpperRot.x = -MODEL_ROT;
-		TireRot.x += -TIRE_ROT;
-
-		// モーションを設定
-		m_pMotion->Set(MOTIONTYPE_MOVE, true, 20);
-	}
-	else if (pInputKeyboard->GetPress(DIK_S) == true)
-	{// 手前に移動
-		if (pInputKeyboard->GetPress(DIK_A) == true)
-		{// 左手前に移動
-			m_move.x += sinf(D3DX_PI * 0.75f - rot.y) * MOVEMENT.x;
-			m_move.z += cosf(D3DX_PI * 0.25f + rot.y) * MOVEMENT.z;
-
-			// 進んだ方向にモデルを傾ける
-			UnderRot.z = -MODEL_ROT;
-			UpperRot.z = -MODEL_ROT;
-
-			// 進んだ方向に角度を向ける
-			m_rotDest.y = rot.y + (D3DX_PI * 0.15f);
-		}
-		else if (pInputKeyboard->GetPress(DIK_D) == true)
-		{// 右手前に移動
-			m_move.x += sinf(-D3DX_PI * 0.75f - rot.y) * MOVEMENT.x;
-			m_move.z += cosf(-D3DX_PI * 0.25f + rot.y) * MOVEMENT.z;
-
-			// 進んだ方向にモデルを傾ける
-			UnderRot.z = MODEL_ROT;
-			UpperRot.z = MODEL_ROT;
-
-			// 進んだ方向に角度を向ける
-			m_rotDest.y = rot.y + (-D3DX_PI * 0.15f);
-		}
-		else if (pInputKeyboard->GetPress(DIK_S) == true)
-		{// 手前に移動
-			m_move.x += sinf(D3DX_PI * 0.0f + rot.y) * MOVEMENT.x;
-			m_move.z += cosf(D3DX_PI * 0.0f + rot.y) * MOVEMENT.z;
-		}
-
-		// 進んだ方向にモデルを傾ける
-		UnderRot.x = MODEL_ROT;
-		UpperRot.x = MODEL_ROT;
-		TireRot.x += TIRE_ROT;
-
-		// モーションを設定
-		m_pMotion->Set(MOTIONTYPE_MOVE, true, 20);
-	}
-	else if (pInputKeyboard->GetPress(DIK_A) == true)
-	{// 左に移動
-		// 進んだ方向にモデルを傾ける
-		UpperRot.z = -MODEL_ROT;
-
-		// モーションを設定
-		m_pMotion->Set(MOTIONTYPE_MOVE, true, 20);
-	}
-	else if (pInputKeyboard->GetPress(DIK_D) == true)
-	{// 右に移動
-		// 進んだ方向にモデルを傾ける
-		UpperRot.z = MODEL_ROT;
-
-		// モーションを設定
-		m_pMotion->Set(MOTIONTYPE_MOVE, true, 20);
-	}
-	else
-	{// 動いてない
-		// オフセットに戻す
-		UpperRot = UpperRotOff;
-		UnderRot = UnderRotOff;
-
-		// モーションを設定
-		m_pMotion->Set(MOTIONTYPE_NEUTRAL, true, 20);
-	}
+	// 移動処理
+	Movement(rot);
 
 	if (m_bJump == false)
 	{// ジャンプしていないとき
-		if (pInputKeyboard->GetPress(DIK_SPACE) == true)
+		if (pInputKeyboard->GetPress(DIK_SPACE) == true || pInputJoypad->GetPress(0, CInputJoypad::JOYKEY_A) == true)
 		{// ジャンプキー長押し
 			// ジャンプ量を上げる
 			m_fJumpHigh += JUMP_ADD;
@@ -315,7 +206,7 @@ void CPlayer::Update(void)
 			}
 		}
 
-		if (pInputKeyboard->GetRelease(DIK_SPACE) == true)
+		if (pInputKeyboard->GetRelease(DIK_SPACE) == true || pInputJoypad->GetRelease(0, CInputJoypad::JOYKEY_A) == true)
 		{// ジャンプ
 			m_bJump = true;
 			m_move.y = JUMP_HEIGHT + (JUMP_HEIGHT * m_fJumpHigh);
@@ -337,10 +228,15 @@ void CPlayer::Update(void)
 	// 位置に移動量を加算
 	pos += m_move;
 
-	// 移動量に慣性
-	m_move.x += (0.0f - m_move.x) * MOVE_INERTIA;
+	// 重力
 	m_move.y += GRAVITY;
-	m_move.z += (0.0f - m_move.z) * MOVE_INERTIA;
+	
+	if (m_bJump == false)
+	{// 地上では慣性
+		// 移動量に慣性
+		m_move.x += (0.0f - m_move.x) * MOVE_INERTIA;
+		m_move.z += (0.0f - m_move.z) * MOVE_INERTIA;
+	}
 
 	if (pos.y < 0.0f)
 	{// 地面との当たり判定
@@ -369,15 +265,21 @@ void CPlayer::Update(void)
 	// 角度を慣性ありで加算
 	rot.y += (m_rotDest.y - rot.y) * 0.1f;
 
+	// 当たり判定
+	if (CollisionEnergyRock(pos) == true)
+	{// エネルギー鉱物と当たっているとき
+		if (pInputKeyboard->GetTrigger(DIK_RETURN) == true)
+		{// 回収するキーを押した
+
+		}
+	}
+
 	// 位置/向きを適用
 	SetPosition(pos);
 	SetRotation(rot);
 
-	// モデルの位置/向きを適用
-	m_apModel[0]->SetRotOff(UnderRot);
+	// モデルの位置を適用
 	m_apModel[1]->SetPosOff(UpperPos);
-	m_apModel[1]->SetRotOff(UpperRot);
-	m_apModel[2]->SetRotOff(TireRot);
 
 	// モーションの更新
 	m_pMotion->Update();
@@ -502,6 +404,227 @@ void CPlayer::SetColor(const D3DXCOLOR col)
 			m_apModel[nCntModel]->SetColor(col);
 		}
 	}
+}
+
+//========================================================================
+// プレイヤーの移動処理
+//========================================================================
+bool CPlayer::Movement(const D3DXVECTOR3 rot)
+{
+	// ローカル変数
+	CInputKeyboard* pInputKeyboard = CManager::GetInputKeyboard();		// キーボード入力の取得
+	CInputJoypad* pInputJoypad = CManager::GetInputJoypad();			// ジョイパッド入力の取得
+
+	D3DXVECTOR3 UnderRotOff = m_apModel[0]->GetRotOffC();	// 下半身の傾き(オフセット保存)
+	D3DXVECTOR3 UnderRot = m_apModel[0]->GetRotOff();		// 下半身の傾き(オフセットをいじる)
+	D3DXVECTOR3 UpperPosOff = m_apModel[1]->GetPosOffC();	// 上半身の位置(オフセット保存)
+	D3DXVECTOR3 UpperPos = m_apModel[1]->GetPosOff();		// 上半身の位置(オフセットをいじる)
+	D3DXVECTOR3 UpperRotOff = m_apModel[1]->GetRotOffC();	// 上半身の傾き(オフセット保存)
+	D3DXVECTOR3 UpperRot = m_apModel[1]->GetRotOff();		// 上半身の傾き(オフセットをいじる)
+	D3DXVECTOR3 TireRotOff = m_apModel[2]->GetRotOffC();	// タイヤの傾き(オフセット保存)
+	D3DXVECTOR3 TireRot = m_apModel[2]->GetRotOff();		// タイヤの傾き(オフセットをいじる)
+
+	D3DXVECTOR3 UnderRotDest = { 0.0f,0.0f,0.0f };			// 下半身の目的の傾き
+	D3DXVECTOR3 UpperRotDest = { 0.0f,0.0f,0.0f };			// 上半身の目的の傾き
+
+	bool bMove = false;
+	int nValueH, nValueV;
+
+	if (pInputJoypad->GetStick(0, CInputJoypad::JOYKEY_LEFTSTICK, &nValueH, &nValueV) == true)
+	{// スティック移動
+		float fSpeed = -(float)nValueV * 0.0000183f;		// スピード
+
+		m_move.x += sinf(rot.y) * (m_bJump ? fSpeed / 6.0f : fSpeed);
+		m_move.z += cosf(rot.y) * (m_bJump ? fSpeed / 6.0f : fSpeed);
+
+		// 進んだ方向にモデルを傾ける
+		UnderRotDest.x = MODEL_ROT * ((nValueV < 0) ? 1 : -1);
+		UnderRotDest.z = MODEL_ROT * ((nValueH < 0) ? -1 : 1);
+		UpperRotDest.x = MODEL_ROT * ((nValueV < 0) ? 1 : -1);
+		UpperRotDest.z = MODEL_ROT * ((nValueH < 0) ? -1 : 1);
+		TireRot.x += TIRE_ROT * ((nValueV < 0) ? 1 : -1); 
+
+		// 進んだ方向に角度を向ける
+		m_rotDest.y = rot.y + ((float)nValueH * 0.00001f * ((nValueV < 0) ? -1 : 1));
+
+		// モーションを設定
+		m_pMotion->Set(MOTIONTYPE_MOVE, true, 20);
+
+		bMove = true;
+	}
+	else if (pInputKeyboard->GetPress(DIK_W) == true || pInputJoypad->GetPress(0, CInputJoypad::JOYKEY_UP) == true)	// ↓8方向移動
+	{// 奥に移動
+		if (pInputKeyboard->GetPress(DIK_A) == true || pInputJoypad->GetPress(0, CInputJoypad::JOYKEY_LEFT) == true)
+		{// 左奥に移動
+			m_move.x += sinf(D3DX_PI * 0.25f - rot.y) * (m_bJump ? AIR_MOVEMENT.x : LAND_MOVEMENT.x);
+			m_move.z += cosf(D3DX_PI * 0.75f + rot.y) * (m_bJump ? AIR_MOVEMENT.z : LAND_MOVEMENT.z);
+
+			// 進んだ方向にモデルを傾ける
+			UnderRotDest.z = -MODEL_ROT;
+			UpperRotDest.z = -MODEL_ROT;
+
+			// 進んだ方向に角度を向ける
+			m_rotDest.y = rot.y + (-D3DX_PI * 0.15f);
+		}
+		else if (pInputKeyboard->GetPress(DIK_D) == true || pInputJoypad->GetPress(0, CInputJoypad::JOYKEY_RIGHT) == true)
+		{// 右奥に移動
+			m_move.x += sinf(-D3DX_PI * 0.25f - rot.y) * (m_bJump ? AIR_MOVEMENT.x : LAND_MOVEMENT.x);
+			m_move.z += cosf(-D3DX_PI * 0.75f + rot.y) * (m_bJump ? AIR_MOVEMENT.z : LAND_MOVEMENT.z);
+
+			// 進んだ方向にモデルを傾ける
+			UnderRotDest.z = MODEL_ROT;
+			UpperRotDest.z = MODEL_ROT;
+
+			// 進んだ方向に角度を向ける
+			m_rotDest.y = rot.y + (D3DX_PI * 0.15f);
+		}
+		else if (pInputKeyboard->GetPress(DIK_W) == true || pInputJoypad->GetPress(0, CInputJoypad::JOYKEY_UP) == true)
+		{// 奥に移動
+			m_move.x += sinf(D3DX_PI * 1.0f + rot.y) * (m_bJump ? AIR_MOVEMENT.x : LAND_MOVEMENT.x);
+			m_move.z += cosf(D3DX_PI * 1.0f + rot.y) * (m_bJump ? AIR_MOVEMENT.z : LAND_MOVEMENT.z);
+		}
+
+		// 進んだ方向にモデルを傾ける
+		UnderRotDest.x = -MODEL_ROT;
+		UpperRotDest.x = -MODEL_ROT;
+		TireRot.x += -TIRE_ROT;
+
+		// モーションを設定
+		m_pMotion->Set(MOTIONTYPE_MOVE, true, 20);
+
+		bMove = true;
+	}
+	else if (pInputKeyboard->GetPress(DIK_S) == true || pInputJoypad->GetPress(0, CInputJoypad::JOYKEY_DOWN) == true)
+	{// 手前に移動
+		if (pInputKeyboard->GetPress(DIK_A) == true || pInputJoypad->GetPress(0, CInputJoypad::JOYKEY_LEFT) == true)
+		{// 左手前に移動
+			m_move.x += sinf(D3DX_PI * 0.75f - rot.y) * (m_bJump ? AIR_MOVEMENT.x : LAND_MOVEMENT.x);
+			m_move.z += cosf(D3DX_PI * 0.25f + rot.y) * (m_bJump ? AIR_MOVEMENT.z : LAND_MOVEMENT.z);
+
+			// 進んだ方向にモデルを傾ける
+			UnderRotDest.z = -MODEL_ROT;
+			UpperRotDest.z = -MODEL_ROT;
+
+			// 進んだ方向に角度を向ける
+			m_rotDest.y = rot.y + (D3DX_PI * 0.15f);
+		}
+		else if (pInputKeyboard->GetPress(DIK_D) == true || pInputJoypad->GetPress(0, CInputJoypad::JOYKEY_RIGHT) == true)
+		{// 右手前に移動
+			m_move.x += sinf(-D3DX_PI * 0.75f - rot.y) * (m_bJump ? AIR_MOVEMENT.x : LAND_MOVEMENT.x);
+			m_move.z += cosf(-D3DX_PI * 0.25f + rot.y) * (m_bJump ? AIR_MOVEMENT.z : LAND_MOVEMENT.z);
+
+			// 進んだ方向にモデルを傾ける
+			UnderRotDest.z = MODEL_ROT;
+			UpperRotDest.z = MODEL_ROT;
+
+			// 進んだ方向に角度を向ける
+			m_rotDest.y = rot.y + (-D3DX_PI * 0.15f);
+		}
+		else if (pInputKeyboard->GetPress(DIK_S) == true || pInputJoypad->GetPress(0, CInputJoypad::JOYKEY_DOWN) == true)
+		{// 手前に移動
+			m_move.x += sinf(D3DX_PI * 0.0f + rot.y) * (m_bJump ? AIR_MOVEMENT.x : LAND_MOVEMENT.x);
+			m_move.z += cosf(D3DX_PI * 0.0f + rot.y) * (m_bJump ? AIR_MOVEMENT.z : LAND_MOVEMENT.z);
+		}
+
+		// 進んだ方向にモデルを傾ける
+		UnderRotDest.x = MODEL_ROT;
+		UpperRotDest.x = MODEL_ROT;
+		TireRot.x += TIRE_ROT;
+
+		// モーションを設定
+		m_pMotion->Set(MOTIONTYPE_MOVE, true, 20);
+
+		bMove = true;
+	}
+	else if (pInputKeyboard->GetPress(DIK_A) == true || pInputJoypad->GetPress(0, CInputJoypad::JOYKEY_LEFT) == true)
+	{// 左に移動
+		// 進んだ方向にモデルを傾ける
+		UpperRotDest.z = -MODEL_ROT;
+
+		// モーションを設定
+		m_pMotion->Set(MOTIONTYPE_MOVE, true, 20);
+
+		bMove = true;
+	}
+	else if (pInputKeyboard->GetPress(DIK_D) == true || pInputJoypad->GetPress(0, CInputJoypad::JOYKEY_RIGHT) == true)
+	{// 右に移動
+		// 進んだ方向にモデルを傾ける
+		UpperRotDest.z = MODEL_ROT;
+
+		// モーションを設定
+		m_pMotion->Set(MOTIONTYPE_MOVE, true, 20);
+
+		bMove = true;
+	}
+	else
+	{// 動いてない
+		// オフセットに戻す
+		UpperRotDest = UpperRotOff;
+		UnderRotDest = UnderRotOff;
+
+		// モーションを設定
+		m_pMotion->Set(MOTIONTYPE_NEUTRAL, true, 20);
+
+		bMove = false;
+	}
+
+	// モデルの傾きを加算
+	UnderRot += (UnderRotDest - UnderRot) * 0.1f;
+	UpperRot += (UpperRotDest - UpperRot) * 0.1f;
+
+	// モデルの向きを適用
+	m_apModel[0]->SetRotOff(UnderRot);
+	m_apModel[1]->SetRotOff(UpperRot);
+	m_apModel[2]->SetRotOff(TireRot);
+
+	return false;
+}
+
+//========================================================================
+// エネルギー鉱物との当たり判定
+//========================================================================
+bool CPlayer::CollisionEnergyRock(const D3DXVECTOR3 pos)
+{
+	for (int nCntPri = 0; nCntPri < MAX_PRIORITY_NUM; nCntPri++)
+	{
+		for (int nCntObj = 0; nCntObj < MAX_OBJECT; nCntObj++)
+		{
+			CObject* pObj;
+
+			// オブジェクトを取得
+			pObj = GetObject(nCntPri, nCntObj);
+
+			if (pObj != NULL)
+			{// NULLチェック
+				CObject::TYPE type;
+
+				// オブジェクトの種類を取得
+				type = pObj->GetType();
+
+				if (type == CObject::TYPE_ENERGYROCK)
+				{// エネルギー鉱物オブジェクトなら当たり判定する
+					D3DXVECTOR3 posRock, dist;
+
+					// エネルギー鉱物の位置を取得
+					posRock = pObj->GetPosition();
+
+					// 距離を計算
+					dist = pos - posRock;
+
+					if ((D3DXVec3Length(&dist) < ENERGYROCK_RADIUS + m_fRadius) &&
+						pos.y < posRock.y + ENERGYROCK_HEIGHT && pos.y + m_fHeight > posRock.y)
+					{// エネルギー鉱物と重なった
+						CParticle3D::Create(posRock, 10, 5, 5.0f, 0.0f, CEffect3D::TYPE_BLENDADD,
+							CParticle3D::TYPE_NORMAL, 10, 3.0f);
+
+						return true;
+					}
+				}
+			}
+		}
+	}
+
+	return false;
 }
 
 //========================================================================

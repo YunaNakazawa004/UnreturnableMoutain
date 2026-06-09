@@ -35,6 +35,8 @@ MODEL_FILENAME = data/MODEL/ROBOT/14_handL_2.x		# [14]左手
 #------------------------------------------------------------------------------
 CHARACTERSET
 	NUM_PARTS = 15					# パーツ数
+	RADIUS = 10.0
+	HEIGHT = 20.0
 
 	PARTSSET
 		INDEX = 0					# 下半身

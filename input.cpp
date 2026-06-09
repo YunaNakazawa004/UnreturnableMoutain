@@ -535,12 +535,12 @@ bool CInputJoypad::GetStick(int nIdx, JOYKEY key, int* pValueH, int* pValueV)
 	{// 右スティック
 		if (pValueH != NULL)
 		{// 水平方向
-			*pValueH = m_joykeyState[nIdx].Gamepad.sThumbLX;
+			*pValueH = m_joykeyState[nIdx].Gamepad.sThumbRX;
 		}
 
 		if (pValueV != NULL)
 		{// 垂直方向
-			*pValueV = m_joykeyState[nIdx].Gamepad.sThumbLY;
+			*pValueV = m_joykeyState[nIdx].Gamepad.sThumbRY;
 		}
 
 		if (m_joykeyState[nIdx].Gamepad.sThumbRX < -XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE ||

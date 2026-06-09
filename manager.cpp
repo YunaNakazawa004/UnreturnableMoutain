@@ -209,7 +209,7 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	}
 
 	// エネルギー鉱物を生成
-	CEnergyRock::Create(D3DXVECTOR3(50.0f, 0.0f, 50.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+	CEnergyRock::Create(D3DXVECTOR3(-50.0f, 0.0f, 50.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 
 	// FPSカウンタを初期化
 	m_nCountFPS = 0;
