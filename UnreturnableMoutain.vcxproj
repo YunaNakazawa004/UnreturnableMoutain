@@ -149,6 +149,7 @@
     <ClCompile Include="debugproc.cpp" />
     <ClCompile Include="effect2D.cpp" />
     <ClCompile Include="effect3D.cpp" />
+    <ClCompile Include="energyrock.cpp" />
     <ClCompile Include="input.cpp" />
     <ClCompile Include="light.cpp" />
     <ClCompile Include="main.cpp" />
@@ -173,6 +174,7 @@
     <ClInclude Include="debugproc.h" />
     <ClInclude Include="effect2D.h" />
     <ClInclude Include="effect3D.h" />
+    <ClInclude Include="energyrock.h" />
     <ClInclude Include="input.h" />
     <ClInclude Include="light.h" />
     <ClInclude Include="main.h" />

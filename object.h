@@ -16,7 +16,7 @@
 #define MAX_PRIORITY_NUM	(8)				// 最大優先順位数
 #define BG_PRIORITY			(0)				// デフォルト背景優先順位
 #define BULLET_PRIORITY		(1)				// デフォルト弾優先順位
-#define ENEMY_PRIORITY		(2)				// デフォルト敵優先順位
+#define OBJECT_PRIORITY		(2)				// デフォルトオブジェクト優先順位
 #define PLAYER_PRIORITY		(3)				// デフォルトプレイヤー優先順位
 #define EFFECT_PRIORITY		(4)				// デフォルトエフェクト優先順位
 #define FRAME_PRIORITY		(5)				// デフォルトUIフレーム優先順位
@@ -63,6 +63,7 @@ public:
 		TYPE_OBJECTX,			// オブジェクトX
 		TYPE_OBJECTBILLBOARD,	// オブジェクトビルボード
 		TYPE_PLAYER,			// プレイヤー
+		TYPE_ENERGYROCK,		// エネルギー鉱物
 		TYPE_MAX
 	}TYPE;
 
