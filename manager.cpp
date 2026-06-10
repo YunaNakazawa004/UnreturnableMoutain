@@ -18,6 +18,7 @@
 #include "object3D.h"
 #include "objectX.h"
 #include "ObjectBillboard.h"
+#include "meshfield.h"
 #include "number.h"
 #include "model.h"
 
@@ -189,8 +190,12 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	CEffect3D::Load();
 	CNumber::Load();
 
-	// 3Dオブジェクトを生成
-	CObject3D::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), 100.0f, 100.0f, CObject::TYPE_OBJECT3D, "data\\TEXTURE\\field000.jpg", 3);
+	//// 3Dオブジェクトを生成
+	//CObject3D::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), 100.0f, 100.0f, CObject::TYPE_OBJECT3D, "data\\TEXTURE\\field000.jpg", 3);
+
+	// メッシュフィールドを生成
+	CMeshField::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR2(20.0f, 20.0f),
+		D3DXVECTOR2(10.0f, 10.0f), CObject::TYPE_MESHFIELD, "data\\TEXTURE\\field000.jpg", 3);
 
 	// ビルボードオブジェクトを生成
 	CObjectBillboard::Create(D3DXVECTOR3(50.0f, 50.0f, 0.0f), 50.0f, 50.0f, CObject::TYPE_OBJECTBILLBOARD, "data\\TEXTURE\\tree000.png", 3);

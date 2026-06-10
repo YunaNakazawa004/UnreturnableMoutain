@@ -62,6 +62,7 @@ public:
 		TYPE_OBJECT3D,			// オブジェクト3D
 		TYPE_OBJECTX,			// オブジェクトX
 		TYPE_OBJECTBILLBOARD,	// オブジェクトビルボード
+		TYPE_MESHFIELD,			// メッシュフィールド
 		TYPE_PLAYER,			// プレイヤー
 		TYPE_ENERGYROCK,		// エネルギー鉱物
 		TYPE_MAX
