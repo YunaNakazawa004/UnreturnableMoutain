@@ -480,8 +480,8 @@ void CMotion::Update(void)
 		{// ブレンドフレームに到達
 			// ブレンドモーションを現在のモーションに設定
 			m_nType = m_nTypeBlend;
-			m_bLoop = m_bLoopBlend;
-			m_nNumKey = m_nNumKeyBlend;
+			m_bLoop = m_aInfo[m_nTypeBlend].bLoop;
+			m_nNumKey = m_aInfo[m_nTypeBlend].nNumKey;
 			m_nKey = m_nKeyBlend;
 			m_nCounter = m_nCounterBlend;
 

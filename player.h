@@ -35,9 +35,6 @@ public:
 		MOTIONTYPE_ACTION,			// アクション
 		MOTIONTYPE_JUMP,			// ジャンプ
 		MOTIONTYPE_LANDING,			// 着地
-		MOTIONTYPE_LANDINGICE,		// 氷の上に着地
-		MOTIONTYPE_UFODOWN,			// UFOから降下
-		MOTIONTYPE_UFOUP,			// UFOに上昇
 		MOTIONTYPE_MAX
 	};
 
@@ -84,6 +81,8 @@ private:
 	float m_fHeight;				// 高さ
 	float m_fJumpHigh;				// ジャンプ量
 	bool m_bJump;					// ジャンプしているか
+	bool m_bLand;					// 着地中かどうか
+	bool m_bAct;					// アクション中かどうか
 	bool m_bDisp;					// 表示するかどうか
 };
 

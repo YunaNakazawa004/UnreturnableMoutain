@@ -95,6 +95,8 @@ CPlayer::CPlayer(const int nPriority) :CObject(nPriority)
 	m_fHeight = 0.0f;
 	m_fJumpHigh = 0.0f;
 	m_bJump = false;
+	m_bLand = false;
+	m_bAct = false;
 	m_bDisp = true;
 }
 
@@ -186,7 +188,19 @@ void CPlayer::Update(void)
 	D3DXVECTOR3 UpperPos = m_apModel[1]->GetPosOff();		// 上半身の位置(オフセットをいじる)
 
 	// 移動処理
-	Movement(rot);
+	if (Movement(rot) == true)
+	{// 移動している
+		if (m_bJump == false)
+		{// ジャンプしていない
+			// モーションを設定
+			m_pMotion->Set(MOTIONTYPE_MOVE, true, 20);
+		}
+	}
+	else if(m_bJump == false && m_bLand == false && m_bAct == false)
+	{// 移動していない
+		// モーションを設定
+		m_pMotion->Set(MOTIONTYPE_NEUTRAL, true, 20);
+	}
 
 	if (m_bJump == false)
 	{// ジャンプしていないとき
@@ -210,6 +224,9 @@ void CPlayer::Update(void)
 		{// ジャンプ
 			m_bJump = true;
 			m_move.y = JUMP_HEIGHT + (JUMP_HEIGHT * m_fJumpHigh);
+
+			// モーションを設定
+			m_pMotion->Set(MOTIONTYPE_JUMP, true, 20);
 
 			// ジャンプ量リセット
 			m_fJumpHigh = 0.0f;
@@ -242,11 +259,20 @@ void CPlayer::Update(void)
 	{// 地面との当たり判定
 		if (m_bJump == true)
 		{// 着地
+			// モーションを設定
+			m_pMotion->Set(MOTIONTYPE_LANDING, true, 20);
+			m_bLand = true;
 		}
 
 		pos.y = 0.0f;
 		m_move.y = 0.0f;
 		m_bJump = false;
+
+		if (m_bLand == true && m_pMotion->GetType() == MOTIONTYPE_LANDING && m_pMotion->IsFinish() == true)
+		{// 着地モーションが終わった
+			m_bLand = false;
+			m_bAct = false;
+		}
 	}
 
 	// 目的の向きを修正
@@ -266,12 +292,19 @@ void CPlayer::Update(void)
 	rot.y += (m_rotDest.y - rot.y) * 0.1f;
 
 	// 当たり判定
-	if (CollisionEnergyRock(pos) == true)
-	{// エネルギー鉱物と当たっているとき
+	if (CollisionEnergyRock(pos) == true && m_bJump == false)
+	{// エネルギー鉱物と当たっているとき/空中ではないとき
 		if (pInputKeyboard->GetTrigger(DIK_RETURN) == true)
 		{// 回収するキーを押した
-
+			// モーションを設定
+			m_pMotion->Set(MOTIONTYPE_ACTION, true, 20);
+			m_bAct = true;
 		}
+	}
+
+	if (m_bAct == true && m_pMotion->GetType() == MOTIONTYPE_ACTION && m_pMotion->IsFinish() == true)
+	{// アクションモーションが終わった
+		m_bAct = false;
 	}
 
 	// 位置/向きを適用
@@ -283,6 +316,8 @@ void CPlayer::Update(void)
 
 	// モーションの更新
 	m_pMotion->Update();
+
+	pDebugProc->Print("%d\n", m_pMotion->GetType());
 }
 
 //========================================================================
@@ -447,9 +482,6 @@ bool CPlayer::Movement(const D3DXVECTOR3 rot)
 		// 進んだ方向に角度を向ける
 		m_rotDest.y = rot.y + ((float)nValueH * 0.00001f * ((nValueV < 0) ? -1 : 1));
 
-		// モーションを設定
-		m_pMotion->Set(MOTIONTYPE_MOVE, true, 20);
-
 		bMove = true;
 	}
 	else if (pInputKeyboard->GetPress(DIK_W) == true || pInputJoypad->GetPress(0, CInputJoypad::JOYKEY_UP) == true)	// ↓8方向移動
@@ -488,9 +520,6 @@ bool CPlayer::Movement(const D3DXVECTOR3 rot)
 		UnderRotDest.x = -MODEL_ROT;
 		UpperRotDest.x = -MODEL_ROT;
 		TireRot.x += -TIRE_ROT;
-
-		// モーションを設定
-		m_pMotion->Set(MOTIONTYPE_MOVE, true, 20);
 
 		bMove = true;
 	}
@@ -531,18 +560,12 @@ bool CPlayer::Movement(const D3DXVECTOR3 rot)
 		UpperRotDest.x = MODEL_ROT;
 		TireRot.x += TIRE_ROT;
 
-		// モーションを設定
-		m_pMotion->Set(MOTIONTYPE_MOVE, true, 20);
-
 		bMove = true;
 	}
 	else if (pInputKeyboard->GetPress(DIK_A) == true || pInputJoypad->GetPress(0, CInputJoypad::JOYKEY_LEFT) == true)
 	{// 左に移動
 		// 進んだ方向にモデルを傾ける
 		UpperRotDest.z = -MODEL_ROT;
-
-		// モーションを設定
-		m_pMotion->Set(MOTIONTYPE_MOVE, true, 20);
 
 		bMove = true;
 	}
@@ -551,9 +574,6 @@ bool CPlayer::Movement(const D3DXVECTOR3 rot)
 		// 進んだ方向にモデルを傾ける
 		UpperRotDest.z = MODEL_ROT;
 
-		// モーションを設定
-		m_pMotion->Set(MOTIONTYPE_MOVE, true, 20);
-
 		bMove = true;
 	}
 	else
@@ -561,9 +581,6 @@ bool CPlayer::Movement(const D3DXVECTOR3 rot)
 		// オフセットに戻す
 		UpperRotDest = UpperRotOff;
 		UnderRotDest = UnderRotOff;
-
-		// モーションを設定
-		m_pMotion->Set(MOTIONTYPE_NEUTRAL, true, 20);
 
 		bMove = false;
 	}
@@ -577,7 +594,7 @@ bool CPlayer::Movement(const D3DXVECTOR3 rot)
 	m_apModel[1]->SetRotOff(UpperRot);
 	m_apModel[2]->SetRotOff(TireRot);
 
-	return false;
+	return bMove;
 }
 
 //========================================================================
