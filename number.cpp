@@ -15,7 +15,7 @@
 //************************************************************************
 #define NUMBER_WIDTH	(90.0f)		// 数字の幅
 #define NUMBER_HEIGHT	(180.0f)	// 数字の高さ
-#define NUMBER_TEXFILE	"data\\TEXTURE\\time_number.png"			// 数字のテクスチャ
+#define NUMBER_TEXFILE	"data\\TEXTURE\\UI\\time_number.png"			// 数字のテクスチャ
 
 //************************************************************************
 // 静的メンバ変数宣言

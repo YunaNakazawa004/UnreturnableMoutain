@@ -316,8 +316,6 @@ void CPlayer::Update(void)
 
 	// モーションの更新
 	m_pMotion->Update();
-
-	pDebugProc->Print("%d\n", m_pMotion->GetType());
 }
 
 //========================================================================
