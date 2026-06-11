@@ -19,6 +19,10 @@
 #include "particle3D.h"
 #include "energyrock.h"
 
+#include <iostream>
+#include <fstream>
+#include <string>
+
 //************************************************************************
 // マクロ定義
 //************************************************************************
@@ -648,21 +652,24 @@ bool CPlayer::CollisionEnergyRock(const D3DXVECTOR3 pos)
 HRESULT CPlayer::SetModel(const char* pFilename)
 {
 	// ローカル変数宣言
-	FILE* pFile;
-	char aString[256] = {};				// ファイルのテキスト読み込み
-	char aTrash[256] = {};				// ごみ箱
-	char aModelName[64][256] = {};		// モデルの名前
+	std::string filename = pFilename;	// 読み込むファイル名
+	std::fstream file(filename);		// ファイル
+	std::string line = {};				// テキストを読み込む
 
 	// テクスチャ読み込み用の変数
-	int nNumTexture = 0;
-	char aTextureName[64][256] = {};		// テクスチャの名前
+	int nNumTexture = 0;				// テクスチャ総数
+	int nCntTexture = 0;				// 
+	std::string TextureName = {};		// テクスチャの名前
 
 	// キャラクターセット用の変数
-	int nNumParts = 0;		// 読み込むパーツ数
-	float fRadius = 0.0f;	// キャラクターの半径
-	float fHeight = 0.0f;	// キャラクターの高さ
-	float fMove = 0.0f;		// キャラクターの移動量
-	float fJump = 0.0f;		// キャラクターのジャンプ量
+	int nCntModel = 0;				// 読み込んだモデル数
+	char aModelName[64][256] = {};	// モデルの名前
+	int nNumParts = 0;				// 読み込むパーツ数
+	int nCntParts = 0;				// 読み込んだパーツ数
+	float fRadius = 0.0f;			// キャラクターの半径
+	float fHeight = 0.0f;			// キャラクターの高さ
+	float fMove = 0.0f;				// キャラクターの移動量
+	float fJump = 0.0f;				// キャラクターのジャンプ量
 	D3DXVECTOR2 Blowoff = D3DXVECTOR2(0.0f, 0.0f);		// 吹っ飛び量
 	D3DXVECTOR2 Somersault = D3DXVECTOR2(0.0f, 0.0f);	// バク宙量
 
@@ -680,268 +687,253 @@ HRESULT CPlayer::SetModel(const char* pFilename)
 	int nCntMotion = 0;			// モーション番号
 	CMotion::KEY key = {};		// キー要素
 
-	pFile = fopen(pFilename, "r");
-
-	if (pFile != NULL)
-	{// ファイルが開けた場合
-		fscanf(pFile, "%[^SCRIPT]", &aTrash[0]);
-
-		while (1)
+	if (file.is_open() == true)
+	{// ファイルが開けた
+		// ファイルの内容を読み込む
+		while (file >> line)
 		{
-			fscanf(pFile, "%s", &aString[0]);
-
-			if (aString[0] == '#')
-			{// コメントは無視
-				fgets(&aTrash[0], ONE_LINE, pFile);
+			if (line.find("#") != std::string::npos)
+			{// コメント
+				std::getline(file, line);
 
 				continue;
 			}
 
-			if (strcmp(&aString[0], "NUM_MODEL") == 0)
-			{// モデル数の読み込み
-				fscanf(pFile, " = %d", &m_nNumModel);
+			if (line.find("NUM_MODEL") != std::string::npos)
+			{// モデル数
+				file >> line;				// =
+				file >> m_nNumModel;		// 数字
 
 				continue;
 			}
 
-			if (strcmp(&aString[0], "MODEL_FILENAME") == 0)
-			{// モデルの名前読み込み
-				for (int nCntModel = 0; nCntModel < m_nNumModel; nCntModel++)
-				{
-					if (nCntModel > 0)
-					{// 2回目以降のMODEL_FILENAMEを読み込んでおく
-						if (strcmp(&aString[0], "MODEL_FILENAME") != 0)
-						{// コメントの代わりに読み込んだ場合はなし
-							fscanf(pFile, "%s", &aTrash[0]);
-						}
-					}
+			if (line.find("MODEL_FILENAME") != std::string::npos && nCntModel < m_nNumModel)
+			{// モデルの名前
+				file >> line;						// =
+				file >> &aModelName[nCntModel][0];	// モデルの名前
 
-					fscanf(pFile, " = %s", &aModelName[nCntModel][0]);		// モデルのパス
-					m_apFileName[nCntModel] = &aModelName[nCntModel][0];
+				m_apFileName[nCntModel] = &aModelName[nCntModel][0];	// 格納
 
-					fscanf(pFile, "%s", &aString[0]);
-
-					if (aString[0] == '#')
-					{// コメント無視
-						fgets(&aTrash[0], ONE_LINE, pFile);
-					}
-				}
+				nCntModel++;		// 読み込んだモデル数をカウントアップ
 
 				continue;
 			}
 
-			if (strcmp(&aString[0], "NUM_TEXTURE") == 0)
-			{// テクスチャ数の読み込み
-				fscanf(pFile, " = %d", &nNumTexture);
+			if (line.find("NUM_TEXTURE") != std::string::npos)
+			{// テクスチャ数
+				file >> line;				// =
+				file >> nNumTexture;		// 数字
 
 				continue;
 			}
 
-			if (strcmp(&aString[0], "TEXTURE_FILENAME") == 0)
-			{// テクスチャの名前読み込み
-				for (int nCntTexture = 0; nCntTexture < nNumTexture; nCntTexture++)
-				{
-					if (nCntTexture > 0)
-					{// 2回目以降のTEXTURE_FILENAMEを読み込んでおく
-						if (strcmp(&aString[0], "TEXTURE_FILENAME") != 0)
-						{// コメントの代わりに読み込んだ場合はなし
-							fscanf(pFile, "%s", &aTrash[0]);
-						}
-					}
+			if (line.find("TEXTURE_FILENAME") != std::string::npos && nCntTexture < nNumTexture)
+			{// テクスチャの名前
+				file >> line;				// =
+				file >> TextureName;		// テクスチャの名前
 
-					fscanf(pFile, " = %s", &aTextureName[nCntTexture][0]);		// テクスチャのパス
-
-					fscanf(pFile, "%s", &aString[0]);
-
-					if (aString[0] == '#')
-					{// コメント無視
-						fgets(&aTrash[0], ONE_LINE, pFile);
-					}
-				}
+				nCntTexture++;		// 読み込んだテクスチャ数をカウントアップ
 
 				continue;
 			}
 
-			if (strcmp(&aString[0], "CHARACTERSET") == 0)
+			if (line.find("CHARACTERSET") != std::string::npos)
 			{// キャラクターの設定
-				fscanf(pFile, "%s", &aString[0]);
+				file >> line;				// NUM_PARTS
 
-				if (strcmp(&aString[0], "NUM_PARTS") == 0)
+				if (line.find("NUM_PARTS") != std::string::npos)
 				{// 読み込むパーツ数
-					fscanf(pFile, " = %d", &nNumParts);
+					file >> line;				// =
+					file >> nNumParts;			// パーツ数
 
-					fscanf(pFile, "%s", &aString[0]);
+					file >> line;				// 次の文字列
 
-					if (aString[0] == '#')
-					{// コメント無視
-						fgets(&aTrash[0], ONE_LINE, pFile);
+					if (line.find("#") != std::string::npos)
+					{// コメント
+						std::getline(file, line);
 
 						// 次の文字列を読み込む
-						fscanf(pFile, "%s", &aString[0]);
+						file >> line;			// 次の文字列
 					}
 				}
 
-				if (strcmp(&aString[0], "RADIUS") == 0)
+				if (line.find("RADIUS") != std::string::npos)
 				{// キャラクターの半径
-					fscanf(pFile, " = %f", &m_fRadius);
+					file >> line;				// =
+					file >> m_fRadius;			// 半径
 
-					fscanf(pFile, "%s", &aString[0]);
+					file >> line;				// 次の文字列
 
-					if (aString[0] == '#')
-					{// コメント無視
-						fgets(&aTrash[0], ONE_LINE, pFile);
+					if (line.find("#") != std::string::npos)
+					{// コメント
+						std::getline(file, line);
 
 						// 次の文字列を読み込む
-						fscanf(pFile, "%s", &aString[0]);
+						file >> line;			// 次の文字列
 					}
 				}
 
-				if (strcmp(&aString[0], "HEIGHT") == 0)
+				if (line.find("HEIGHT") != std::string::npos)
 				{// キャラクターの高さ
-					fscanf(pFile, " = %f", &m_fHeight);
+					file >> line;				// =
+					file >> m_fHeight;			// 高さ
 
-					fscanf(pFile, "%s", &aString[0]);
+					file >> line;				// 次の文字列
 
-					if (aString[0] == '#')
-					{// コメント無視
-						fgets(&aTrash[0], ONE_LINE, pFile);
+					if (line.find("#") != std::string::npos)
+					{// コメント
+						std::getline(file, line);
 
 						// 次の文字列を読み込む
-						fscanf(pFile, "%s", &aString[0]);
+						file >> line;			// 次の文字列
 					}
 				}
 
-				if (strcmp(&aString[0], "MOVE") == 0)
+				if (line.find("MOVE") != std::string::npos)
 				{// キャラクターの移動量
-					fscanf(pFile, " = %f", &fMove);
+					file >> line;				// =
+					file >> fMove;				// 移動量
 
-					fscanf(pFile, "%s", &aString[0]);
+					file >> line;				// 次の文字列
 
-					if (aString[0] == '#')
-					{// コメント無視
-						fgets(&aTrash[0], ONE_LINE, pFile);
+					if (line.find("#") != std::string::npos)
+					{// コメント
+						std::getline(file, line);
 
 						// 次の文字列を読み込む
-						fscanf(pFile, "%s", &aString[0]);
+						file >> line;			// 次の文字列
 					}
 				}
 
-				if (strcmp(&aString[0], "JUMP") == 0)
+				if (line.find("JUMP") != std::string::npos)
 				{// キャラクターのジャンプ量
-					fscanf(pFile, " = %f", &fJump);
+					file >> line;				// =
+					file >> fJump;				// ジャンプ量
 
-					fscanf(pFile, "%s", &aString[0]);
+					file >> line;				// 次の文字列
 
-					if (aString[0] == '#')
-					{// コメント無視
-						fgets(&aTrash[0], ONE_LINE, pFile);
+					if (line.find("#") != std::string::npos)
+					{// コメント
+						std::getline(file, line);
 
 						// 次の文字列を読み込む
-						fscanf(pFile, "%s", &aString[0]);
+						file >> line;			// 次の文字列
 					}
 				}
 
-				if (strcmp(&aString[0], "BLOWOFF") == 0)
+				if (line.find("BLOWOFF") != std::string::npos)
 				{// キャラクターの吹っ飛び量
-					fscanf(pFile, " = %f %f", &Blowoff.x, &Blowoff.y);
+					file >> line;				// =
+					file >> Blowoff.x;			// 吹っ飛び量x
+					file >> Blowoff.y;			// 吹っ飛び量y
 
-					fscanf(pFile, "%s", &aString[0]);
+					file >> line;				// 次の文字列
 
-					if (aString[0] == '#')
-					{// コメント無視
-						fgets(&aTrash[0], ONE_LINE, pFile);
+					if (line.find("#") != std::string::npos)
+					{// コメント
+						std::getline(file, line);
 
 						// 次の文字列を読み込む
-						fscanf(pFile, "%s", &aString[0]);
+						file >> line;			// 次の文字列
 					}
 				}
 
-				if (strcmp(&aString[0], "SOMERSAULT") == 0)
+				if (line.find("SOMERSAULT") != std::string::npos)
 				{// キャラクターのバク宙量
-					fscanf(pFile, " = %f %f", &Somersault.x, &Somersault.y);
+					file >> line;				// =
+					file >> Somersault.x;		// バク宙量x
+					file >> Somersault.y;		// バク宙量y
 
-					fscanf(pFile, "%s", &aString[0]);
+					file >> line;				// 次の文字列
 
-					if (aString[0] == '#')
-					{// コメント無視
-						fgets(&aTrash[0], ONE_LINE, pFile);
+					if (line.find("#") != std::string::npos)
+					{// コメント
+						std::getline(file, line);
 
 						// 次の文字列を読み込む
-						fscanf(pFile, "%s", &aString[0]);
+						file >> line;			// 次の文字列
 					}
 				}
 
 				// パーツ読み込み
 				for (int nCntParts = 0; nCntParts < nNumParts; nCntParts++)
 				{
-					if (strcmp(&aString[0], "PARTSSET") == 0)
+					if (line.find("PARTSSET") != std::string::npos)
 					{// PARTSSET
-						fscanf(pFile, "%s", &aString[0]);
+						file >> line;				// モデル番号
 					}
 
-					if (strcmp(&aString[0], "INDEX") == 0)
+					if (line.find("INDEX") != std::string::npos)
 					{// モデル番号
-						fscanf(pFile, " = %d", &nIdx);
+						file >> line;				// =
+						file >> nIdx;				// モデル番号
 
-						fscanf(pFile, "%s", &aString[0]);
+						file >> line;				// 次の文字列
 
-						if (aString[0] == '#')
-						{// コメント無視
-							fgets(&aTrash[0], ONE_LINE, pFile);
+						if (line.find("#") != std::string::npos)
+						{// コメント
+							std::getline(file, line);
 
 							// 次の文字列を読み込む
-							fscanf(pFile, "%s", &aString[0]);
+							file >> line;			// 次の文字列
 						}
 					}
 
-					if (strcmp(&aString[0], "PARENT") == 0)
+					if (line.find("PARENT") != std::string::npos)
 					{// 親のモデル番号
-						fscanf(pFile, " = %d", &nIdxParent);
+						file >> line;				// =
+						file >> nIdxParent;			// 親のモデル番号
 
-						fscanf(pFile, "%s", &aString[0]);
+						file >> line;				// 次の文字列
 
-						if (aString[0] == '#')
-						{// コメント無視
-							fgets(&aTrash[0], ONE_LINE, pFile);
+						if (line.find("#") != std::string::npos)
+						{// コメント
+							std::getline(file, line);
 
 							// 次の文字列を読み込む
-							fscanf(pFile, "%s", &aString[0]);
+							file >> line;			// 次の文字列
 						}
 					}
 
-					if (strcmp(&aString[0], "POS") == 0)
+					if (line.find("POS") != std::string::npos)
 					{// パーツの位置(オフセット)
-						fscanf(pFile, " = %f %f %f", &pos.x, &pos.y, &pos.z);
+						file >> line;				// =
+						file >> pos.x;				// 位置(オフセット)x
+						file >> pos.y;				// 位置(オフセット)y
+						file >> pos.z;				// 位置(オフセット)y
 
-						fscanf(pFile, "%s", &aString[0]);
+						file >> line;				// 次の文字列
 
-						if (aString[0] == '#')
-						{// コメント無視
-							fgets(&aTrash[0], ONE_LINE, pFile);
+						if (line.find("#") != std::string::npos)
+						{// コメント
+							std::getline(file, line);
 
 							// 次の文字列を読み込む
-							fscanf(pFile, "%s", &aString[0]);
+							file >> line;			// 次の文字列
 						}
 					}
 
-					if (strcmp(&aString[0], "ROT") == 0)
+					if (line.find("ROT") != std::string::npos)
 					{// パーツの向き
-						fscanf(pFile, " = %f %f %f", &rot.x, &rot.y, &rot.z);
+						file >> line;				// =
+						file >> rot.x;				// 向き(オフセット)x
+						file >> rot.y;				// 向き(オフセット)y
+						file >> rot.z;				// 向き(オフセット)y
 
-						fscanf(pFile, "%s", &aString[0]);
+						file >> line;				// 次の文字列
 
-						if (aString[0] == '#')
-						{// コメント無視
-							fgets(&aTrash[0], ONE_LINE, pFile);
+						if (line.find("#") != std::string::npos)
+						{// コメント
+							std::getline(file, line);
 
 							// 次の文字列を読み込む
-							fscanf(pFile, "%s", &aString[0]);
+							file >> line;			// 次の文字列
 						}
 					}
 
-					if (strcmp(&aString[0], "END_PARTSSET") == 0)
+					if (line.find("END_PARTSSET") != std::string::npos)
 					{// END_PARTSSET
-						fscanf(pFile, "%s", &aString[0]);
+						file >> line;				// 次の文字列
 					}
 
 					// モデルの生成
@@ -961,21 +953,22 @@ HRESULT CPlayer::SetModel(const char* pFilename)
 				continue;
 			}
 
-			if (strcmp(&aString[0], "MOTIONSET") == 0)
+			if (line.find("MOTIONSET") != std::string::npos)
 			{// モーションの設定
-				fscanf(pFile, "%s", &aString[0]);
+				file >> line;				// 次の文字列
 
-				if (aString[0] == '#')
-				{// コメント無視
-					fgets(&aTrash[0], ONE_LINE, pFile);
+				if (line.find("#") != std::string::npos)
+				{// コメント
+					std::getline(file, line);
 
 					// 次の文字列を読み込む
-					fscanf(pFile, "%s", &aString[0]);
+					file >> line;			// 次の文字列
 				}
 
-				if (strcmp(&aString[0], "LOOP") == 0)
+				if (line.find("LOOP") != std::string::npos)
 				{// ループするかどうか
-					fscanf(pFile, " = %d", &nLoop);
+					file >> line;				// =
+					file >> nLoop;				// ループするかどうか
 
 					// ループの真偽を代入
 					if (nLoop == 0)
@@ -987,126 +980,134 @@ HRESULT CPlayer::SetModel(const char* pFilename)
 						info.bLoop = true;
 					}
 
-					fscanf(pFile, "%s", &aString[0]);
+					file >> line;				// 次の文字列
 
-					if (aString[0] == '#')
-					{// コメント無視
-						fgets(&aTrash[0], ONE_LINE, pFile);
+					if (line.find("#") != std::string::npos)
+					{// コメント
+						std::getline(file, line);
 
 						// 次の文字列を読み込む
-						fscanf(pFile, "%s", &aString[0]);
+						file >> line;			// 次の文字列
 					}
 				}
 
-				if (strcmp(&aString[0], "NUM_KEY") == 0)
+				if (line.find("NUM_KEY") != std::string::npos)
 				{// キーの総数
-					fscanf(pFile, " = %d", &nNumKey);
+					file >> line;				// =
+					file >> nNumKey;			// キーの総数
 
 					// キーの総数を代入
 					info.nNumKey = nNumKey;
 
-					fscanf(pFile, "%s", &aString[0]);
+					file >> line;				// 次の文字列
 
-					if (aString[0] == '#')
-					{// コメント無視
-						fgets(&aTrash[0], ONE_LINE, pFile);
+					if (line.find("#") != std::string::npos)
+					{// コメント
+						std::getline(file, line);
 
 						// 次の文字列を読み込む
-						fscanf(pFile, "%s", &aString[0]);
+						file >> line;			// 次の文字列
 					}
 				}
 
 				// キー読み込み
 				for (int nCntKey = 0; nCntKey < nNumKey; nCntKey++)
 				{
-					if (strcmp(&aString[0], "KEYSET") == 0)
+					if (line.find("KEYSET") != std::string::npos)
 					{// KEYSET
-						fscanf(pFile, "%s", &aString[0]);
+						file >> line;				// 次の文字列
 
-						if (aString[0] == '#')
-						{// コメント無視
-							fgets(&aTrash[0], ONE_LINE, pFile);
+						if (line.find("#") != std::string::npos)
+						{// コメント
+							std::getline(file, line);
 
 							// 次の文字列を読み込む
-							fscanf(pFile, "%s", &aString[0]);
+							file >> line;			// 次の文字列
 						}
 					}
 
-					if (strcmp(&aString[0], "FRAME") == 0)
+					if (line.find("FRAME") != std::string::npos)
 					{// 再生フレーム数
-						fscanf(pFile, " = %d", &nFrame);
+						file >> line;				// =
+						file >> nFrame;				// 再生フレーム数
 
 						info.aKeyInfo[nCntKey].nFrame = nFrame;
 
-						fscanf(pFile, "%s", &aString[0]);
+						file >> line;				// 次の文字列
 
-						if (aString[0] == '#')
-						{// コメント無視
-							fgets(&aTrash[0], ONE_LINE, pFile);
+						if (line.find("#") != std::string::npos)
+						{// コメント
+							std::getline(file, line);
 
 							// 次の文字列を読み込む
-							fscanf(pFile, "%s", &aString[0]);
+							file >> line;			// 次の文字列
 						}
 					}
 
 					// パーツごとに読み込み
 					for (int nCntPartsKey = 0; nCntPartsKey < nNumParts; nCntPartsKey++)
 					{
-						if (strcmp(&aString[0], "KEY") == 0)
+						if (line.find("KEY") != std::string::npos)
 						{// KEY
-							fscanf(pFile, "%s", &aString[0]);
+							file >> line;				// 次の文字列
 
-							if (aString[0] == '#')
-							{// コメント無視
-								fgets(&aTrash[0], ONE_LINE, pFile);
+							if (line.find("#") != std::string::npos)
+							{// コメント
+								std::getline(file, line);
 
 								// 次の文字列を読み込む
-								fscanf(pFile, "%s", &aString[0]);
+								file >> line;			// 次の文字列
 							}
 						}
 
-						if (strcmp(&aString[0], "POS") == 0)
+						if (line.find("POS") != std::string::npos)
 						{// パーツの位置(オフセット)
-							fscanf(pFile, " = %f %f %f", &key.fPosX, &key.fPosY, &key.fPosZ);
+							file >> line;				// =
+							file >> key.fPosX;			// 位置(オフセット)x
+							file >> key.fPosY;			// 位置(オフセット)y
+							file >> key.fPosZ;			// 位置(オフセット)y
 
-							fscanf(pFile, "%s", &aString[0]);
+							file >> line;				// 次の文字列
 
-							if (aString[0] == '#')
-							{// コメント無視
-								fgets(&aTrash[0], ONE_LINE, pFile);
+							if (line.find("#") != std::string::npos)
+							{// コメント
+								std::getline(file, line);
 
 								// 次の文字列を読み込む
-								fscanf(pFile, "%s", &aString[0]);
+								file >> line;			// 次の文字列
 							}
 						}
 
-						if (strcmp(&aString[0], "ROT") == 0)
+						if (line.find("ROT") != std::string::npos)
 						{// パーツの向き
-							fscanf(pFile, " = %f %f %f", &key.fRotX, &key.fRotY, &key.fRotZ);
+							file >> line;				// =
+							file >> key.fRotX;			// 向き(オフセット)x
+							file >> key.fRotY;			// 向き(オフセット)y
+							file >> key.fRotZ;			// 向き(オフセット)y
 
-							fscanf(pFile, "%s", &aString[0]);
+							file >> line;				// 次の文字列
 
-							if (aString[0] == '#')
-							{// コメント無視
-								fgets(&aTrash[0], ONE_LINE, pFile);
+							if (line.find("#") != std::string::npos)
+							{// コメント
+								std::getline(file, line);
 
 								// 次の文字列を読み込む
-								fscanf(pFile, "%s", &aString[0]);
+								file >> line;			// 次の文字列
 							}
 						}
 
-						if (strcmp(&aString[0], "END_KEY") == 0)
+						if (line.find("END_KEY") != std::string::npos)
 						{// END_KEY
-							fscanf(pFile, "%s", &aString[0]);
+							file >> line;				// 次の文字列
 						}
 
 						// モーション情報に代入
 						info.aKeyInfo[nCntKey].aKey[nCntPartsKey] = key;
 					}
 
-					if (strcmp(&aString[0], "END_KEYSET") == 0)
+					if (line.find("END_KEYSET") != std::string::npos)
 					{// END_KEYSET
-						fscanf(pFile, "%s", &aString[0]);
+						file >> line;				// 次の文字列
 					}
 				}
 
@@ -1118,16 +1119,17 @@ HRESULT CPlayer::SetModel(const char* pFilename)
 				continue;
 			}
 
-			if (strcmp(&aString[0], "END_SCRIPT") == 0)
+			if (line.find("END_SCRIPT") != std::string::npos)
 			{// ファイルの読み込みが完了
 				break;
 			}
 		}
 
-		fclose(pFile);
+		// ファイルを閉じる
+		file.close();
 	}
 	else
-	{// ファイルが開けなかった場合
+	{// ファイルが開けなかった
 		OutputDebugStringA("! ! ! ファイルを開けませんでした ! ! !\n");
 
 		return E_FAIL;
