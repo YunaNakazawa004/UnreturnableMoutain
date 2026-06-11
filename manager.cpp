@@ -390,6 +390,14 @@ void CManager::Update(void)
 
 			return;
 		}
+
+		if (m_pInputKeyboard->GetTrigger(DIK_F8) == true)
+		{// ワイヤーフレーム切り替え
+			if (m_pRenderer != NULL)
+			{// NULLチェック
+				m_pRenderer->SwapWireFrame();
+			}
+		}
 	}
 
 	if (m_pInputMouse != NULL)

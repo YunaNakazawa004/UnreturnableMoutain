@@ -174,3 +174,23 @@ void CRenderer::Draw(void)
 	// バックバッファとフロントバッファの入れ替え
 	m_pD3DDevice->Present(NULL, NULL, NULL, NULL);
 }
+
+//========================================================================
+// ワイヤーフレーム切り替え
+//========================================================================
+void CRenderer::SwapWireFrame(void)
+{
+	static bool bWire = false;
+
+	// true / false 入れ替え
+	bWire = bWire ? false : true;
+
+	if (bWire == true)
+	{// ワイヤーフレームON
+		m_pD3DDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
+	}
+	else
+	{// ワイヤーフレームOFF
+		m_pD3DDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
+	}
+}

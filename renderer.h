@@ -25,12 +25,9 @@ public:
 
 	LPDIRECT3DDEVICE9 GetDevice(void) { return m_pD3DDevice; }
 
-private:
-	//HRESULT Init(void);
-	//void Uninit(void);
-	//void Update(void);
-	//void Draw(void);
+	void SwapWireFrame(void);
 
+private:
 	LPDIRECT3D9 m_pD3D;							// Direct3Dオブジェクトへのポインタ
 	LPDIRECT3DDEVICE9 m_pD3DDevice;				// Direct3Dデバイスへのポインタ
 };
