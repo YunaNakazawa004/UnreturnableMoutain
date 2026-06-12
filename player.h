@@ -87,6 +87,7 @@ private:
 	int m_nEnergyCounter;			// エネルギー減少カウンター
 
 	bool m_bJump;					// ジャンプしているか
+	bool m_bMove;					// 移動しているか
 	bool m_bLand;					// 着地中かどうか
 	bool m_bAct;					// アクション中かどうか
 	bool m_bDisp;					// 表示するかどうか

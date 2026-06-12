@@ -107,6 +107,7 @@ CPlayer::CPlayer(const int nPriority) :CObject(nPriority)
 	m_fEnergy = 0.0f;
 	m_nEnergyCounter = 0;
 	m_bJump = false;
+	m_bMove = false;
 	m_bLand = false;
 	m_bAct = false;
 	m_bDisp = true;
@@ -197,6 +198,7 @@ void CPlayer::Update(void)
 	CDebugProc* pDebugProc = CManager::GetDebugProc();					// デバッグ表示の取得
 	D3DXVECTOR3 pos = CPlayer::GetPosition();				// プレイヤーの位置	
 	D3DXVECTOR3 rot = CPlayer::GetRotation();				// プレイヤーの向き
+	D3DXVECTOR2 move = { 0.0f,0.0f };						// XZ方向に動いているかどうかの判断用
 
 	D3DXVECTOR3 UpperPosOff = m_apModel[1]->GetPosOffC();	// 上半身の位置(オフセット保存)
 	D3DXVECTOR3 UpperPos = m_apModel[1]->GetPosOff();		// 上半身の位置(オフセットをいじる)
@@ -311,6 +313,9 @@ void CPlayer::Update(void)
 		m_move.z += (0.0f - m_move.z) * MOVE_INERTIA;
 	}
 
+	// XZ方向への移動量(動いているかいないか)※Y座標のみの変化はとらない
+	move = D3DXVECTOR2(m_move.x, m_move.z);		
+
 	if (pos.y < 0.0f)
 	{// 地面との当たり判定
 		if (m_bJump == true && m_pMotion->GetType() != MOTIONTYPE_DEATH)
@@ -323,6 +328,11 @@ void CPlayer::Update(void)
 		pos.y = 0.0f;
 		m_move.y = 0.0f;
 		m_bJump = false;
+
+		if (D3DXVec2Length(&move) >= 0.4f)
+		{// 移動している
+			CParticle3D::Create(pos, 1, 3, 1.0f, -0.2f, CEffect3D::TYPE_NORMAL_NULL, CParticle3D::TYPE_NORMAL, 2, 2.0f);
+		}
 
 		if (m_bLand == true && m_pMotion->GetType() == MOTIONTYPE_LANDING && m_pMotion->IsFinish() == true)
 		{// 着地モーションが終わった
@@ -698,6 +708,8 @@ bool CPlayer::Movement(const D3DXVECTOR3 rot)
 	m_apModel[0]->SetRotOff(UnderRot);
 	m_apModel[1]->SetRotOff(UpperRot);
 	m_apModel[2]->SetRotOff(TireRot);
+
+	m_bMove = bMove;		// 保存
 
 	return bMove;
 }
