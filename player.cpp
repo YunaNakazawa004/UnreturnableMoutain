@@ -718,7 +718,7 @@ bool CPlayer::CollisionEnergyRock(D3DXVECTOR3* pPos)
 							CParticle3D::TYPE_NORMAL, 10, 3.0f);
 
 						// “–‚½‚è”»’è
-						dynamic_cast<CEnergyRock*>(pObj)->Collision(pPos, &m_posOld, &m_move, m_fRadius, m_fHeight);
+						dynamic_cast<CObjectX*>(pObj)->Collision(pPos, &m_posOld, &m_move, m_fRadius, m_fHeight);
 
 						return true;
 					}
