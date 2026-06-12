@@ -199,34 +199,44 @@ void CPlayer::Update(void)
 	D3DXVECTOR3 UpperPos = m_apModel[1]->GetPosOff();		// 上半身の位置(オフセットをいじる)
 
 	// 操作
-	pDebugProc->Print("\n*** 操作説明 ***\n");
-	pDebugProc->Print("[キーボード]\n");
-	pDebugProc->Print("W:前進\nS:後退\nA:左に回転\nD:右に回転\n");
+	pDebugProc->Print("\n*** プレイヤー ***\n");
+	pDebugProc->Print("エネルギー残量:%f\n", m_fEnergy);
+	pDebugProc->Print("\n\n*** 操作説明 ***\n");
+	pDebugProc->Print("\n[キーボード]\n");
+	pDebugProc->Print("WASD:移動\n");
 	pDebugProc->Print("Space:ジャンプ(長押しで高さ変化)\n");
 	pDebugProc->Print("Enter:エネルギー回収(鉱石の近くで)\n");
 	pDebugProc->Print("IJKL/マウス右クリック:カメラ操作\n");
 	pDebugProc->Print("BackSpace:位置リセット\n");
-	pDebugProc->Print("エネルギー残量:%f\n", m_fEnergy);
+	pDebugProc->Print("\n[コントローラー]\n");
+	pDebugProc->Print("左スティック/十字キー:移動\n");
+	pDebugProc->Print("A:ジャンプ(長押しで高さ変化)\n");
+	pDebugProc->Print("X:エネルギー回収(鉱石の近くで)\n");
+	pDebugProc->Print("右スティック:カメラ操作\n");
+	pDebugProc->Print("START:位置リセット\n");
 
 	// 移動処理
-	if (Movement(rot) == true)
-	{// 移動している
-		if (m_bJump == false)
-		{// ジャンプしていない
-			// モーションを設定
-			m_pMotion->Set(MOTIONTYPE_MOVE, true, 20);
+	if (m_pMotion->GetType() != MOTIONTYPE_DEATH)
+	{// 死亡状態じゃないとき
+		if (Movement(rot) == true)
+		{// 移動している
+			if (m_bJump == false)
+			{// ジャンプしていない
+				// モーションを設定
+				m_pMotion->Set(MOTIONTYPE_MOVE, true, 20);
+			}
+
+			// 移動するとエネルギーが減る
+			m_nEnergyCounter++;
 		}
-
-		// 移動するとエネルギーが減る
-		m_nEnergyCounter++;
-	}
-	else if (m_bJump == false && m_bLand == false && m_bAct == false)
-	{// 移動していない
-		// モーションを設定
-		m_pMotion->Set(MOTIONTYPE_NEUTRAL, true, 20);
+		else if (m_bJump == false && m_bLand == false && m_bAct == false)
+		{// 移動していない
+			// モーションを設定
+			m_pMotion->Set(MOTIONTYPE_NEUTRAL, true, 20);
+		}
 	}
 
-	if (m_bJump == false)
+	if (m_bJump == false && m_pMotion->GetType() != MOTIONTYPE_DEATH)
 	{// ジャンプしていないとき
 		static float fMinusEnergy = 0.0f;
 
@@ -276,6 +286,9 @@ void CPlayer::Update(void)
 
 		m_nEnergyCounter = 0;
 		m_fEnergy = FIRST_ENERGY;
+
+		// モーションを設定
+		m_pMotion->Set(MOTIONTYPE_NEUTRAL, true, 20);
 	}
 
 	// 位置に移動量を加算
@@ -293,7 +306,7 @@ void CPlayer::Update(void)
 
 	if (pos.y < 0.0f)
 	{// 地面との当たり判定
-		if (m_bJump == true)
+		if (m_bJump == true && m_pMotion->GetType() != MOTIONTYPE_DEATH)
 		{// 着地
 			// モーションを設定
 			m_pMotion->Set(MOTIONTYPE_LANDING, true, 20);
@@ -310,8 +323,6 @@ void CPlayer::Update(void)
 			m_bAct = false;
 		}
 	}
-
-	pDebugProc->Print("%d\n", m_nEnergyCounter);
 
 	// 目的の向きを修正
 	float fmoveAngle = m_rotDest.y - rot.y;
@@ -330,12 +341,13 @@ void CPlayer::Update(void)
 	rot.y += (m_rotDest.y - rot.y) * 0.1f;
 
 	// 当たり判定
-	if (CollisionEnergyRock(pos) == true && m_bJump == false)
+	if (CollisionEnergyRock(pos) == true && m_bJump == false && m_pMotion->GetType() != MOTIONTYPE_DEATH)
 	{// エネルギー鉱物と当たっているとき/空中ではないとき
 		if (pInputKeyboard->GetTrigger(DIK_RETURN) == true || pInputJoypad->GetTrigger(0, CInputJoypad::JOYKEY_X) == true)
 		{// 回収するキーを押した
 			// モーションを設定
 			m_pMotion->Set(MOTIONTYPE_ACTION, true, 20);
+
 			m_bAct = true;
 			m_bLand = false;
 		}
@@ -364,6 +376,9 @@ void CPlayer::Update(void)
 	else if (m_fEnergy < 0.0f)
 	{// 最小値に調整
 		m_fEnergy = 0.0f;
+
+		// モーションを設定
+		m_pMotion->Set(MOTIONTYPE_DEATH, true, 20);
 	}
 
 	// 位置/向きを適用

@@ -35,6 +35,7 @@ public:
 		MOTIONTYPE_ACTION,			// アクション
 		MOTIONTYPE_JUMP,			// ジャンプ
 		MOTIONTYPE_LANDING,			// 着地
+		MOTIONTYPE_DEATH,			// 死亡
 		MOTIONTYPE_MAX
 	};
 
