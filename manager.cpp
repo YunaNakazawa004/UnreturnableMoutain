@@ -194,8 +194,8 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	//CObject3D::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), 100.0f, 100.0f, CObject::TYPE_OBJECT3D, "data\\TEXTURE\\field000.jpg", 3);
 
 	// メッシュフィールドを生成
-	CMeshField::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR2(20.0f, 20.0f),
-		D3DXVECTOR2(10.0f, 10.0f), CObject::TYPE_MESHFIELD, "data\\TEXTURE\\field000.jpg", 3);
+	CMeshField::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR2(50.0f, 50.0f),
+		D3DXVECTOR2(30.0f, 30.0f), CObject::TYPE_MESHFIELD, "data\\TEXTURE\\field000.jpg", 3);
 
 	// ビルボードオブジェクトを生成
 	CObjectBillboard::Create(D3DXVECTOR3(50.0f, 50.0f, 0.0f), 50.0f, 50.0f, CObject::TYPE_OBJECTBILLBOARD, "data\\TEXTURE\\tree000.png", 3);
