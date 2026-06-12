@@ -94,6 +94,11 @@ int CTexture::Register(const char* pFilename)
 		return -1;
 	}
 
+	if (pFilename == NULL)
+	{// NULLだったら
+		return -1;
+	}
+
 	// ローカル変数宣言
 	CRenderer* pRenderer = CManager::GetRenderer();			// レンダラーへのポインタ
 	LPDIRECT3DDEVICE9 pDevice = pRenderer->GetDevice();			// デバイスへのポインタ
