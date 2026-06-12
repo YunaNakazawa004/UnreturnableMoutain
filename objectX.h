@@ -24,7 +24,7 @@ public:
 	CObjectX(const int nPriority);
 	virtual ~CObjectX();
 
-	static CObjectX* Create(const D3DXVECTOR3 pos, const CObject::TYPE type, const char* pFilename, 
+	static CObjectX* Create(const D3DXVECTOR3 pos, const CObject::TYPE type, const char* pFilename,
 		const int nPriority = BG_PRIORITY);
 	HRESULT Init(void) { return S_OK; }
 	HRESULT Init(const D3DXVECTOR3 pos);
@@ -42,6 +42,8 @@ public:
 	D3DXVECTOR3 GetScale(void) { return m_scale; }
 	void SetColor(const D3DXCOLOR col);
 	D3DXCOLOR GetColor(void) { return m_col; }
+	D3DXVECTOR3 GetVtxMax(void) { return m_VtxMax; }
+	D3DXVECTOR3 GetVtxMin(void) { return m_VtxMin; }
 	void SetDisp(const bool bDisp) { m_bDisp = bDisp; }
 	void SwapDisp(void) { m_bDisp = m_bDisp ? false : true; }
 

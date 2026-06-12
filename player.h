@@ -61,7 +61,7 @@ public:
 	void SwapDisp(void) { m_bDisp = m_bDisp ? false : true; }
 
 	bool Movement(const D3DXVECTOR3 rot);
-	bool CollisionEnergyRock(const D3DXVECTOR3 pos);
+	bool CollisionEnergyRock(D3DXVECTOR3* pPos);
 
 private:
 	HRESULT SetModel(const char* pFilename);
@@ -72,7 +72,8 @@ private:
 	CMotion* m_pMotion;							// モーションへのポインタ
 
 	D3DXMATRIX m_mtxWorld;			// ワールドマトリックス
-	D3DXVECTOR3 m_pos;				// 位置
+	D3DXVECTOR3 m_pos;				// 現在の位置
+	D3DXVECTOR3 m_posOld;			// 前回の位置
 	D3DXVECTOR3 m_move;				// 移動量
 	D3DXVECTOR3 m_rot;				// 向き
 	D3DXVECTOR3 m_rotDest;			// 目的の向き

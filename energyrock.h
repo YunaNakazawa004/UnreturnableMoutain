@@ -31,6 +31,9 @@ public:
 	void Update(void);
 	void Draw(void);
 
+	bool Collision(D3DXVECTOR3* pPos, D3DXVECTOR3* pPosOld, D3DXVECTOR3* pMove,
+		const float fRadius, const float fHeight);
+
 private:
 };
 

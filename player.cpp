@@ -94,6 +94,7 @@ CPlayer::CPlayer(const int nPriority) :CObject(nPriority)
 	m_nNumModel = 0;
 	m_pMotion = NULL;
 	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_posOld = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_rotDest = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
@@ -124,6 +125,7 @@ HRESULT CPlayer::Init(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot)
 {
 	// プレイヤーの情報の初期化
 	m_pos = pos;
+	m_posOld = pos;
 	m_rot = rot;
 	m_scale = D3DXVECTOR3(1.0f, 1.0f, 1.0f);
 	m_col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
@@ -207,13 +209,16 @@ void CPlayer::Update(void)
 	pDebugProc->Print("Space:ジャンプ(長押しで高さ変化)\n");
 	pDebugProc->Print("Enter:エネルギー回収(鉱石の近くで)\n");
 	pDebugProc->Print("IJKL/マウス右クリック:カメラ操作\n");
-	pDebugProc->Print("BackSpace:位置リセット\n");
+	pDebugProc->Print("BackSpace:リセット\n");
 	pDebugProc->Print("\n[コントローラー]\n");
 	pDebugProc->Print("左スティック/十字キー:移動\n");
 	pDebugProc->Print("A:ジャンプ(長押しで高さ変化)\n");
 	pDebugProc->Print("X:エネルギー回収(鉱石の近くで)\n");
 	pDebugProc->Print("右スティック:カメラ操作\n");
-	pDebugProc->Print("START:位置リセット\n");
+	pDebugProc->Print("START:リセット\n");
+
+	// 前回の位置を保存
+	m_posOld = m_pos;
 
 	// 移動処理
 	if (m_pMotion->GetType() != MOTIONTYPE_DEATH)
@@ -280,6 +285,7 @@ void CPlayer::Update(void)
 	if (pInputKeyboard->GetTrigger(DIK_BACKSPACE) == true || pInputJoypad->GetTrigger(0, CInputJoypad::JOYKEY_START) == true)
 	{// 位置回転リセット
 		pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+		m_posOld = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 		rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 		m_rotDest = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 		m_move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
@@ -341,7 +347,7 @@ void CPlayer::Update(void)
 	rot.y += (m_rotDest.y - rot.y) * 0.1f;
 
 	// 当たり判定
-	if (CollisionEnergyRock(pos) == true && m_bJump == false && m_pMotion->GetType() != MOTIONTYPE_DEATH)
+	if (CollisionEnergyRock(&pos) == true && m_bJump == false && m_pMotion->GetType() != MOTIONTYPE_DEATH)
 	{// エネルギー鉱物と当たっているとき/空中ではないとき
 		if (pInputKeyboard->GetTrigger(DIK_RETURN) == true || pInputJoypad->GetTrigger(0, CInputJoypad::JOYKEY_X) == true)
 		{// 回収するキーを押した
@@ -677,7 +683,7 @@ bool CPlayer::Movement(const D3DXVECTOR3 rot)
 //========================================================================
 // エネルギー鉱物との当たり判定
 //========================================================================
-bool CPlayer::CollisionEnergyRock(const D3DXVECTOR3 pos)
+bool CPlayer::CollisionEnergyRock(D3DXVECTOR3* pPos)
 {
 	for (int nCntPri = 0; nCntPri < MAX_PRIORITY_NUM; nCntPri++)
 	{
@@ -703,13 +709,16 @@ bool CPlayer::CollisionEnergyRock(const D3DXVECTOR3 pos)
 					posRock = pObj->GetPosition();
 
 					// 距離を計算
-					dist = pos - posRock;
+					dist = *pPos - posRock;
 
 					if ((D3DXVec3Length(&dist) < ENERGYROCK_RADIUS + m_fRadius) &&
-						pos.y < posRock.y + ENERGYROCK_HEIGHT && pos.y + m_fHeight > posRock.y)
+						pPos->y < posRock.y + ENERGYROCK_HEIGHT && pPos->y + m_fHeight > posRock.y)
 					{// エネルギー鉱物と重なった
 						CParticle3D::Create(posRock, 10, 5, 5.0f, 0.0f, CEffect3D::TYPE_BLENDADD,
 							CParticle3D::TYPE_NORMAL, 10, 3.0f);
+
+						// 当たり判定
+						dynamic_cast<CEnergyRock*>(pObj)->Collision(pPos, &m_posOld, &m_move, m_fRadius, m_fHeight);
 
 						return true;
 					}
