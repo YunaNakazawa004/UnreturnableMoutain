@@ -22,10 +22,12 @@
 #define MOVEMENT				(D3DXVECTOR3(5.0f, 5.0f, 5.0f))			// 移動量
 #define ROT						(D3DXVECTOR3(0.035f, 0.035f, 0.035f))	// 向き移動量
 #define AUTO_ROT				(D3DXVECTOR3(0.005f, 0.005f, 0.005f))	// 自動回転移動量
+#define AUTOROTATE_COUNT		(180)									// 回り込みまでのカウント
 #define DEFAULT_VIEW_ANGLE		(45.0f)									// 規定の視野角
 #define INERTIA_VIEW_ANGLE		(0.05f)									// 視野角の慣性
 #define INERTIA_POSR			(0.6f)									// 注視点の慣性
 #define INERTIA_POSV			(0.6f)									// 視点の慣性
+#define INERTIA_ROT				(0.02f)									// 回り込みの慣性
 #define MAX_Y					(300.0f)								// 上の制限
 #define MIN_Y					(-300.0f)								// 下の制限
 
@@ -110,6 +112,7 @@ void CCamera::Update(void)
 	D3DXVECTOR3 MousePos;
 	static D3DXVECTOR3 ClickPos, CameraRot;		// クリックされた位置、クリックされた瞬間のカメラの向き
 	static float fCameraAngle;					// クリックされた瞬間のカメラの上下角度
+	static int nAutoCameraCounter = 0;			// カメラの回り込みまでのカウンター
 	D3DXVECTOR3 pos = pPlayer->GetPosition();
 	D3DXVECTOR3 rot = pPlayer->GetRotation();
 
@@ -130,9 +133,9 @@ void CCamera::Update(void)
 	// それぞれのカメラの処理
 	switch (m_type)
 	{
-#if 1
 	case TYPE_PLAYER:
 		int nValueH, nValueV;
+		nAutoCameraCounter++;
 
 		// プレイヤー向きを調整
 		CorrectAngle(&rot.y, ((rot.y - D3DX_PI) - m_rot.y));
@@ -155,6 +158,9 @@ void CCamera::Update(void)
 			m_posVDest.x = m_posRDest.x + sinf(D3DX_PI + m_rot.y) * m_fDistance * sinf((D3DX_PI * 0.5f) - m_fAngle);
 			m_posVDest.y = m_posRDest.y + cosf((D3DX_PI * 0.5f) - m_fAngle) * m_fDistance;
 			m_posVDest.z = m_posRDest.z + cosf(D3DX_PI + m_rot.y) * m_fDistance * sinf((D3DX_PI * 0.5f) - m_fAngle);
+
+			// 操作されたらカウンターをリセット
+			nAutoCameraCounter = 0;
 		}
 		else if (pInputKeyboard->GetPress(DIK_L) == true)
 		{// 左に旋回
@@ -163,6 +169,9 @@ void CCamera::Update(void)
 			m_posVDest.x = m_posRDest.x + sinf(D3DX_PI + m_rot.y) * m_fDistance * sinf((D3DX_PI * 0.5f) - m_fAngle);
 			m_posVDest.y = m_posRDest.y + cosf((D3DX_PI * 0.5f) - m_fAngle) * m_fDistance;
 			m_posVDest.z = m_posRDest.z + cosf(D3DX_PI + m_rot.y) * m_fDistance * sinf((D3DX_PI * 0.5f) - m_fAngle);
+
+			// 操作されたらカウンターをリセット
+			nAutoCameraCounter = 0;
 		}
 
 		if (pInputKeyboard->GetPress(DIK_K) == true)
@@ -179,6 +188,9 @@ void CCamera::Update(void)
 			m_posVDest.x = m_posRDest.x + sinf(D3DX_PI + m_rot.y) * m_fDistance * sinf((D3DX_PI * 0.5f) - m_fAngle);
 			m_posVDest.y = m_posRDest.y + cosf((D3DX_PI * 0.5f) - m_fAngle) * m_fDistance;
 			m_posVDest.z = m_posRDest.z + cosf(D3DX_PI + m_rot.y) * m_fDistance * sinf((D3DX_PI * 0.5f) - m_fAngle);
+
+			// 操作されたらカウンターをリセット
+			nAutoCameraCounter = 0;
 		}
 		else if (pInputKeyboard->GetPress(DIK_I) == true)
 		{// 下に移動
@@ -194,6 +206,9 @@ void CCamera::Update(void)
 			m_posVDest.x = m_posRDest.x + sinf(D3DX_PI + m_rot.y) * m_fDistance * sinf((D3DX_PI * 0.5f) - m_fAngle);
 			m_posVDest.y = m_posRDest.y + cosf((D3DX_PI * 0.5f) - m_fAngle) * m_fDistance;
 			m_posVDest.z = m_posRDest.z + cosf(D3DX_PI + m_rot.y) * m_fDistance * sinf((D3DX_PI * 0.5f) - m_fAngle);
+
+			// 操作されたらカウンターをリセット
+			nAutoCameraCounter = 0;
 		}
 
 		// 視点移動(マウス)
@@ -220,6 +235,9 @@ void CCamera::Update(void)
 			m_posVDest.x = m_posRDest.x + sinf(D3DX_PI + m_rot.y) * m_fDistance * sinf((D3DX_PI * 0.5f) - m_fAngle);
 			m_posVDest.y = m_posRDest.y + cosf((D3DX_PI * 0.5f) - m_fAngle) * m_fDistance;
 			m_posVDest.z = m_posRDest.z + cosf(D3DX_PI + m_rot.y) * m_fDistance * sinf((D3DX_PI * 0.5f) - m_fAngle);
+
+			// 操作されたらカウンターをリセット
+			nAutoCameraCounter = 0;
 		}
 
 		// 視点移動(ジョイパッド)
@@ -245,11 +263,21 @@ void CCamera::Update(void)
 			m_posVDest.x = m_posRDest.x + sinf(D3DX_PI + m_rot.y) * m_fDistance * sinf((D3DX_PI * 0.5f) - m_fAngle);
 			m_posVDest.y = m_posRDest.y + cosf((D3DX_PI * 0.5f) - m_fAngle) * m_fDistance;
 			m_posVDest.z = m_posRDest.z + cosf(D3DX_PI + m_rot.y) * m_fDistance * sinf((D3DX_PI * 0.5f) - m_fAngle);
+
+			// 操作されたらカウンターをリセット
+			nAutoCameraCounter = 0;
 		}
 
+		if (nAutoCameraCounter > AUTOROTATE_COUNT)
+		{// プレイヤーの入力がない場合回り込む
+			m_rot.y += ((rot.y - D3DX_PI) - m_rot.y) * INERTIA_ROT;
+		}
+
+#if 0
 		pDebugProc->Print("*** カメラ ***\n");
 		pDebugProc->Print("視点の位置 : ( %f %f %f )\n", m_posV.x, m_posV.y, m_posV.z);
 		pDebugProc->Print("注視点の位置 : ( %f %f %f )\n", m_posR.x, m_posR.y, m_posR.z);
+#endif
 
 		// カメラ向きを調整
 		CorrectAngle(&m_rot.y, m_rot.y);
@@ -261,7 +289,7 @@ void CCamera::Update(void)
 		m_posV += (m_posVDest - m_posV) * INERTIA_POSV;
 
 		break;
-#endif
+
 	case TYPE_SOLO:			// 単体カメラ
 		// 視点移動
 		if (pInputMouse->GetPress(CInputMouse::MOUSEBUTTON_LEFT) == true &&

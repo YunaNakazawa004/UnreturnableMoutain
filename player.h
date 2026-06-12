@@ -80,6 +80,10 @@ private:
 	float m_fRadius;				// 半径
 	float m_fHeight;				// 高さ
 	float m_fJumpHigh;				// ジャンプ量
+
+	float m_fEnergy;				// エネルギー
+	int m_nEnergyCounter;			// エネルギー減少カウンター
+
 	bool m_bJump;					// ジャンプしているか
 	bool m_bLand;					// 着地中かどうか
 	bool m_bAct;					// アクション中かどうか

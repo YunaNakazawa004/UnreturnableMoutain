@@ -37,6 +37,10 @@
 #define JUMP_ADD		(0.02f)									// ジャンプの変化量
 #define MAX_JUMP		(1.0f)									// ジャンプ量の最大値
 #define GRAVITY			(-0.3f)									// 重力
+#define MAX_ENERGY		(100.0f)								// 最大所持エネルギー
+#define FIRST_ENERGY	(80.0f)									// 初期所持エネルギー
+#define ONE_ENERGY		(5.0f)									// 鉱石ひとつあたりのエネルギー
+#define MINUS_ENERGY	(90)									// エネルギー減少の間隔
 
 //========================================================================
 // プレイヤークラスの生成処理
@@ -98,6 +102,8 @@ CPlayer::CPlayer(const int nPriority) :CObject(nPriority)
 	m_fRadius = 0.0f;
 	m_fHeight = 0.0f;
 	m_fJumpHigh = 0.0f;
+	m_fEnergy = 0.0f;
+	m_nEnergyCounter = 0;
 	m_bJump = false;
 	m_bLand = false;
 	m_bAct = false;
@@ -121,6 +127,7 @@ HRESULT CPlayer::Init(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot)
 	m_rot = rot;
 	m_scale = D3DXVECTOR3(1.0f, 1.0f, 1.0f);
 	m_col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+	m_fEnergy = FIRST_ENERGY;
 
 	// モーションを生成/初期化
 	if (m_pMotion == NULL)
@@ -191,6 +198,16 @@ void CPlayer::Update(void)
 	D3DXVECTOR3 UpperPosOff = m_apModel[1]->GetPosOffC();	// 上半身の位置(オフセット保存)
 	D3DXVECTOR3 UpperPos = m_apModel[1]->GetPosOff();		// 上半身の位置(オフセットをいじる)
 
+	// 操作
+	pDebugProc->Print("\n*** 操作説明 ***\n");
+	pDebugProc->Print("[キーボード]\n");
+	pDebugProc->Print("W:前進\nS:後退\nA:左に回転\nD:右に回転\n");
+	pDebugProc->Print("Space:ジャンプ(長押しで高さ変化)\n");
+	pDebugProc->Print("Enter:エネルギー回収(鉱石の近くで)\n");
+	pDebugProc->Print("IJKL/マウス右クリック:カメラ操作\n");
+	pDebugProc->Print("BackSpace:位置リセット\n");
+	pDebugProc->Print("エネルギー残量:%f\n", m_fEnergy);
+
 	// 移動処理
 	if (Movement(rot) == true)
 	{// 移動している
@@ -199,8 +216,11 @@ void CPlayer::Update(void)
 			// モーションを設定
 			m_pMotion->Set(MOTIONTYPE_MOVE, true, 20);
 		}
+
+		// 移動するとエネルギーが減る
+		m_nEnergyCounter++;
 	}
-	else if(m_bJump == false && m_bLand == false && m_bAct == false)
+	else if (m_bJump == false && m_bLand == false && m_bAct == false)
 	{// 移動していない
 		// モーションを設定
 		m_pMotion->Set(MOTIONTYPE_NEUTRAL, true, 20);
@@ -208,6 +228,8 @@ void CPlayer::Update(void)
 
 	if (m_bJump == false)
 	{// ジャンプしていないとき
+		static float fMinusEnergy = 0.0f;
+
 		if (pInputKeyboard->GetPress(DIK_SPACE) == true || pInputJoypad->GetPress(0, CInputJoypad::JOYKEY_A) == true)
 		{// ジャンプキー長押し
 			// ジャンプ量を上げる
@@ -221,13 +243,16 @@ void CPlayer::Update(void)
 			{// 最大値ではないときだけ
 				// モデルの位置を変更
 				UpperPos.y -= JUMP_ADD;
+
+				// 消費するエネルギー量を増やす
+				fMinusEnergy += 0.1f;
 			}
 		}
 
 		if (pInputKeyboard->GetRelease(DIK_SPACE) == true || pInputJoypad->GetRelease(0, CInputJoypad::JOYKEY_A) == true)
 		{// ジャンプ
 			m_bJump = true;
-			m_move.y = JUMP_HEIGHT + (JUMP_HEIGHT * m_fJumpHigh);
+			m_move.y = JUMP_HEIGHT + (JUMP_HEIGHT * m_fJumpHigh) - ((JUMP_HEIGHT * 0.8f) * (m_fEnergy * 0.01f));
 
 			// モーションを設定
 			m_pMotion->Set(MOTIONTYPE_JUMP, true, 20);
@@ -235,6 +260,10 @@ void CPlayer::Update(void)
 			// ジャンプ量リセット
 			m_fJumpHigh = 0.0f;
 			UpperPos.y = UpperPosOff.y;
+
+			// エネルギーを消費する
+			m_fEnergy -= fMinusEnergy;
+			fMinusEnergy = 0.0f;		// リセット
 		}
 	}
 
@@ -244,6 +273,9 @@ void CPlayer::Update(void)
 		rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 		m_rotDest = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 		m_move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+
+		m_nEnergyCounter = 0;
+		m_fEnergy = FIRST_ENERGY;
 	}
 
 	// 位置に移動量を加算
@@ -251,7 +283,7 @@ void CPlayer::Update(void)
 
 	// 重力
 	m_move.y += GRAVITY;
-	
+
 	if (m_bJump == false)
 	{// 地上では慣性
 		// 移動量に慣性
@@ -279,6 +311,8 @@ void CPlayer::Update(void)
 		}
 	}
 
+	pDebugProc->Print("%d\n", m_nEnergyCounter);
+
 	// 目的の向きを修正
 	float fmoveAngle = m_rotDest.y - rot.y;
 
@@ -298,17 +332,38 @@ void CPlayer::Update(void)
 	// 当たり判定
 	if (CollisionEnergyRock(pos) == true && m_bJump == false)
 	{// エネルギー鉱物と当たっているとき/空中ではないとき
-		if (pInputKeyboard->GetTrigger(DIK_RETURN) == true)
+		if (pInputKeyboard->GetTrigger(DIK_RETURN) == true || pInputJoypad->GetTrigger(0, CInputJoypad::JOYKEY_X) == true)
 		{// 回収するキーを押した
 			// モーションを設定
 			m_pMotion->Set(MOTIONTYPE_ACTION, true, 20);
 			m_bAct = true;
+			m_bLand = false;
 		}
 	}
 
 	if (m_bAct == true && m_pMotion->GetType() == MOTIONTYPE_ACTION && m_pMotion->IsFinish() == true)
 	{// アクションモーションが終わった
 		m_bAct = false;
+
+		// エネルギー回収
+		m_fEnergy += ONE_ENERGY;
+	}
+
+	// エネルギー減少
+	if (m_nEnergyCounter > MINUS_ENERGY)
+	{// 一定時間移動し続けると減少
+		m_fEnergy -= 1.0f;		// 減らす
+
+		m_nEnergyCounter = 0;	// リセット
+	}
+
+	if (m_fEnergy > MAX_ENERGY)
+	{// 最大値に調整
+		m_fEnergy = MAX_ENERGY;
+	}
+	else if (m_fEnergy < 0.0f)
+	{// 最小値に調整
+		m_fEnergy = 0.0f;
 	}
 
 	// 位置/向きを適用
@@ -467,19 +522,24 @@ bool CPlayer::Movement(const D3DXVECTOR3 rot)
 	bool bMove = false;
 	int nValueH, nValueV;
 
+	// 8方向移動時のスピード
+	float fSpeedX = ((m_bJump ? AIR_MOVEMENT.x : LAND_MOVEMENT.x) * (1.5f - (m_fEnergy * 0.01f)));
+	float fSpeedZ = ((m_bJump ? AIR_MOVEMENT.z : LAND_MOVEMENT.z) * (1.5f - (m_fEnergy * 0.01f)));
+
 	if (pInputJoypad->GetStick(0, CInputJoypad::JOYKEY_LEFTSTICK, &nValueH, &nValueV) == true)
 	{// スティック移動
-		float fSpeed = -(float)nValueV * 0.0000183f;		// スピード
+		float fSpeed = ((m_bJump ? -(float)nValueV * 0.0000183f / 6.0f : -(float)nValueV * 0.0000183f)
+			* (1.5f - (m_fEnergy * 0.01f)));		// スピード
 
-		m_move.x += sinf(rot.y) * (m_bJump ? fSpeed / 6.0f : fSpeed);
-		m_move.z += cosf(rot.y) * (m_bJump ? fSpeed / 6.0f : fSpeed);
+		m_move.x += sinf(rot.y) * fSpeed;
+		m_move.z += cosf(rot.y) * fSpeed;
 
 		// 進んだ方向にモデルを傾ける
 		UnderRotDest.x = MODEL_ROT * ((nValueV < 0) ? 1 : -1);
 		UnderRotDest.z = MODEL_ROT * ((nValueH < 0) ? -1 : 1);
 		UpperRotDest.x = MODEL_ROT * ((nValueV < 0) ? 1 : -1);
 		UpperRotDest.z = MODEL_ROT * ((nValueH < 0) ? -1 : 1);
-		TireRot.x += TIRE_ROT * ((nValueV < 0) ? 1 : -1); 
+		TireRot.x += TIRE_ROT * ((nValueV < 0) ? 1 : -1);
 
 		// 進んだ方向に角度を向ける
 		m_rotDest.y = rot.y + ((float)nValueH * 0.00001f * ((nValueV < 0) ? -1 : 1));
@@ -490,8 +550,8 @@ bool CPlayer::Movement(const D3DXVECTOR3 rot)
 	{// 奥に移動
 		if (pInputKeyboard->GetPress(DIK_A) == true || pInputJoypad->GetPress(0, CInputJoypad::JOYKEY_LEFT) == true)
 		{// 左奥に移動
-			m_move.x += sinf(D3DX_PI * 0.25f - rot.y) * (m_bJump ? AIR_MOVEMENT.x : LAND_MOVEMENT.x);
-			m_move.z += cosf(D3DX_PI * 0.75f + rot.y) * (m_bJump ? AIR_MOVEMENT.z : LAND_MOVEMENT.z);
+			m_move.x += sinf(D3DX_PI * 0.25f - rot.y) * fSpeedX;
+			m_move.z += cosf(D3DX_PI * 0.75f + rot.y) * fSpeedZ;
 
 			// 進んだ方向にモデルを傾ける
 			UnderRotDest.z = -MODEL_ROT;
@@ -502,8 +562,8 @@ bool CPlayer::Movement(const D3DXVECTOR3 rot)
 		}
 		else if (pInputKeyboard->GetPress(DIK_D) == true || pInputJoypad->GetPress(0, CInputJoypad::JOYKEY_RIGHT) == true)
 		{// 右奥に移動
-			m_move.x += sinf(-D3DX_PI * 0.25f - rot.y) * (m_bJump ? AIR_MOVEMENT.x : LAND_MOVEMENT.x);
-			m_move.z += cosf(-D3DX_PI * 0.75f + rot.y) * (m_bJump ? AIR_MOVEMENT.z : LAND_MOVEMENT.z);
+			m_move.x += sinf(-D3DX_PI * 0.25f - rot.y) * fSpeedX;
+			m_move.z += cosf(-D3DX_PI * 0.75f + rot.y) * fSpeedZ;
 
 			// 進んだ方向にモデルを傾ける
 			UnderRotDest.z = MODEL_ROT;
@@ -514,8 +574,8 @@ bool CPlayer::Movement(const D3DXVECTOR3 rot)
 		}
 		else if (pInputKeyboard->GetPress(DIK_W) == true || pInputJoypad->GetPress(0, CInputJoypad::JOYKEY_UP) == true)
 		{// 奥に移動
-			m_move.x += sinf(D3DX_PI * 1.0f + rot.y) * (m_bJump ? AIR_MOVEMENT.x : LAND_MOVEMENT.x);
-			m_move.z += cosf(D3DX_PI * 1.0f + rot.y) * (m_bJump ? AIR_MOVEMENT.z : LAND_MOVEMENT.z);
+			m_move.x += sinf(D3DX_PI * 1.0f + rot.y) * fSpeedX;
+			m_move.z += cosf(D3DX_PI * 1.0f + rot.y) * fSpeedZ;
 		}
 
 		// 進んだ方向にモデルを傾ける
@@ -529,8 +589,8 @@ bool CPlayer::Movement(const D3DXVECTOR3 rot)
 	{// 手前に移動
 		if (pInputKeyboard->GetPress(DIK_A) == true || pInputJoypad->GetPress(0, CInputJoypad::JOYKEY_LEFT) == true)
 		{// 左手前に移動
-			m_move.x += sinf(D3DX_PI * 0.75f - rot.y) * (m_bJump ? AIR_MOVEMENT.x : LAND_MOVEMENT.x);
-			m_move.z += cosf(D3DX_PI * 0.25f + rot.y) * (m_bJump ? AIR_MOVEMENT.z : LAND_MOVEMENT.z);
+			m_move.x += sinf(D3DX_PI * 0.75f - rot.y) * fSpeedX;
+			m_move.z += cosf(D3DX_PI * 0.25f + rot.y) * fSpeedZ;
 
 			// 進んだ方向にモデルを傾ける
 			UnderRotDest.z = -MODEL_ROT;
@@ -541,8 +601,8 @@ bool CPlayer::Movement(const D3DXVECTOR3 rot)
 		}
 		else if (pInputKeyboard->GetPress(DIK_D) == true || pInputJoypad->GetPress(0, CInputJoypad::JOYKEY_RIGHT) == true)
 		{// 右手前に移動
-			m_move.x += sinf(-D3DX_PI * 0.75f - rot.y) * (m_bJump ? AIR_MOVEMENT.x : LAND_MOVEMENT.x);
-			m_move.z += cosf(-D3DX_PI * 0.25f + rot.y) * (m_bJump ? AIR_MOVEMENT.z : LAND_MOVEMENT.z);
+			m_move.x += sinf(-D3DX_PI * 0.75f - rot.y) * fSpeedX;
+			m_move.z += cosf(-D3DX_PI * 0.25f + rot.y) * fSpeedZ;
 
 			// 進んだ方向にモデルを傾ける
 			UnderRotDest.z = MODEL_ROT;
@@ -553,8 +613,8 @@ bool CPlayer::Movement(const D3DXVECTOR3 rot)
 		}
 		else if (pInputKeyboard->GetPress(DIK_S) == true || pInputJoypad->GetPress(0, CInputJoypad::JOYKEY_DOWN) == true)
 		{// 手前に移動
-			m_move.x += sinf(D3DX_PI * 0.0f + rot.y) * (m_bJump ? AIR_MOVEMENT.x : LAND_MOVEMENT.x);
-			m_move.z += cosf(D3DX_PI * 0.0f + rot.y) * (m_bJump ? AIR_MOVEMENT.z : LAND_MOVEMENT.z);
+			m_move.x += sinf(D3DX_PI * 0.0f + rot.y) * fSpeedX;
+			m_move.z += cosf(D3DX_PI * 0.0f + rot.y) * fSpeedZ;
 		}
 
 		// 進んだ方向にモデルを傾ける
