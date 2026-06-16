@@ -132,8 +132,13 @@ HRESULT CMeshField::Init(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot,
 
 			// 頂点座標の設定
 			pVtx[nVtx].pos.x = -((m_block.x * m_size.x * 2.0f) * 0.5f) + (nCntMeshField2 * m_size.x * 2.0f);
-			pVtx[nVtx].pos.y = 50.0f * (nCntMeshField2 % 2);
+			pVtx[nVtx].pos.y = 0.0f;
 			pVtx[nVtx].pos.z = ((m_block.y * m_size.y * 2.0f) * 0.5f) - (nCntMeshField1 * m_size.y * 2.0f);
+
+			if (nCntMeshField2 == (int)m_block.x)
+			{
+				pVtx[nVtx].pos.y = 30.0f;
+			}
 
 			// 頂点カラーの設定
 			pVtx[nVtx].col = COLOR_WHITE;
@@ -389,7 +394,7 @@ void CMeshField::SetNor(void)
 			nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
 
 			// 法線の設定
-			if ((nCntMeshField1 == 0 && nCntMeshField2 == m_block.x))
+			if ((nCntMeshField1 == 0 && nCntMeshField2 == (int)m_block.x))
 			{// 法線ひとつ(右上)(▽)
 				vec1 = pVtx[nVtx + ((int)m_block.x + 1)].pos - pVtx[nVtx].pos;
 				vec2 = pVtx[nVtx - 1].pos - pVtx[nVtx].pos;
@@ -400,7 +405,7 @@ void CMeshField::SetNor(void)
 				// 正規化
 				D3DXVec3Normalize(&nor, &nor);
 			}
-			else if (nCntMeshField1 == m_block.y && nCntMeshField2 == 0)
+			else if (nCntMeshField1 == (int)m_block.y && nCntMeshField2 == 0)
 			{// 法線ひとつ(左下)(△)
 				vec1 = pVtx[nVtx - ((int)m_block.x + 1)].pos - pVtx[nVtx].pos;
 				vec2 = pVtx[nVtx + 1].pos - pVtx[nVtx].pos;
@@ -439,7 +444,7 @@ void CMeshField::SetNor(void)
 
 				nor = (norA + norB) / 2.0f;		// 最終的な法線方向
 			}
-			else if (nCntMeshField1 == m_block.y && nCntMeshField2 == m_block.x)
+			else if (nCntMeshField1 == (int)m_block.y && nCntMeshField2 == (int)m_block.x)
 			{// 法線ふたつ(右下)
 				// (△)
 				int nMainVtx = nVtx - 1;						// 真左の頂点に主頂点を設定
@@ -505,7 +510,7 @@ void CMeshField::SetNor(void)
 
 				nor = (norA + norB + norC) / 3.0f;		// 最終的な法線方向
 			}
-			else if (nCntMeshField1 == m_block.y)
+			else if (nCntMeshField1 == (int)m_block.y)
 			{// 法線みっつ(下の辺)
 				// (△)
 				vec1 = pVtx[nVtx - ((int)m_block.x + 1)].pos - pVtx[nVtx].pos;
@@ -581,7 +586,7 @@ void CMeshField::SetNor(void)
 
 				nor = (norA + norB + norC) / 3.0f;		// 最終的な法線方向
 			}
-			else if (nCntMeshField2 == m_block.x)
+			else if (nCntMeshField2 == (int)m_block.x)
 			{// 法線みっつ(右の辺)
 				// (▽)
 				vec1 = pVtx[nVtx + ((int)m_block.x + 1)].pos - pVtx[nVtx].pos;

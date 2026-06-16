@@ -202,8 +202,8 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	// メッシュフィールドを生成
 	if (m_pMeshField == NULL)
 	{// NULLチェック
-		m_pMeshField = CMeshField::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR2(16.0f, 16.0f),
-			D3DXVECTOR2(100.0f, 100.0f), CObject::TYPE_MESHFIELD, NULL, 3);
+		m_pMeshField = CMeshField::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR2(32.0f, 32.0f),
+			D3DXVECTOR2(10.0f, 10.0f), CObject::TYPE_MESHFIELD, NULL, 3);
 
 		if (m_pMeshField == NULL)
 		{// NULLチェック
