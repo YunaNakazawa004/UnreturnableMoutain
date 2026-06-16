@@ -15,9 +15,13 @@
 #include "camera.h"
 #include "model.h"
 #include "motion.h"
+
 #include "effect3D.h"
 #include "particle3D.h"
 #include "energyrock.h"
+
+#include "object3D.h"
+#include "meshfield.h"
 
 #include <iostream>
 #include <fstream>
@@ -196,6 +200,7 @@ void CPlayer::Update(void)
 	CInputKeyboard* pInputKeyboard = CManager::GetInputKeyboard();		// キーボード入力の取得
 	CInputJoypad* pInputJoypad = CManager::GetInputJoypad();			// ジョイパッド入力の取得
 	CDebugProc* pDebugProc = CManager::GetDebugProc();					// デバッグ表示の取得
+	CMeshField* pMeshField = CManager::GetMeshField();					// メッシュフィールドの取得
 	D3DXVECTOR3 pos = CPlayer::GetPosition();				// プレイヤーの位置	
 	D3DXVECTOR3 rot = CPlayer::GetRotation();				// プレイヤーの向き
 	D3DXVECTOR2 move = { 0.0f,0.0f };						// XZ方向に動いているかどうかの判断用
@@ -203,6 +208,10 @@ void CPlayer::Update(void)
 	D3DXVECTOR3 UpperPosOff = m_apModel[1]->GetPosOffC();	// 上半身の位置(オフセット保存)
 	D3DXVECTOR3 UpperPos = m_apModel[1]->GetPosOff();		// 上半身の位置(オフセットをいじる)
 
+	float fHeight = 0.0f;		// 地面の高さ
+	D3DXVECTOR2 polygonIdx = { -1.0f,-1.0f };		// ポリゴン番号
+
+#if 0
 	// 操作
 	pDebugProc->Print("\n*** プレイヤー ***\n");
 	pDebugProc->Print("エネルギー残量:%f\n", m_fEnergy);
@@ -219,6 +228,7 @@ void CPlayer::Update(void)
 	pDebugProc->Print("X:エネルギー回収(鉱石の近くで)\n");
 	pDebugProc->Print("右スティック:カメラ操作\n");
 	pDebugProc->Print("START:リセット\n");
+#endif
 
 	// 前回の位置を保存
 	m_posOld = m_pos;
@@ -314,9 +324,27 @@ void CPlayer::Update(void)
 	}
 
 	// XZ方向への移動量(動いているかいないか)※Y座標のみの変化はとらない
-	move = D3DXVECTOR2(m_move.x, m_move.z);		
+	move = D3DXVECTOR2(m_move.x, m_move.z);
 
-	if (pos.y < 0.0f)
+	// ポリゴン番号を取得
+	polygonIdx = pMeshField->GetPolygonIdx(pos);
+
+	pDebugProc->Print("乗っているポリゴン番号 : %d %d\n", (int)polygonIdx.x, (int)polygonIdx.y);
+
+	// 地面の高さを取得
+	fHeight = pMeshField->GetHeight(pos, polygonIdx);
+
+	if (fHeight == ERROR_HEIGHT)
+	{// 無効な高さだったら
+		fHeight = 0.0f;
+	}
+
+	if (m_bJump == false)
+	{// 空中ではないとき
+		pos.y = fHeight;
+	}
+
+	if (pos.y <= fHeight)
 	{// 地面との当たり判定
 		if (m_bJump == true && m_pMotion->GetType() != MOTIONTYPE_DEATH)
 		{// 着地
@@ -325,7 +353,7 @@ void CPlayer::Update(void)
 			m_bLand = true;
 		}
 
-		pos.y = 0.0f;
+		pos.y = fHeight;
 		m_move.y = 0.0f;
 		m_bJump = false;
 
@@ -697,8 +725,6 @@ bool CPlayer::Movement(const D3DXVECTOR3 rot)
 	{// 追加角度の最大値
 		fRotCounter = MAX_ROTADD;
 	}
-
-	pDebugProc->Print("%f\n", fSpeedX);
 
 	// モデルの傾きを加算
 	UnderRot += (UnderRotDest - UnderRot) * 0.1f;

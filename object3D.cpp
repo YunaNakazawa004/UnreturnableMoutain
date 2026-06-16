@@ -94,6 +94,8 @@ HRESULT CObject3D::Init(const D3DXVECTOR3 pos,
 	CRenderer* pRenderer = CManager::GetRenderer();			// レンダラーへのポインタ
 	LPDIRECT3DDEVICE9 pDevice = pRenderer->GetDevice();			// デバイスへのポインタ
 	VERTEX_3D* pVtx;
+	D3DXVECTOR3 vec0, vec1, vec2, vec3;
+	D3DXVECTOR3 norA, norB;
 
 	// クラスの値を初期化
 	m_pos = pos;
@@ -121,20 +123,34 @@ HRESULT CObject3D::Init(const D3DXVECTOR3 pos,
 	pVtx[0].pos.y = 0.0f;
 	pVtx[0].pos.z = +fDepth;
 	pVtx[1].pos.x = +fWidth;
-	pVtx[1].pos.y = 0.0f;
+	pVtx[1].pos.y = 30.0f;
 	pVtx[1].pos.z = +fDepth;
 	pVtx[2].pos.x = -fWidth;
-	pVtx[2].pos.y = 0.0f;
+	pVtx[2].pos.y = 30.0f;
 	pVtx[2].pos.z = -fDepth;
 	pVtx[3].pos.x = +fWidth;
 	pVtx[3].pos.y = 0.0f;
 	pVtx[3].pos.z = -fDepth;
+	
+	// それぞれの頂点間のベクトルを計算
+	vec0 = pVtx[1].pos - pVtx[0].pos;
+	vec1 = pVtx[2].pos - pVtx[0].pos;
+	vec2 = pVtx[1].pos - pVtx[3].pos;
+	vec3 = pVtx[2].pos - pVtx[3].pos;
+
+	// 法線を計算
+	D3DXVec3Cross(&norA, &vec0, &vec1);
+	D3DXVec3Cross(&norB, &vec3, &vec2);
+
+	// 法線を正規化
+	D3DXVec3Normalize(&norA, &norA);
+	D3DXVec3Normalize(&norB, &norB);
 
 	// 法線の設定
-	pVtx[0].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
-	pVtx[1].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
-	pVtx[2].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
-	pVtx[3].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
+	pVtx[0].nor = norA;
+	pVtx[1].nor = (norA + norB) * 0.5f;
+	pVtx[2].nor = (norA + norB) * 0.5f;
+	pVtx[3].nor = norB;
 
 	// 頂点カラーの設定
 	pVtx[0].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
@@ -323,4 +339,130 @@ void CObject3D::SetTexUV(const int nPatternAnim, const int nTexWidth, const int 
 
 	// 頂点バッファをアンロックする
 	m_pVtxBuff->Unlock();
+}
+
+//========================================================================
+// 現在位置の高さを取得
+//========================================================================
+float CObject3D::GetHeight(const D3DXVECTOR3 pos)
+{
+	// ローカル変数
+	D3DXVECTOR3 vecLine, vecToPos;		// 境界線ベクトル、現在位置へのベクトル
+	D3DXVECTOR3 posCorrect = pos;		// 角度を含めて調整した現在位置
+	float fposLine;			// 外積
+	float fDist;			// ポリゴンと現在位置との距離
+	int nCntLine = 0;		// 内側にいた回数
+	VERTEX_3D* pVtx;
+
+	fDist = sqrtf((((m_pos.x - pos.x) * 2) * ((m_pos.x - pos.x) * 2)) + 
+		(((m_pos.z - pos.z) * 2) * ((m_pos.z - pos.z) * 2))) * 0.5f;
+
+	// 現在位置に角度分の調整
+	//posCorrect.x = pos.x + sinf(D3DX_PI + m_rot.y) * fDist;
+	//posCorrect.z = pos.z + cosf((D3DX_PI * 0.5f) + m_rot.y) * fDist;
+
+	// 頂点バッファをロックし、頂点情報へのポインタを取得
+	m_pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
+
+	// プレイヤーが対象ポリゴン(0-1-2)の内側にいるかどうか
+	for (int nCnt = 0; nCnt < 3; nCnt++)
+	{
+		vecLine = pVtx[(nCnt + 1) % 3].pos - pVtx[nCnt].pos;		// 辺のベクトル
+		vecToPos = posCorrect - pVtx[nCnt].pos;							// 現在位置へのベクトル
+
+		// 外積を計算
+		fposLine = (float)((int)(((vecLine.z * vecToPos.x) - (vecLine.x * vecToPos.z)) * 1.0f) / (int)1);
+
+		if (fposLine > 0.0f)
+		{// 内側にいる
+			nCntLine++;
+		}
+	}
+
+	if (nCntLine >= 3)
+	{// 対象ポリゴン(0-1-2)の内側にいる
+		D3DXVECTOR3 vec1, vec2, nor;	// ベクトル、法線
+		float fHeight = 0.0f;			// 求める高さ
+
+		// ベクトルを取得
+		vec1 = pVtx[1].pos - pVtx[0].pos;
+		vec2 = pVtx[2].pos - pVtx[0].pos;
+
+		// 法線の計算
+		D3DXVec3Cross(&nor, &vec1, &vec2);
+
+		// 法線を正規化
+		D3DXVec3Normalize(&nor, &nor);
+
+		if (nor.y != 0.0f)
+		{// yの法線が0ではない
+			// 高さを求める計算
+			// 元の式 : (pos.x - pVtx[0].pos.x) * nor.x + (pos.y - pVtx[0].pos.y) * nor.y + (pos.z - pVtx[0].pos.z) * nor.z = 0.0f
+			fHeight = ((-(posCorrect.x - pVtx[0].pos.x) * nor.x - (posCorrect.z - pVtx[0].pos.z) * nor.z) / nor.y) + pVtx[0].pos.y;
+
+			// 頂点バッファをアンロックする
+			m_pVtxBuff->Unlock();
+
+			return fHeight;
+		}
+	}
+	else
+	{// 内側にいない→次のポリゴンの内側にいるかどうか調べる
+		nCntLine = 0;		// リセット
+	}
+
+	// プレイヤーが対象ポリゴン(3-2-1)の内側にいるかどうか
+	for (int nCnt = 3; nCnt > 0; nCnt--)
+	{
+		vecLine = pVtx[(nCnt + 1) % 3 + 1].pos - pVtx[nCnt].pos;		// 辺のベクトル
+		vecToPos = posCorrect - pVtx[nCnt].pos;								// 現在位置へのベクトル
+
+		// 外積を計算
+		fposLine = (float)((int)(((vecLine.z * vecToPos.x) - (vecLine.x * vecToPos.z)) * 1.0f) / (int)1);
+
+		if (fposLine > 0.0f)
+		{// 内側にいる
+			nCntLine++;
+		}
+	}
+
+	if (nCntLine >= 3)
+	{// 対象ポリゴン(3-2-1)の内側にいる
+		D3DXVECTOR3 vec1, vec2, nor;	// ベクトル、法線
+		float fHeight = 0.0f;			// 求める高さ
+
+		// ベクトルを取得
+		vec1 = pVtx[2].pos - pVtx[3].pos;
+		vec2 = pVtx[1].pos - pVtx[3].pos;
+
+		// 法線の計算
+		D3DXVec3Cross(&nor, &vec1, &vec2);
+
+		// 法線を正規化
+		D3DXVec3Normalize(&nor, &nor);
+
+		if (nor.y != 0.0f)
+		{// yの法線が0ではない
+			// 高さを求める計算
+			// 元の式 : (pos.x - pVtx[3].pos.x) * nor.x + (pos.y - pVtx[3].pos.y) * nor.y + (pos.z - pVtx[3].pos.z) * nor.z = 0.0f
+			fHeight = ((-(posCorrect.x - pVtx[3].pos.x) * nor.x - (posCorrect.z - pVtx[3].pos.z) * nor.z) / nor.y) + pVtx[3].pos.y;
+
+			// 頂点バッファをアンロックする
+			m_pVtxBuff->Unlock();
+
+			return fHeight;
+		}
+	}
+	else
+	{// どちらのポリゴンの内側にもいない
+		// 頂点バッファをアンロックする
+		m_pVtxBuff->Unlock();
+
+		return ERROR_HEIGHT;
+	}
+
+	// 頂点バッファをアンロックする
+	m_pVtxBuff->Unlock();
+
+	return ERROR_HEIGHT;
 }

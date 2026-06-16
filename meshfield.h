@@ -39,8 +39,12 @@ public:
 	void SetColor(const D3DXCOLOR col);
 	D3DXCOLOR GetColor(void) { return m_col; }
 	void SetTexUV(const int nCntVtx, const float ftexU, const float ftexV);
+	void SetNor(void);
 	void SetDisp(const bool bDisp) { m_bDisp = bDisp; }
 	void SwapDisp(void) { m_bDisp = m_bDisp ? false : true; }
+
+	D3DXVECTOR2 GetPolygonIdx(const D3DXVECTOR3 pos);
+	float GetHeight(const D3DXVECTOR3 pos, const D3DXVECTOR2 polygonIdx);
 
 private:
 	LPDIRECT3DVERTEXBUFFER9 m_pVtxBuff;			// 頂点バッファへのポインタ

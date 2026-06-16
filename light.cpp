@@ -8,6 +8,8 @@
 
 #include "renderer.h"
 #include "manager.h"
+#include "input.h"
+#include "debugproc.h"
 
 //=============================================================================
 // ライトクラスのコンストラクタ
@@ -54,7 +56,7 @@ HRESULT CLight::Init(void)
 	D3DXVec3Normalize(&vecDir, &vecDir);		// ベクトルを正規化する
 	m_aLight[0].Direction = vecDir;
 
-	vecDir = D3DXVECTOR3(-0.2f, 0.6f, 0.3f);
+	vecDir = D3DXVECTOR3(0.2f, 0.6f, -0.3f);
 	D3DXVec3Normalize(&vecDir, &vecDir);		// ベクトルを正規化する
 	m_aLight[1].Direction = vecDir;
 
@@ -69,8 +71,8 @@ HRESULT CLight::Init(void)
 
 	// ライトを有効にする
 	pDevice->LightEnable(0, TRUE);
-	pDevice->LightEnable(1, TRUE);
-	pDevice->LightEnable(2, TRUE);
+	//pDevice->LightEnable(1, TRUE);
+	//pDevice->LightEnable(2, TRUE);
 
 	return S_OK;
 }

@@ -11,6 +11,11 @@
 #include "object.h"
 
 //************************************************************************
+// マクロ定義
+//************************************************************************
+#define ERROR_HEIGHT			(-99999.0f)					// 高さを算出できなかった場合の数値
+
+//************************************************************************
 // オブジェクト3Dクラス
 //************************************************************************
 class CObject3D : public CObject
@@ -40,6 +45,8 @@ public:
 	void SetTexUV(const int nPatternAnim, const int nTexWidth, const int nTexHeight, const float fScrollX, const float fScrollY);
 	void SetDisp(const bool bDisp) { m_bDisp = bDisp; }
 	void SwapDisp(void) { m_bDisp = m_bDisp ? false : true; }
+
+	float GetHeight(const D3DXVECTOR3 pos);
 
 private:
 	LPDIRECT3DVERTEXBUFFER9 m_pVtxBuff;			// 頂点バッファへのポインタ

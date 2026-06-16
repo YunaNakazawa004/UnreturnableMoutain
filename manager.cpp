@@ -40,6 +40,8 @@ CCamera* CManager::m_pCamera = NULL;					// カメラのインスタンス
 CLight* CManager::m_pLight = NULL;						// ライトのインスタンス
 CTexture* CManager::m_pTexture = NULL;					// テクスチャのインスタンス
 CPlayer* CManager::m_pPlayer = NULL;					// プレイヤーのインスタンス
+CObject3D* CManager::m_pObject3D = NULL;				// オブジェクト3Dのインスタンス
+CMeshField* CManager::m_pMeshField = NULL;				// メッシュフィールドのインスタンス
 int CManager::m_nCountFPS = 0;							// FPSカウンター
 bool CManager::m_bPause = false;						// ポーズするかしないか
 
@@ -59,6 +61,8 @@ CManager::CManager()
 	m_pLight = NULL;
 	m_pTexture = NULL;
 	m_pPlayer = NULL;
+	m_pObject3D = NULL;
+	m_pMeshField = NULL;
 	m_nCountFPS = 0;
 	m_bPause = false;
 }
@@ -190,16 +194,38 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	CEffect3D::Load();
 	CNumber::Load();
 
-	//// 3Dオブジェクトを生成
-	//CObject3D::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), 100.0f, 100.0f, CObject::TYPE_OBJECT3D, "data\\TEXTURE\\field000.jpg", 3);
+	//// ビルボードオブジェクトを生成
+	//CObjectBillboard::Create(D3DXVECTOR3(50.0f, 50.0f, 0.0f), 50.0f, 50.0f, CObject::TYPE_OBJECTBILLBOARD, "data\\TEXTURE\\tree000.png", 3);
 
 	// メッシュフィールドを生成
-	CMeshField::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR2(50.0f, 50.0f),
-		D3DXVECTOR2(30.0f, 30.0f), CObject::TYPE_MESHFIELD, "data\\TEXTURE\\field000.jpg", 3);
+	if (m_pMeshField == NULL)
+	{// NULLチェック
+		m_pMeshField = CMeshField::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR2(16.0f, 16.0f),
+			D3DXVECTOR2(100.0f, 100.0f), CObject::TYPE_MESHFIELD, NULL, 3);
 
-	// ビルボードオブジェクトを生成
-	CObjectBillboard::Create(D3DXVECTOR3(50.0f, 50.0f, 0.0f), 50.0f, 50.0f, CObject::TYPE_OBJECTBILLBOARD, "data\\TEXTURE\\tree000.png", 3);
+		if (m_pMeshField == NULL)
+		{// NULLチェック
+			OutputDebugStringA("! ! ! メッシュフィールドの生成に失敗しました ! ! !\n");
 
+			return E_FAIL;
+		}
+	}
+	
+#if 0
+	// オブジェクト3Dを生成
+	if (m_pObject3D == NULL)
+	{// NULLチェック
+		m_pObject3D = CObject3D::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), 100.0f, 100.0f, CObject::TYPE_OBJECT3D, "data\\TEXTURE\\field000.jpg", 3);
+
+		if (m_pObject3D == NULL)
+		{// NULLチェック
+			OutputDebugStringA("! ! ! オブジェクト3Dの生成に失敗しました ! ! !\n");
+
+			return E_FAIL;
+		}
+	}
+#endif
+	
 	// プレイヤーを生成
 	if (m_pPlayer == NULL)
 	{// NULLチェック
@@ -235,6 +261,12 @@ void CManager::Uninit(void)
 	CEffect3D::Unload();
 	CEffect2D::Unload();
 
+	// オブジェクト3Dの破棄
+	if (m_pObject3D != NULL)
+	{// NULLチェック
+		m_pObject3D = NULL;
+	}
+	
 	// プレイヤーの破棄
 	if (m_pPlayer != NULL)
 	{// NULLチェック

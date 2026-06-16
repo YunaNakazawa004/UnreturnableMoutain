@@ -22,6 +22,8 @@ class CCamera;
 class CLight;
 class CTexture;
 class CPlayer;
+class CObject3D;
+class CMeshField;
 
 //************************************************************************
 // マネージャークラス
@@ -47,6 +49,8 @@ public:
 	static CLight* GetLight(void) { return m_pLight; }
 	static CTexture* GetTexture(void) { return m_pTexture; }
 	static CPlayer* GetPlayer(void) { return m_pPlayer; }
+	static CObject3D* GetObject3D(void) { return m_pObject3D; }
+	static CMeshField* GetMeshField(void) { return m_pMeshField; }
 
 	static int GetFPS(void) { return m_nCountFPS; }
 	static void SetFPS(const int nCountFPS) { m_nCountFPS = nCountFPS; };
@@ -68,6 +72,8 @@ private:
 	static CLight* m_pLight;						// ライトのインスタンス
 	static CTexture* m_pTexture;					// テクスチャのインスタンス
 	static CPlayer* m_pPlayer;						// プレイヤーのインスタンス
+	static CObject3D* m_pObject3D;					// オブジェクト3Dのインスタンス
+	static CMeshField* m_pMeshField;				// メッシュフィールドのインスタンス
 		
 	static int m_nCountFPS;							// FPSカウンター
 	static bool m_bPause;							// ポーズするかしないか
