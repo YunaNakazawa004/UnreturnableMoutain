@@ -200,6 +200,7 @@ void CGrass::CollisionPlayer(void)
 	CPlayer* pPlayer = CManager::GetPlayer();			// プレイヤーの取得
 	D3DXVECTOR3 posPlayer = pPlayer->GetPosition();		// プレイヤーの位置
 	D3DXVECTOR3 pos = GetPosition();					// 自分の位置
+	D3DXVECTOR3 rot = GetRotation();					// 自分の向き
 	D3DXVECTOR3 rotDest;		// 目的の向き
 	D3DXVECTOR3 dist;			// 距離
 	float fDist;				// 距離
@@ -213,8 +214,8 @@ void CGrass::CollisionPlayer(void)
 		D3DXVec3Normalize(&dist, &dist);
 
 		// 向きのオフセットに代入
-		rotDest.x = -sinf(dist.z) * ((PLAYER_DIST - fDist) * 0.1f);
-		rotDest.z = sinf(dist.x) * ((PLAYER_DIST - fDist) * 0.1f);
+		rotDest.x = -sinf(dist.z + rot.y) * ((PLAYER_DIST - fDist) * 0.05f);
+		rotDest.z = sinf(dist.x + rot.y) * ((PLAYER_DIST - fDist) * 0.05f);
 	}
 	else
 	{// 近くなくなった
@@ -222,6 +223,46 @@ void CGrass::CollisionPlayer(void)
 		rotDest.z = 0.0f;
 	}
 
+	// X向きを調整
+	if (rotDest.x > D3DX_PI)
+	{
+		rotDest.x -= D3DX_PI * 2.0f;
+	}
+	else if (rotDest.x < -D3DX_PI)
+	{
+		rotDest.x += D3DX_PI * 2.0f;
+	}
+
+	// Z向きを調整
+	if (rotDest.z > D3DX_PI)
+	{
+		rotDest.z -= D3DX_PI * 2.0f;
+	}
+	else if (rotDest.z < -D3DX_PI)
+	{
+		rotDest.z += D3DX_PI * 2.0f;
+	}
+
 	m_rotOff.x += (rotDest.x - m_rotOff.x) * 0.1f;
 	m_rotOff.z += (rotDest.z - m_rotOff.z) * 0.1f;
+
+	// X向きを調整
+	if (m_rotOff.x > D3DX_PI)
+	{
+		m_rotOff.x -= D3DX_PI * 2.0f;
+	}
+	else if (m_rotOff.x < -D3DX_PI)
+	{
+		m_rotOff.x += D3DX_PI * 2.0f;
+	}
+
+	// Z向きを調整
+	if (m_rotOff.z > D3DX_PI)
+	{
+		m_rotOff.z -= D3DX_PI * 2.0f;
+	}
+	else if (m_rotOff.z < -D3DX_PI)
+	{
+		m_rotOff.z += D3DX_PI * 2.0f;
+	}
 }

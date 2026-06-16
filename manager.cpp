@@ -214,7 +214,13 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	}
 	
 	// ëêÇê∂ê¨
-	CGrass::Create(D3DXVECTOR3(10.0f, 0.0f, 10.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+	CGrass::Create(D3DXVECTOR3(10.0f, 0.0f, 10.0f), D3DXVECTOR3(0.0f, D3DX_PI * 1.0f, 0.0f));
+	CGrass::Create(D3DXVECTOR3(5.0f, 0.0f, 5.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+	CGrass::Create(D3DXVECTOR3(10.0f, 0.0f, 15.0f), D3DXVECTOR3(0.0f, D3DX_PI * 0.5f, 0.0f));
+	CGrass::Create(D3DXVECTOR3(5.0f, 0.0f, 20.0f), D3DXVECTOR3(0.0f, D3DX_PI * 0.25f, 0.0f));
+	CGrass::Create(D3DXVECTOR3(15.0f, 0.0f, 20.0f), D3DXVECTOR3(0.0f, D3DX_PI * 1.0f, 0.0f));
+	CGrass::Create(D3DXVECTOR3(20.0f, 0.0f, 15.0f), D3DXVECTOR3(0.0f, D3DX_PI * 1.5f, 0.0f));
+	CGrass::Create(D3DXVECTOR3(25.0f, 0.0f, 15.0f), D3DXVECTOR3(0.0f, D3DX_PI * 0.75f, 0.0f));
 	
 	// ÉvÉåÉCÉÑÅ[Çê∂ê¨
 	if (m_pPlayer == NULL)
