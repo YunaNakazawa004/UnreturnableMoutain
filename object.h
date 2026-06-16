@@ -21,6 +21,7 @@
 #define EFFECT_PRIORITY		(4)				// デフォルトエフェクト優先順位
 #define FRAME_PRIORITY		(5)				// デフォルトUIフレーム優先順位
 #define UI_PRIORITY			(6)				// デフォルトUI優先順位
+#define FADE_PRIORITY		(7)				// デフォルトフェード優先順位
 
 #define COLOR_RED			(D3DXCOLOR(1.0f,0.0f,0.0f,1.0f))
 #define COLOR_GREEN			(D3DXCOLOR(0.0f,0.5f,0.0f,1.0f))
@@ -65,6 +66,7 @@ public:
 		TYPE_MESHFIELD,			// メッシュフィールド
 		TYPE_PLAYER,			// プレイヤー
 		TYPE_ENERGYROCK,		// エネルギー鉱物
+		TYPE_GRASS,				// 草
 		TYPE_MAX
 	}TYPE;
 

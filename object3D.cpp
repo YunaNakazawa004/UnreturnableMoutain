@@ -19,7 +19,7 @@
 //========================================================================
 // オブジェクト3Dクラスの生成処理
 //========================================================================
-CObject3D* CObject3D::Create(const D3DXVECTOR3 pos, const float fWidth, const float fDepth,
+CObject3D* CObject3D::Create(const D3DXVECTOR3 pos, const float fWidth, const float fHeight, const float fDepth,
 	const CObject::TYPE type, const char* pFilename, const int nPriority)
 {
 	if (CObject::GetNumAll() >= MAX_OBJECT)
@@ -40,7 +40,7 @@ CObject3D* CObject3D::Create(const D3DXVECTOR3 pos, const float fWidth, const fl
 	if (pObject3D != NULL)
 	{// NULLチェック
 		// 初期化処理
-		if (FAILED(pObject3D->Init(pos, fWidth, fDepth)))
+		if (FAILED(pObject3D->Init(pos, fWidth, fHeight, fDepth)))
 		{// もし失敗した場合
 			OutputDebugStringA("! ! ! オブジェクト3Dの初期化に失敗しました ! ! !\n");
 
@@ -88,7 +88,7 @@ CObject3D::~CObject3D()
 // オブジェクト3Dクラスの初期化処理(オーバーロード)
 //========================================================================
 HRESULT CObject3D::Init(const D3DXVECTOR3 pos,
-	const float fWidth, const float fDepth)
+	const float fWidth, const float fHeight, const float fDepth, const MAINPOS mainpos)
 {
 	// ローカル変数宣言
 	CRenderer* pRenderer = CManager::GetRenderer();			// レンダラーへのポインタ
@@ -118,20 +118,60 @@ HRESULT CObject3D::Init(const D3DXVECTOR3 pos,
 	m_pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
 
 	// 頂点情報の設定
-	// 頂点座標の設定
-	pVtx[0].pos.x = -fWidth;
-	pVtx[0].pos.y = 0.0f;
-	pVtx[0].pos.z = +fDepth;
-	pVtx[1].pos.x = +fWidth;
-	pVtx[1].pos.y = 30.0f;
-	pVtx[1].pos.z = +fDepth;
-	pVtx[2].pos.x = -fWidth;
-	pVtx[2].pos.y = 30.0f;
-	pVtx[2].pos.z = -fDepth;
-	pVtx[3].pos.x = +fWidth;
-	pVtx[3].pos.y = 0.0f;
-	pVtx[3].pos.z = -fDepth;
-	
+	switch (mainpos)
+	{
+	case MAINPOS_CENTER:		// posが真ん中の場合
+		// 頂点座標の設定
+		pVtx[0].pos.x = -fWidth;
+		pVtx[0].pos.y = +fHeight;
+		pVtx[0].pos.z = +fDepth;
+		pVtx[1].pos.x = +fWidth;
+		pVtx[1].pos.y = +fHeight;
+		pVtx[1].pos.z = +fDepth;
+		pVtx[2].pos.x = -fWidth;
+		pVtx[2].pos.y = -fHeight;
+		pVtx[2].pos.z = -fDepth;
+		pVtx[3].pos.x = +fWidth;
+		pVtx[3].pos.y = -fHeight;
+		pVtx[3].pos.z = -fDepth;
+
+		break;
+
+	case MAINPOS_TOPLEFT:		// posが左上の場合
+		// 頂点座標の設定
+		pVtx[0].pos.x = 0.0f;
+		pVtx[0].pos.y = 0.0f;
+		pVtx[0].pos.z = 0.0f;
+		pVtx[1].pos.x = fWidth * 2.0f;
+		pVtx[1].pos.y = 0.0f;
+		pVtx[1].pos.z = 0.0f;
+		pVtx[2].pos.x = 0.0f;
+		pVtx[2].pos.y = -fHeight * 2.0f;
+		pVtx[2].pos.z = -fDepth * 2.0f;
+		pVtx[3].pos.x = +fWidth * 2.0f;
+		pVtx[3].pos.y = -fHeight * 2.0f;
+		pVtx[3].pos.z = -fDepth * 2.0f;
+
+		break;
+
+	case MAINPOS_BOTTOMMID:		// posが真ん中下の場合
+		// 頂点座標の設定
+		pVtx[0].pos.x = -fWidth;
+		pVtx[0].pos.y = +fHeight * 2.0f;
+		pVtx[0].pos.z = +fDepth * 2.0f;
+		pVtx[1].pos.x = +fWidth;
+		pVtx[1].pos.y = +fHeight * 2.0f;
+		pVtx[1].pos.z = +fDepth * 2.0f;
+		pVtx[2].pos.x = -fWidth;
+		pVtx[2].pos.y = 0.0f;
+		pVtx[2].pos.z = 0.0f;
+		pVtx[3].pos.x = +fWidth;
+		pVtx[3].pos.y = 0.0f;
+		pVtx[3].pos.z = 0.0f;
+
+		break;
+	}
+
 	// それぞれの頂点間のベクトルを計算
 	vec0 = pVtx[1].pos - pVtx[0].pos;
 	vec1 = pVtx[2].pos - pVtx[0].pos;

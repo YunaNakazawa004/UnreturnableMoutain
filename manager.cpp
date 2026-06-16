@@ -26,6 +26,7 @@
 #include "effect3D.h"
 #include "player.h"
 #include "energyrock.h"
+#include "grass.h"
 
 //************************************************************************
 // 静的メンバ変数宣言
@@ -193,6 +194,7 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	CEffect2D::Load();
 	CEffect3D::Load();
 	CNumber::Load();
+	CGrass::Load();
 
 	//// ビルボードオブジェクトを生成
 	//CObjectBillboard::Create(D3DXVECTOR3(50.0f, 50.0f, 0.0f), 50.0f, 50.0f, CObject::TYPE_OBJECTBILLBOARD, "data\\TEXTURE\\tree000.png", 3);
@@ -211,20 +213,8 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 		}
 	}
 	
-#if 0
-	// オブジェクト3Dを生成
-	if (m_pObject3D == NULL)
-	{// NULLチェック
-		m_pObject3D = CObject3D::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), 100.0f, 100.0f, CObject::TYPE_OBJECT3D, "data\\TEXTURE\\field000.jpg", 3);
-
-		if (m_pObject3D == NULL)
-		{// NULLチェック
-			OutputDebugStringA("! ! ! オブジェクト3Dの生成に失敗しました ! ! !\n");
-
-			return E_FAIL;
-		}
-	}
-#endif
+	// 草を生成
+	CGrass::Create(D3DXVECTOR3(10.0f, 0.0f, 10.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 	
 	// プレイヤーを生成
 	if (m_pPlayer == NULL)
@@ -257,6 +247,7 @@ void CManager::Uninit(void)
 	CObject::ReleaseAll();
 
 	// オブジェクトのテクスチャを破棄
+	CGrass::Unload();
 	CNumber::Unload();
 	CEffect3D::Unload();
 	CEffect2D::Unload();

@@ -250,6 +250,7 @@ void CEffect3D::Draw(void)
 	pDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATER);
 	pDevice->SetRenderState(D3DRS_ALPHAREF, 0);
 
+	// 描画処理
 	CObjectBillboard::Draw();
 
 	// アルファテストを無効にする

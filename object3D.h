@@ -21,13 +21,23 @@
 class CObject3D : public CObject
 {
 public:
+	// posÇÃà íu
+	typedef enum
+	{
+		MAINPOS_CENTER = 0,		// ê^ÇÒíÜ
+		MAINPOS_TOPLEFT,		// ç∂è„
+		MAINPOS_BOTTOMMID,		// ê^ÇÒíÜâ∫
+		MAINPOS_MAX
+	}MAINPOS;
+
 	CObject3D(const int nPriority);
 	virtual ~CObject3D();
 
-	static CObject3D* Create(const D3DXVECTOR3 pos, const float fWidth, const float fDepth, 
+	static CObject3D* Create(const D3DXVECTOR3 pos, const float fWidth, const float fHeight, const float fDepth,
 		const CObject::TYPE type, const char *pFilename, const int nPriority = BG_PRIORITY);
 	HRESULT Init(void) { return S_OK; }
-	HRESULT Init(const D3DXVECTOR3 pos, const float fWidth, const float fDepth);
+	HRESULT Init(const D3DXVECTOR3 pos, const float fWidth, const float fHeight, const float fDepth, 
+		const MAINPOS mainpos = MAINPOS_CENTER);
 	void Uninit(void);
 	void Update(void);
 	void Draw(void);
