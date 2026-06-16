@@ -124,7 +124,7 @@ HRESULT CGrass::Init(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot)
 	CObject3D::Init(pos, GRASS_WIDTH, GRASS_HEIGHT, 0.0f, CObject3D::MAINPOS_BOTTOMMID);
 
 	// 角度を設定
-	SetRotation(D3DXVECTOR3(rot.x + FIRST_ROT_X, rot.y, rot.z));
+	SetRotation(rot);
 	m_rotOff = rot;
 
 	return S_OK;
@@ -152,8 +152,8 @@ void CGrass::Update(void)
 	rot -= m_rotOff;
 
 	// ゆらゆら
-	fSin += 0.03f;
-	rot.x += sinf(fSin) * 0.003f;
+	fSin += 0.005f;
+	rot.x += cosf(fSin) * 0.003f;
 
 	// プレイヤーとの当たり判定
 	CollisionPlayer();
