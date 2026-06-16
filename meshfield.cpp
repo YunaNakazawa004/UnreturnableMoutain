@@ -770,7 +770,7 @@ float CMeshField::GetHeight(const D3DXVECTOR3 pos, const D3DXVECTOR2 polygonIdx)
 		// ŠOÏ‚ðŒvŽZ
 		fposLine = (float)((int)(((aVecLine[nCnt].z * aVecToPos[nCnt].x) - (aVecLine[nCnt].x * aVecToPos[nCnt].z)) * 1.0f) / (int)1);
 
-		if (fposLine > 0.0f)
+		if (fposLine >= 0.0f)
 		{// “à‘¤‚É‚¢‚é
 			nCntLine++;
 		}
@@ -829,7 +829,7 @@ float CMeshField::GetHeight(const D3DXVECTOR3 pos, const D3DXVECTOR2 polygonIdx)
 		// ŠOÏ‚ðŒvŽZ
 		fposLine = (float)((int)(((aVecLine[nCnt].z * aVecToPos[nCnt].x) - (aVecLine[nCnt].x * aVecToPos[nCnt].z)) * 1.0f) / (int)1);
 
-		if (fposLine > 0.0f)
+		if (fposLine >= 0.0f)
 		{// “à‘¤‚É‚¢‚é
 			nCntLine++;
 		}
