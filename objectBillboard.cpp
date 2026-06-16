@@ -211,13 +211,13 @@ void CObjectBillboard::Draw(void)
 	m_mtxWorld._42 = 0.0f;
 	m_mtxWorld._43 = 0.0f;
 
-	// 位置を反映
-	D3DXMatrixTranslation(&mtxTrans, m_pos.x, m_pos.y, m_pos.z);
-	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxTrans);
-
 	// スケールを反映
 	D3DXMatrixScaling(&mtxScale, m_scale.x, m_scale.y, m_scale.z);
 	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxScale);
+
+	// 位置を反映
+	D3DXMatrixTranslation(&mtxTrans, m_pos.x, m_pos.y, m_pos.z);
+	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxTrans);
 
 	// ワールドマトリックスの設定
 	pDevice->SetTransform(D3DTS_WORLD, &m_mtxWorld);
