@@ -214,8 +214,8 @@ void CGrass::CollisionPlayer(void)
 		D3DXVec3Normalize(&dist, &dist);
 
 		// 向きのオフセットに代入
-		rotDest.x = -sinf(dist.z + rot.y) * ((PLAYER_DIST - fDist) * 0.05f);
-		rotDest.z = sinf(dist.x + rot.y) * ((PLAYER_DIST - fDist) * 0.05f);
+		rotDest.x = sinf(dist.z) * cosf(rot.y) * ((PLAYER_DIST - fDist) * 0.05f);
+		rotDest.z = sinf(dist.x) * cosf(rot.y + D3DX_PI) * ((PLAYER_DIST - fDist) * 0.05f);
 	}
 	else
 	{// 近くなくなった
