@@ -386,7 +386,8 @@ void CPlayer::Update(void)
 	rot.y += (m_rotDest.y - rot.y) * 0.1f;
 
 	// 当たり判定
-	if (CollisionEnergyRock(&pos) == true && m_bJump == false && m_pMotion->GetType() != MOTIONTYPE_DEATH)
+	if (CEnergyRock::Collision(&pos, &m_posOld, &m_move, m_fRadius, m_fHeight) == true && 
+		m_bJump == false && m_pMotion->GetType() != MOTIONTYPE_DEATH)
 	{// エネルギー鉱物と当たっているとき/空中ではないとき
 		if (pInputKeyboard->GetTrigger(DIK_RETURN) == true || pInputJoypad->GetTrigger(0, CInputJoypad::JOYKEY_X) == true)
 		{// 回収するキーを押した
@@ -738,56 +739,6 @@ bool CPlayer::Movement(const D3DXVECTOR3 rot)
 	m_bMove = bMove;		// 保存
 
 	return bMove;
-}
-
-//========================================================================
-// エネルギー鉱物との当たり判定
-//========================================================================
-bool CPlayer::CollisionEnergyRock(D3DXVECTOR3* pPos)
-{
-	for (int nCntPri = 0; nCntPri < MAX_PRIORITY_NUM; nCntPri++)
-	{
-		for (int nCntObj = 0; nCntObj < MAX_OBJECT; nCntObj++)
-		{
-			CObject* pObj;
-
-			// オブジェクトを取得
-			pObj = GetObject(nCntPri, nCntObj);
-
-			if (pObj != NULL)
-			{// NULLチェック
-				CObject::TYPE type;
-
-				// オブジェクトの種類を取得
-				type = pObj->GetType();
-
-				if (type == CObject::TYPE_ENERGYROCK)
-				{// エネルギー鉱物オブジェクトなら当たり判定する
-					D3DXVECTOR3 posRock, dist;
-
-					// エネルギー鉱物の位置を取得
-					posRock = pObj->GetPosition();
-
-					// 距離を計算
-					dist = *pPos - posRock;
-
-					if ((D3DXVec3Length(&dist) < ENERGYROCK_RADIUS + m_fRadius) &&
-						pPos->y < posRock.y + ENERGYROCK_HEIGHT && pPos->y + m_fHeight > posRock.y)
-					{// エネルギー鉱物と重なった
-						CParticle3D::Create(posRock, 10, 5, 5.0f, 0.0f, CEffect3D::TYPE_BLENDADD,
-							CParticle3D::TYPE_NORMAL, 10, 3.0f);
-
-						// 当たり判定
-						dynamic_cast<CObjectX*>(pObj)->Collision(pPos, &m_posOld, &m_move, m_fRadius, m_fHeight);
-
-						return true;
-					}
-				}
-			}
-		}
-	}
-
-	return false;
 }
 
 //========================================================================

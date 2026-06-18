@@ -61,7 +61,6 @@ public:
 	void SwapDisp(void) { m_bDisp = m_bDisp ? false : true; }
 
 	bool Movement(const D3DXVECTOR3 rot);
-	bool CollisionEnergyRock(D3DXVECTOR3* pPos);
 
 private:
 	HRESULT SetModel(const char* pFilename);

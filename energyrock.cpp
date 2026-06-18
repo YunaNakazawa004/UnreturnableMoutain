@@ -111,3 +111,51 @@ void CEnergyRock::Draw(void)
 	// 描画処理
 	CObjectX::Draw();
 }
+
+//========================================================================
+// エネルギー鉱物との当たり判定
+//========================================================================
+bool CEnergyRock::Collision(D3DXVECTOR3* pPos, D3DXVECTOR3* posOld, D3DXVECTOR3* move,
+	const float fRadius, const float fHeight)
+{
+	for (int nCntPri = 0; nCntPri < MAX_PRIORITY_NUM; nCntPri++)
+	{
+		for (int nCntObj = 0; nCntObj < MAX_OBJECT; nCntObj++)
+		{
+			CObject* pObj;
+
+			// オブジェクトを取得
+			pObj = GetObject(nCntPri, nCntObj);
+
+			if (pObj != NULL)
+			{// NULLチェック
+				CObject::TYPE type;
+
+				// オブジェクトの種類を取得
+				type = pObj->GetType();
+
+				if (type == CObject::TYPE_ENERGYROCK)
+				{// エネルギー鉱物オブジェクトなら当たり判定する
+					D3DXVECTOR3 posRock, dist;
+
+					// エネルギー鉱物の位置を取得
+					posRock = pObj->GetPosition();
+
+					// 距離を計算
+					dist = *pPos - posRock;
+
+					if ((D3DXVec3Length(&dist) < ENERGYROCK_RADIUS + fRadius) &&
+						pPos->y < posRock.y + ENERGYROCK_HEIGHT && pPos->y + fHeight > posRock.y)
+					{// エネルギー鉱物と重なった
+						// 当たり判定
+						dynamic_cast<CObjectX*>(pObj)->Collision(pPos, posOld, move, fRadius, fHeight);
+
+						return true;
+					}
+				}
+			}
+		}
+	}
+
+	return false;
+}
