@@ -24,6 +24,7 @@ class CTexture;
 class CPlayer;
 class CObject3D;
 class CMeshField;
+class CMapObject;
 
 //************************************************************************
 // マネージャークラス
@@ -51,6 +52,7 @@ public:
 	static CPlayer* GetPlayer(void) { return m_pPlayer; }
 	static CObject3D* GetObject3D(void) { return m_pObject3D; }
 	static CMeshField* GetMeshField(void) { return m_pMeshField; }
+	static CMapObject* GeMapObject(void) { return m_pMapObject; }
 
 	static int GetFPS(void) { return m_nCountFPS; }
 	static void SetFPS(const int nCountFPS) { m_nCountFPS = nCountFPS; };
@@ -74,6 +76,7 @@ private:
 	static CPlayer* m_pPlayer;						// プレイヤーのインスタンス
 	static CObject3D* m_pObject3D;					// オブジェクト3Dのインスタンス
 	static CMeshField* m_pMeshField;				// メッシュフィールドのインスタンス
+	static CMapObject* m_pMapObject;				// マップオブジェクトのインスタンス
 		
 	static int m_nCountFPS;							// FPSカウンター
 	static bool m_bPause;							// ポーズするかしないか

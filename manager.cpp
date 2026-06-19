@@ -21,6 +21,7 @@
 #include "meshfield.h"
 #include "number.h"
 #include "model.h"
+#include "map_object.h"
 
 #include "effect2D.h"
 #include "effect3D.h"
@@ -43,6 +44,7 @@ CTexture* CManager::m_pTexture = NULL;					// テクスチャのインスタンス
 CPlayer* CManager::m_pPlayer = NULL;					// プレイヤーのインスタンス
 CObject3D* CManager::m_pObject3D = NULL;				// オブジェクト3Dのインスタンス
 CMeshField* CManager::m_pMeshField = NULL;				// メッシュフィールドのインスタンス
+CMapObject* CManager::m_pMapObject = NULL;				// マップオブジェクトのインスタンス
 int CManager::m_nCountFPS = 0;							// FPSカウンター
 bool CManager::m_bPause = false;						// ポーズするかしないか
 
@@ -64,6 +66,7 @@ CManager::CManager()
 	m_pPlayer = NULL;
 	m_pObject3D = NULL;
 	m_pMeshField = NULL;
+	m_pMapObject = NULL;
 	m_nCountFPS = 0;
 	m_bPause = false;
 }
@@ -177,10 +180,10 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 			return E_FAIL;
 		}
 	}
-
+	
 	// テクスチャの生成
 	if (SUCCEEDED(CreateInstance(&m_pTexture)))
-	{// デバッグ表示の生成に成功
+	{// テクスチャの生成に成功
 		// 読み込み処理
 		if (FAILED(m_pTexture->Load()))
 		{// 初期化処理が失敗した場合
@@ -196,14 +199,29 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	CNumber::Load();
 	CGrass::Load();
 
-	//// ビルボードオブジェクトを生成
-	//CObjectBillboard::Create(D3DXVECTOR3(50.0f, 50.0f, 0.0f), 50.0f, 50.0f, CObject::TYPE_OBJECTBILLBOARD, "data\\TEXTURE\\tree000.png", 3);
+	// マップオブジェクトの生成
+	if (SUCCEEDED(CreateInstance(&m_pMapObject)))
+	{// マップオブジェクトの生成に成功
+		// 初期化処理
+		if (FAILED(m_pMapObject->Init()))
+		{// 初期化処理が失敗した場合
+			OutputDebugStringA("! ! ! マップオブジェクトの初期化に失敗しました ! ! !\n");
+
+			return E_FAIL;
+		}
+
+		// マップオブジェクトのデータを読み込む
+		if (FAILED(m_pMapObject->ReadData("data\\map_object.bin")))
+		{// もし失敗したら
+			return E_FAIL;
+		}
+	}
 
 	// メッシュフィールドを生成
 	if (m_pMeshField == NULL)
 	{// NULLチェック
 		m_pMeshField = CMeshField::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR2(32.0f, 32.0f),
-			D3DXVECTOR2(10.0f, 10.0f), CObject::TYPE_MESHFIELD, NULL, 3);
+			D3DXVECTOR2(10.0f, 10.0f), CObject::TYPE_MESHFIELD, "data\\TEXTURE\\field002.jpg", 3);
 
 		if (m_pMeshField == NULL)
 		{// NULLチェック
@@ -211,16 +229,13 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 
 			return E_FAIL;
 		}
+
+		// ステージのデータを読み込む
+		if (FAILED(m_pMeshField->ReadData("data\\stage.bin")))
+		{// もし失敗したら
+			return E_FAIL;
+		}
 	}
-	
-	// 草を生成
-	CGrass::Create(D3DXVECTOR3(10.0f, 0.0f, 10.0f), D3DXVECTOR3(0.0f, D3DX_PI * 1.0f, 0.0f));
-	CGrass::Create(D3DXVECTOR3(5.0f, 0.0f, 5.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
-	CGrass::Create(D3DXVECTOR3(10.0f, 0.0f, 15.0f), D3DXVECTOR3(0.0f, D3DX_PI * 0.5f, 0.0f));
-	CGrass::Create(D3DXVECTOR3(5.0f, 0.0f, 20.0f), D3DXVECTOR3(0.0f, D3DX_PI * 0.25f, 0.0f));
-	CGrass::Create(D3DXVECTOR3(15.0f, 0.0f, 20.0f), D3DXVECTOR3(0.0f, D3DX_PI * 1.0f, 0.0f));
-	CGrass::Create(D3DXVECTOR3(20.0f, 0.0f, 15.0f), D3DXVECTOR3(0.0f, D3DX_PI * 1.5f, 0.0f));
-	CGrass::Create(D3DXVECTOR3(25.0f, 0.0f, 15.0f), D3DXVECTOR3(0.0f, D3DX_PI * 0.75f, 0.0f));
 	
 	// プレイヤーを生成
 	if (m_pPlayer == NULL)
@@ -270,6 +285,13 @@ void CManager::Uninit(void)
 		m_pPlayer = NULL;
 	}
 
+	// マップオブジェクトの破棄
+	if (m_pMapObject != NULL)
+	{// NULLチェック
+		delete m_pMapObject;
+		m_pMapObject = NULL;
+	}
+	
 	// テクスチャの破棄
 	if (m_pTexture != NULL)
 	{// NULLチェック

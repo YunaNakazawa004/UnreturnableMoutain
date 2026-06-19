@@ -49,6 +49,7 @@ public:
 	void Draw(void);
 
 	D3DXVECTOR3 GetPosition(void) { return m_posP; }
+	D3DXVECTOR3 GetRotation(void) { return D3DXVECTOR3(0.0f, 0.0f, 0.0f); }
 
 private:
 	CEffect3D* m_apEffect[PARTICLE3D_EFFECT];		// エフェクトのインスタンス

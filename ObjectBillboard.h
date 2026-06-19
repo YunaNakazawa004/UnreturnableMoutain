@@ -19,7 +19,7 @@ public:
 	CObjectBillboard(const int nPriority);
 	virtual ~CObjectBillboard();
 
-	static CObjectBillboard* Create(const D3DXVECTOR3 pos, const float fWidth, const float fHeight, 
+	static CObjectBillboard* Create(const D3DXVECTOR3 pos, const float fWidth, const float fHeight,
 		const CObject::TYPE type, const char* pFilename, const int nPriority = BG_PRIORITY);
 	HRESULT Init(void) { return S_OK; }
 	HRESULT Init(const D3DXVECTOR3 pos, const float fWidth, const float fHeight);
@@ -31,6 +31,7 @@ public:
 
 	void SetPosition(const D3DXVECTOR3 pos);
 	D3DXVECTOR3 GetPosition(void) { return m_pos; }
+	D3DXVECTOR3 GetRotation(void) { return D3DXVECTOR3(0.0f, 0.0f, 0.0f); }
 	void SetScale(const D3DXVECTOR3 scale);
 	D3DXVECTOR3 GetScale(void) { return m_scale; }
 	void SetSize(const float fRadius);

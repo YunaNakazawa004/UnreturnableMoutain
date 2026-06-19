@@ -81,6 +81,7 @@ public:
 	virtual void Draw(void) = 0;
 
 	virtual D3DXVECTOR3 GetPosition(void) = 0;
+	virtual D3DXVECTOR3 GetRotation(void) = 0;
 	
 	static void ReleaseAll(void);
 	static void UpdateAll(void);

@@ -10,6 +10,7 @@
 #include "manager.h"
 #include "texture.h"
 
+#include "meshfield.h"
 #include "player.h"
 
 //************************************************************************
@@ -106,6 +107,7 @@ CGrass::CGrass(const int nPriority) :CObject3D(nPriority)
 {
 	// 値をクリア
 	m_rotOff = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_fShake = 0.0f;
 }
 
 //========================================================================
@@ -126,6 +128,7 @@ HRESULT CGrass::Init(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot)
 	// 角度を設定
 	SetRotation(rot);
 	m_rotOff = rot;
+	m_fShake = 0.0f;
 
 	return S_OK;
 }
@@ -145,20 +148,39 @@ void CGrass::Uninit(void)
 void CGrass::Update(void)
 {
 	// ローカル変数
+	CMeshField* pMeshField = CManager::GetMeshField();					// メッシュフィールドの取得
+	D3DXVECTOR3 pos = CObject3D::GetPosition();
 	D3DXVECTOR3 rot = CObject3D::GetRotation();
-	static float fSin = 0.0f;
+
+	float fHeight = 0.0f;		// 地面の高さ
+	D3DXVECTOR2 polygonIdx = { -1.0f,-1.0f };		// ポリゴン番号
 
 	// オフセットの向きを抜いた値にする
 	rot -= m_rotOff;
 
 	// ゆらゆら
-	fSin += 0.005f;
-	rot.x += cosf(fSin) * 0.003f;
+	m_fShake += 0.005f;
+	rot.x += cosf(m_fShake) * 0.0005f;
 
 	// プレイヤーとの当たり判定
 	CollisionPlayer();
 
-	// 向きを適用
+	// ポリゴン番号を取得
+	polygonIdx = pMeshField->GetPolygonIdx(pos);
+
+	// 地面の高さを取得
+	fHeight = pMeshField->GetHeight(pos, polygonIdx);
+
+	if (fHeight == ERROR_HEIGHT)
+	{// 無効な高さだったら
+		fHeight = 0.0f;
+	}
+
+	// 高さを代入
+	pos.y = fHeight;
+
+	// 位置/向きを適用
+	SetPosition(pos);
 	SetRotation(m_rotOff + rot);
 }
 

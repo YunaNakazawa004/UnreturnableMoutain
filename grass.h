@@ -32,6 +32,7 @@ public:
 private:
 	static int m_nIdxTexture;			// テクスチャのインデックス
 	D3DXVECTOR3 m_rotOff;				// 向きオフセット
+	float m_fShake;						// 揺れ具合;
 };
 
 #endif

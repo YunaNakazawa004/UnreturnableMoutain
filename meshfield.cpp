@@ -188,12 +188,6 @@ HRESULT CMeshField::Init(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot,
 	// インデックスバッファをアンロックする
 	m_pIdxBuff->Unlock();
 
-	// ステージのデータを読み込む
-	if (FAILED(ReadData("data\\stage.bin")))
-	{// もし失敗したら
-		return E_FAIL;
-	}
-
 	return S_OK;
 }
 
