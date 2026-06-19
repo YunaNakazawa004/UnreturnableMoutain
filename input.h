@@ -90,12 +90,15 @@ public:
 	bool GetTrigger(const int nButton);
 	bool GetRelease(const int nButton);
 	POINT GetPosition(void) { return m_cursorPos; }
+	int GetWheel(void) { return m_nWheel; }
+	void ResetWheel(void) { m_nWheel = 0; }
 
 private:
 	DIMOUSESTATE2 m_mouseState;			// マウスのプレス情報
 	DIMOUSESTATE2 m_mouseStateTrigger;	// マウスのトリガー情報
 	DIMOUSESTATE2 m_mouseStateRelease;	// マウスのリリース情報
 	POINT m_cursorPos;					// マウスカーソルの位置
+	int m_nWheel;						// マウスホイールの回転量
 };
 
 //*****************************************************************************

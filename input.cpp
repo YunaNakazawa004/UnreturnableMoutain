@@ -333,6 +333,9 @@ void CInputMouse::Update(void)
 		// カーソルの座標を保存
 		GetCursorPos(&m_cursorPos);
 		ScreenToClient(FindWindowA("WindowClass", NULL), &m_cursorPos);
+
+		// ホイールの回転量を保存
+		m_nWheel += mouseState.lZ;
 	}
 	else
 	{// デバイスがアクセス権を持っていない場合

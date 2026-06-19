@@ -30,6 +30,7 @@
 #define INERTIA_ROT				(0.02f)									// 回り込みの慣性
 #define MAX_Y					(300.0f)								// 上の制限
 #define MIN_Y					(-300.0f)								// 下の制限
+#define MIN_DISTANCE			(20.0f)									// カメラの距離の最低値
 
 //=============================================================================
 // カメラクラスのコンストラクタ
@@ -268,6 +269,20 @@ void CCamera::Update(void)
 			nAutoCameraCounter = 0;
 		}
 
+		// カメラのズーム
+		if (pInputMouse->GetWheel() != 0)
+		{// ホイールが回転したとき
+			m_fDistance += (float)(pInputMouse->GetWheel() / 120) * 10.0f;
+
+			if (m_fDistance <= MIN_DISTANCE)
+			{// 最低値
+				m_fDistance = MIN_DISTANCE;
+			}
+
+			// ホイールの値をリセット
+			pInputMouse->ResetWheel();
+		}
+
 		if (nAutoCameraCounter > AUTOROTATE_COUNT)
 		{// プレイヤーの入力がない場合回り込む
 			m_rot.y += ((rot.y - D3DX_PI) - m_rot.y) * INERTIA_ROT;
@@ -495,6 +510,20 @@ void CCamera::Update(void)
 
 			m_posVDest.x = m_posR.x + sinf(D3DX_PI + m_rot.y) * m_fDistance * sinf((D3DX_PI * 0.5f) - m_fAngle);
 			m_posVDest.z = m_posR.z + cosf(D3DX_PI + m_rot.y) * m_fDistance * sinf((D3DX_PI * 0.5f) - m_fAngle);
+		}
+
+		// カメラのズーム
+		if (pInputMouse->GetWheel() != 0)
+		{// ホイールが回転したとき
+			m_fDistance += (float)(pInputMouse->GetWheel() / 120) * 10.0f;
+
+			if (m_fDistance <= MIN_DISTANCE)
+			{// 最低値
+				m_fDistance = MIN_DISTANCE;
+			}
+
+			// ホイールの値をリセット
+			pInputMouse->ResetWheel();
 		}
 
 		// リセット
