@@ -429,11 +429,12 @@ void CModel::SetColor(const D3DXCOLOR col)
 //========================================================================
 // 当たり判定
 //========================================================================
-bool CModel::Collision(D3DXVECTOR3* pPos, D3DXVECTOR3* pPosOld, D3DXVECTOR3* pMove,
+bool CModel::Collision(const D3DXVECTOR3 posMe, D3DXVECTOR3* pPos, D3DXVECTOR3* pPosOld, D3DXVECTOR3* pMove,
 	const float fRadius, const float fHeight)
 {
 	bool bLand = false;		// 着地しているか
 	int nCntLand = 0;	// 辺の内側に入った数(4回入っていれば、オブジェクトの内側にいる)
+	D3DXVECTOR3 pos = posMe + m_posOffC;		// 現在位置
 
 	for (int nCnt = 0; nCnt < 4; nCnt++)
 	{
@@ -474,14 +475,14 @@ bool CModel::Collision(D3DXVECTOR3* pPos, D3DXVECTOR3* pPosOld, D3DXVECTOR3* pMo
 		fZE = fOffXE * fSin + fOffZE * fCos;
 
 		// 始点
-		start.x = m_posOffC.x + fXS;
+		start.x = pos.x + fXS;
 		start.y = 0.0f;
-		start.z = m_posOffC.z + fZS;
+		start.z = pos.z + fZS;
 
 		// 終点
-		end.x = m_posOffC.x + fXE;
+		end.x = pos.x + fXE;
 		end.y = 0.0f;
-		end.z = m_posOffC.z + fZE;
+		end.z = pos.z + fZE;
 
 		// 境界線ベクトル
 		vecLine.x = (end.x) - (start.x);
@@ -531,8 +532,8 @@ bool CModel::Collision(D3DXVECTOR3* pPos, D3DXVECTOR3* pPosOld, D3DXVECTOR3* pMo
 		{// 交点の割合が範囲内
 			if (fPosLine >= 0.0f && (fPosOldLine <= 0.0f))
 			{// 交差した
-				if ((m_posOffC.y + m_VtxMin.y - fHeight <= pPos->y) &&
-					(m_posOffC.y + m_VtxMax.y >= pPos->y))
+				if ((pos.y + m_VtxMin.y - fHeight <= pPos->y) &&
+					(pos.y + m_VtxMax.y >= pPos->y))
 				{// 高さが合っている
 					// 現在の移動ベクトル
 					D3DXVECTOR3 move = vecMove;
@@ -558,23 +559,23 @@ bool CModel::Collision(D3DXVECTOR3* pPos, D3DXVECTOR3* pPosOld, D3DXVECTOR3* pMo
 
 			if (nCntLand == 4)
 			{// 全ての内側に入っていたら
-				if ((m_posOffC.y + m_VtxMin.y - fHeight <= pPos->y) &&
-					(m_posOffC.y + m_VtxMax.y >= pPos->y))
+				if ((pos.y + m_VtxMin.y - fHeight <= pPos->y) &&
+					(pos.y + m_VtxMax.y >= pPos->y))
 				{// 範囲内
 					bLand = true;		// 着地フラグ
 				}
 
 				// 位置調整
-				if ((m_posOffC.y + m_VtxMin.y - fHeight >= pPosOld->y) &&
-					(m_posOffC.y + m_VtxMin.y - fHeight <= pPos->y))
+				if ((pos.y + m_VtxMin.y - fHeight >= pPosOld->y) &&
+					(pos.y + m_VtxMin.y - fHeight <= pPos->y))
 				{// 下からの当たり判定
-					pPos->y = m_posOffC.y + m_VtxMin.y - fHeight;
+					pPos->y = pos.y + m_VtxMin.y - fHeight;
 					pMove->y = -0.5f;							// 移動量を0にする
 				}
-				else if ((m_posOffC.y + m_VtxMax.y <= pPosOld->y) &&
-					(m_posOffC.y + m_VtxMax.y >= pPos->y))
+				else if ((pos.y + m_VtxMax.y <= pPosOld->y) &&
+					(pos.y + m_VtxMax.y >= pPos->y))
 				{// 上からの当たり判定
-					pPos->y = m_posOffC.y + m_VtxMax.y;
+					pPos->y = pos.y + m_VtxMax.y;
 					pMove->y = 0.0f;							// 移動量を0にする
 				}
 			}

@@ -54,7 +54,7 @@ public:
 	void SetDisp(const bool bDisp) { m_bDisp = bDisp; }
 	void SwapDisp(void) { m_bDisp = m_bDisp ? false : true; }
 
-	bool Collision(D3DXVECTOR3* pPos, D3DXVECTOR3* pPosOld, D3DXVECTOR3* pMove,
+	bool Collision(const D3DXVECTOR3 posMe, D3DXVECTOR3* pPos, D3DXVECTOR3* pPosOld, D3DXVECTOR3* pMove,
 		const float fRadius, const float fHeight);
 
 private:

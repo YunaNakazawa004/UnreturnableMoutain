@@ -331,7 +331,7 @@ bool CTree::Collision(D3DXVECTOR3* pPos, D3DXVECTOR3* posOld, D3DXVECTOR3* move,
 						pPos->y < posObj.y + Radius.y && pPos->y + fHeight > posObj.y)
 					{// –Ø‚Æd‚È‚Á‚½
 						// “–‚½‚è”»’è
-						bColl = dynamic_cast<CTree*>(pObj)->m_apModel[0]->Collision(pPos, posOld, move, fRadius, fHeight);
+						bColl = dynamic_cast<CTree*>(pObj)->m_apModel[0]->Collision(posObj, pPos, posOld, move, fRadius, fHeight);
 
 						if (dynamic_cast<CTree*>(pObj)->GetShake() == true && bColl == true)
 						{// ˆê“x—h‚ç‚·
