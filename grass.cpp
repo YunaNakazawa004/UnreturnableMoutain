@@ -206,7 +206,7 @@ void CGrass::CollisionPlayer(void)
 	float fDist;				// ‹——£
 
 	// ‹——£‚ðŒvŽZ
-	dist = posPlayer - pos;
+	dist = pos - posPlayer;
 	fDist = D3DXVec3Length(&dist);
 
 	if (fDist < PLAYER_DIST)

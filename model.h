@@ -47,10 +47,15 @@ public:
 	D3DXVECTOR3 GetRotOffC(void) { return m_rotOffC; }
 	void SetScale(const D3DXVECTOR3 scale);
 	D3DXVECTOR3 GetScale(void) { return m_scale; }
+	D3DXVECTOR3 GetVtxMax(void) { return m_VtxMax; }
+	D3DXVECTOR3 GetVtxMin(void) { return m_VtxMin; }
 	void SetColor(const D3DXCOLOR col);
 	D3DXCOLOR GetColor(void) { return m_col; }
 	void SetDisp(const bool bDisp) { m_bDisp = bDisp; }
 	void SwapDisp(void) { m_bDisp = m_bDisp ? false : true; }
+
+	bool Collision(D3DXVECTOR3* pPos, D3DXVECTOR3* pPosOld, D3DXVECTOR3* pMove,
+		const float fRadius, const float fHeight);
 
 private:
 	LPD3DXMESH m_pMesh;						// メッシュ(頂点情報)へのポインタ

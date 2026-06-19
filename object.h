@@ -67,6 +67,7 @@ public:
 		TYPE_PLAYER,			// プレイヤー
 		TYPE_ENERGYROCK,		// エネルギー鉱物
 		TYPE_GRASS,				// 草
+		TYPE_TREE,				// 木
 		TYPE_MAX
 	}TYPE;
 
