@@ -13,6 +13,9 @@
 
 #include "object3D.h"
 
+#include <fstream>
+#include <iostream>
+
 //************************************************************************
 // マクロ定義
 //************************************************************************
@@ -188,6 +191,12 @@ HRESULT CMeshField::Init(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot,
 
 	// インデックスバッファをアンロックする
 	m_pIdxBuff->Unlock();
+
+	// ファイルからステージ読み込み
+	if (FAILED(ReadData("data\\stage.bin")))
+	{// もし失敗したら
+		return E_FAIL;
+	}
 
 	return S_OK;
 }
@@ -879,4 +888,111 @@ float CMeshField::GetHeight(const D3DXVECTOR3 pos, const D3DXVECTOR2 polygonIdx)
 	m_pVtxBuff->Unlock();
 
 	return ERROR_HEIGHT;
+}
+
+//========================================================================
+// 外部ファイルから頂点情報を読み込む
+//========================================================================
+HRESULT CMeshField::ReadData(const char* pFilename)
+{
+	CRenderer* pRenderer = CManager::GetRenderer();			// レンダラーへのポインタ
+	LPDIRECT3DDEVICE9 pDevice = pRenderer->GetDevice();		// デバイスへのポインタ
+
+	// バイナリ形式でファイルオープン
+	std::ifstream file(pFilename, std::ios_base::in | std::ios_base::binary);
+
+	if (file.is_open() == true)
+	{// ファイルが開けた
+		VERTEX_3D* pVtx;
+		WORD* pIdx;
+		D3DXVECTOR2 block, size;
+		int nNumVtx, nNumIdx;
+
+		// 読み込む
+		file.read((char*)&block, sizeof(block));
+		file.read((char*)&size, sizeof(size));
+		file.read((char*)&nNumVtx, sizeof(nNumVtx));
+		file.read((char*)&nNumIdx, sizeof(nNumIdx));
+
+		// 現在の設定との整合性をチェック
+		if (m_block == block && m_size == size && m_nNumVtx == nNumVtx && m_nNumIdx == nNumIdx)
+		{// 全て同じなら代入
+			m_block = block;
+			m_size = size;
+			m_nNumVtx = nNumVtx;
+			m_nNumIdx = nNumIdx;
+		}
+		else
+		{// 1つでも違う場合
+			// 一度頂点バッファとインデックスバッファを破棄して計算しなおす
+			// 頂点バッファの破棄
+			if (m_pVtxBuff != NULL)
+			{
+				m_pVtxBuff->Release();
+				m_pVtxBuff = NULL;
+			}
+
+			// インデックスバッファの破棄
+			if (m_pIdxBuff != NULL)
+			{
+				m_pIdxBuff->Release();
+				m_pIdxBuff = NULL;
+			}
+
+			// 頂点バッファの生成
+			pDevice->CreateVertexBuffer(sizeof(VERTEX_3D) * nNumVtx,
+				D3DUSAGE_WRITEONLY,
+				FVF_VERTEX_3D,
+				D3DPOOL_MANAGED,
+				&m_pVtxBuff,
+				NULL);
+
+			// インデックスバッファの生成
+			pDevice->CreateIndexBuffer(sizeof(WORD) * nNumIdx,
+				D3DUSAGE_WRITEONLY,
+				D3DFMT_INDEX16,
+				D3DPOOL_MANAGED,
+				&m_pIdxBuff,
+				NULL);
+
+			// 代入
+			m_block = block;
+			m_size = size;
+			m_nNumVtx = nNumVtx;
+			m_nNumIdx = nNumIdx;
+		}
+
+		// 頂点バッファをロックし、頂点情報へのポインタを取得
+		m_pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
+
+		for (int nCntVtx = 0; nCntVtx < nNumVtx; nCntVtx++)
+		{
+			file.read((char*)&pVtx[nCntVtx], sizeof(*pVtx));
+		}
+
+		// 頂点バッファをアンロックする
+		m_pVtxBuff->Unlock();
+
+		// インデックスバッファをロックし、頂点番号データへのポインタを取得
+		m_pIdxBuff->Lock(0, 0, (void**)&pIdx, 0);
+
+		for (int nCntIdx = 0; nCntIdx < nNumIdx; nCntIdx++)
+		{
+			file.read((char*)&pIdx[nCntIdx], sizeof(*pIdx));
+		}
+
+		// インデックスバッファをアンロックする
+		m_pIdxBuff->Unlock();
+
+		// ファイルを閉じる
+		file.close();
+	}
+	else
+	{// ファイルが開けなかった
+		OutputDebugStringA("! ! ! ファイルを開けませんでした ! ! !\n");
+
+		return E_FAIL;
+	}
+
+	return S_OK;
 }

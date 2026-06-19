@@ -51,6 +51,8 @@ public:
 	D3DXVECTOR2 GetPolygonIdx(const D3DXVECTOR3 pos);
 	float GetHeight(const D3DXVECTOR3 pos, const D3DXVECTOR2 polygonIdx);
 
+	HRESULT ReadData(const char* pFilename);
+
 private:
 	LPDIRECT3DVERTEXBUFFER9 m_pVtxBuff;			// 頂点バッファへのポインタ
 	LPDIRECT3DINDEXBUFFER9 m_pIdxBuff;			// インデックスバッファへのポインタ
