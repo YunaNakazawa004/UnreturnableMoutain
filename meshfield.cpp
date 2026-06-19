@@ -8,10 +8,11 @@
 
 #include "renderer.h"
 #include "manager.h"
-#include "debugproc.h"
 #include "texture.h"
+#include "input.h"
+#include "debugproc.h"
 
-#include "object3D.h"
+#include "player.h"
 
 #include <fstream>
 #include <iostream>
@@ -103,7 +104,7 @@ HRESULT CMeshField::Init(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot,
 	CRenderer* pRenderer = CManager::GetRenderer();			// レンダラーへのポインタ
 	LPDIRECT3DDEVICE9 pDevice = pRenderer->GetDevice();		// デバイスへのポインタ
 	VERTEX_3D* pVtx;					// 頂点情報へのポインタ
-	WORD* pIdx;							// インデックス情報へのポインタ
+	DWORD* pIdx;							// インデックス情報へのポインタ
 
 	// クラスの値を初期化
 	m_pos = pos;
@@ -134,14 +135,9 @@ HRESULT CMeshField::Init(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot,
 			int nVtx = nCntMeshField2 + (nCntMeshField1 * ((int)m_block.x + 1));
 
 			// 頂点座標の設定
-			pVtx[nVtx].pos.x = -((m_block.x * m_size.x * 2.0f) * 0.5f) + (nCntMeshField2 * m_size.x * 2.0f);
+			pVtx[nVtx].pos.x = ((float)nCntMeshField2 * m_size.x * 2.0f) - ((m_block.x * m_size.x * 2.0f) * 0.5f);
 			pVtx[nVtx].pos.y = 0.0f;
-			pVtx[nVtx].pos.z = ((m_block.y * m_size.y * 2.0f) * 0.5f) - (nCntMeshField1 * m_size.y * 2.0f);
-
-			if (nCntMeshField2 == (int)m_block.x)
-			{
-				pVtx[nVtx].pos.y = 30.0f;
-			}
+			pVtx[nVtx].pos.z = -((float)nCntMeshField1 * m_size.y * 2.0f) + ((m_block.y * m_size.y * 2.0f) * 0.5f);
 
 			// 頂点カラーの設定
 			pVtx[nVtx].col = COLOR_WHITE;
@@ -151,16 +147,16 @@ HRESULT CMeshField::Init(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot,
 		}
 	}
 
+	// 法線の設定
+	SetNor();
+
 	// 頂点バッファをアンロックする
 	m_pVtxBuff->Unlock();
 
-	// 法線を設定
-	SetNor();
-
 	// インデックスバッファの生成
-	pDevice->CreateIndexBuffer(sizeof(WORD) * m_nNumIdx,
+	pDevice->CreateIndexBuffer(sizeof(DWORD) * m_nNumIdx,
 		D3DUSAGE_WRITEONLY,
-		D3DFMT_INDEX16,
+		D3DFMT_INDEX32,
 		D3DPOOL_MANAGED,
 		&m_pIdxBuff,
 		NULL);
@@ -171,14 +167,14 @@ HRESULT CMeshField::Init(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot,
 	int nNum = 0;			// 縮退ポリゴン
 
 	// 頂点番号データの設定
-	for (int nCntMeshField1 = 0; nCntMeshField1 < m_nNumIdx / 2; nCntMeshField1++)
+	for (int nCntMeshField1 = 0; nCntMeshField1 < (m_nNumIdx / 2); nCntMeshField1++)
 	{
 		if (nCntMeshField1 % ((int)m_block.x + 2) == ((int)m_block.x + 1))
 		{// 縮退ポリゴンのところ
-			nNum++;
+			pIdx[0] = (nCntMeshField1 - nNum) - 1;
+			pIdx[1] = (nCntMeshField1 - nNum) + ((int)m_block.x + 1);
 
-			pIdx[0] = nCntMeshField1 - nNum;
-			pIdx[1] = nCntMeshField1 - nNum + ((int)m_block.x + 2);
+			nNum++;
 		}
 		else
 		{// 縮退以外のポリゴン
@@ -192,7 +188,7 @@ HRESULT CMeshField::Init(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot,
 	// インデックスバッファをアンロックする
 	m_pIdxBuff->Unlock();
 
-	// ファイルからステージ読み込み
+	// ステージのデータを読み込む
 	if (FAILED(ReadData("data\\stage.bin")))
 	{// もし失敗したら
 		return E_FAIL;
@@ -240,6 +236,7 @@ void CMeshField::Draw(void)
 	{// 表示しない場合
 		return;
 	}
+
 
 	// ローカル変数宣言
 	CRenderer* pRenderer = CManager::GetRenderer();			// レンダラーへのポインタ
@@ -362,6 +359,26 @@ void CMeshField::SetColor(const D3DXCOLOR col)
 }
 
 //========================================================================
+// 頂点カラー設定(オーバーロード)
+//========================================================================
+void CMeshField::SetColor(const int nCntVtx, const D3DXCOLOR col)
+{
+	m_col = col;
+
+	VERTEX_3D* pVtx;
+
+	// 頂点バッファをロックし、頂点情報へのポインタを取得
+	m_pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
+
+	// 頂点カラーの設定
+	pVtx[nCntVtx].col = m_col;
+
+	// 頂点バッファをアンロックする
+	m_pVtxBuff->Unlock();
+}
+
+
+//========================================================================
 // テクスチャ座標設定
 //========================================================================
 void CMeshField::SetTexUV(const int nCntVtx, const float ftexU, const float ftexV)
@@ -379,12 +396,12 @@ void CMeshField::SetTexUV(const int nCntVtx, const float ftexU, const float ftex
 }
 
 //========================================================================
-// 法線を全て再計算
+// 法線を設定
 //========================================================================
 void CMeshField::SetNor(void)
 {
-	// ローカル変数宣言
 	VERTEX_3D* pVtx;					// 頂点情報へのポインタ
+	D3DXVECTOR3 nor, nor1, nor2, nor3, nor4, nor5, nor6, vec1, vec2;
 
 	// 頂点バッファをロックし、頂点情報へのポインタを取得
 	m_pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
@@ -764,16 +781,16 @@ float CMeshField::GetHeight(const D3DXVECTOR3 pos, const D3DXVECTOR2 polygonIdx)
 	m_pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
 
 	// 下の点を主頂点にする(△)
-	nMainVtx = nVtx + (int)m_block.y + 1;
+	nMainVtx = nVtx + (int)m_block.x + 1;
 
-	// プレイヤーが対象ポリゴン(nMainVtx - (nMainVtx - m_block.y + 1) - nMainVtx + 1)の内側にいるかどうか
-	// nMainVtx - (nMainVtx - (int)m_block.y + 1) 間のベクトル
-	aVecLine[0] = pVtx[nMainVtx - ((int)m_block.y + 1)].pos - pVtx[nMainVtx].pos;		// 辺のベクトル
+	// プレイヤーが対象ポリゴン(nMainVtx - (nMainVtx - m_block.x + 1) - nMainVtx + 1)の内側にいるかどうか
+	// nMainVtx - (nMainVtx - (int)m_block.x + 1) 間のベクトル
+	aVecLine[0] = pVtx[nMainVtx - ((int)m_block.x + 1)].pos - pVtx[nMainVtx].pos;		// 辺のベクトル
 	aVecToPos[0] = pos - pVtx[nMainVtx].pos;										// 現在位置へのベクトル
 
-	// (nMainVtx - (int)m_block.y + 1) - nMainVtx + 1 間のベクトル
-	aVecLine[1] = pVtx[nMainVtx + 1].pos - pVtx[nMainVtx - ((int)m_block.y + 1)].pos;	// 辺のベクトル
-	aVecToPos[1] = pos - pVtx[nMainVtx - ((int)m_block.y + 1)].pos;					// 現在位置へのベクトル
+	// (nMainVtx - (int)m_block.x + 1) - nMainVtx + 1 間のベクトル
+	aVecLine[1] = pVtx[nMainVtx + 1].pos - pVtx[nMainVtx - ((int)m_block.x + 1)].pos;	// 辺のベクトル
+	aVecToPos[1] = pos - pVtx[nMainVtx - ((int)m_block.x + 1)].pos;					// 現在位置へのベクトル
 
 	// nMainVtx + 1 - nMainVtx 間のベクトル
 	aVecLine[2] = pVtx[nMainVtx].pos - pVtx[nMainVtx + 1].pos;						// 辺のベクトル
@@ -791,12 +808,12 @@ float CMeshField::GetHeight(const D3DXVECTOR3 pos, const D3DXVECTOR2 polygonIdx)
 	}
 
 	if (nCntLine >= 3)
-	{// 対象ポリゴン(nMainVtx - (nMainVtx - m_block.y + 1) - nMainVtx + 1)の内側にいる
+	{// 対象ポリゴン(nMainVtx - (nMainVtx - m_block.x + 1) - nMainVtx + 1)の内側にいる
 		D3DXVECTOR3 vec1, vec2, nor;	// ベクトル、法線
 		float fHeight = 0.0f;			// 求める高さ
 
 		// ベクトルを取得
-		vec1 = pVtx[nMainVtx - ((int)m_block.y + 1)].pos - pVtx[nMainVtx].pos;
+		vec1 = pVtx[nMainVtx - ((int)m_block.x + 1)].pos - pVtx[nMainVtx].pos;
 		vec2 = pVtx[nMainVtx + 1].pos - pVtx[nMainVtx].pos;
 
 		// 法線の計算
@@ -825,14 +842,14 @@ float CMeshField::GetHeight(const D3DXVECTOR3 pos, const D3DXVECTOR2 polygonIdx)
 	// 右の点を主頂点にする(▽)
 	nMainVtx = nVtx + 1;
 
-	// プレイヤーが対象ポリゴン(nMainVtx - (nMainVtx + m_block.y + 1) - (nMainVtx - 1))の内側にいるかどうか
-	// nMainVtx - (nMainVtx + (int)m_block.y + 1) 間のベクトル
-	aVecLine[0] = pVtx[nMainVtx + ((int)m_block.y + 1)].pos - pVtx[nMainVtx].pos;		// 辺のベクトル
+	// プレイヤーが対象ポリゴン(nMainVtx - (nMainVtx + m_block.x + 1) - (nMainVtx - 1))の内側にいるかどうか
+	// nMainVtx - (nMainVtx + (int)m_block.x + 1) 間のベクトル
+	aVecLine[0] = pVtx[nMainVtx + ((int)m_block.x + 1)].pos - pVtx[nMainVtx].pos;		// 辺のベクトル
 	aVecToPos[0] = pos - pVtx[nMainVtx].pos;										// 現在位置へのベクトル
 
-	// (nMainVtx + (int)m_block.y + 1) - (nMainVtx - 1) 間のベクトル
-	aVecLine[1] = pVtx[nMainVtx - 1].pos - pVtx[nMainVtx + ((int)m_block.y + 1)].pos;	// 辺のベクトル
-	aVecToPos[1] = pos - pVtx[nMainVtx + ((int)m_block.y + 1)].pos;					// 現在位置へのベクトル
+	// (nMainVtx + (int)m_block.x + 1) - (nMainVtx - 1) 間のベクトル
+	aVecLine[1] = pVtx[nMainVtx - 1].pos - pVtx[nMainVtx + ((int)m_block.x + 1)].pos;	// 辺のベクトル
+	aVecToPos[1] = pos - pVtx[nMainVtx + ((int)m_block.x + 1)].pos;					// 現在位置へのベクトル
 
 	// (nMainVtx - 1) - nMainVtx 間のベクトル
 	aVecLine[2] = pVtx[nMainVtx].pos - pVtx[nMainVtx - 1].pos;						// 辺のベクトル
@@ -855,7 +872,7 @@ float CMeshField::GetHeight(const D3DXVECTOR3 pos, const D3DXVECTOR2 polygonIdx)
 		float fHeight = 0.0f;			// 求める高さ
 
 		// ベクトルを取得
-		vec1 = pVtx[nMainVtx + ((int)m_block.y + 1)].pos - pVtx[nMainVtx].pos;
+		vec1 = pVtx[nMainVtx + ((int)m_block.x + 1)].pos - pVtx[nMainVtx].pos;
 		vec2 = pVtx[nMainVtx - 1].pos - pVtx[nMainVtx].pos;
 
 		// 法線の計算
@@ -904,7 +921,7 @@ HRESULT CMeshField::ReadData(const char* pFilename)
 	if (file.is_open() == true)
 	{// ファイルが開けた
 		VERTEX_3D* pVtx;
-		WORD* pIdx;
+		DWORD* pIdx;
 		D3DXVECTOR2 block, size;
 		int nNumVtx, nNumIdx;
 
@@ -948,9 +965,9 @@ HRESULT CMeshField::ReadData(const char* pFilename)
 				NULL);
 
 			// インデックスバッファの生成
-			pDevice->CreateIndexBuffer(sizeof(WORD) * nNumIdx,
+			pDevice->CreateIndexBuffer(sizeof(DWORD) * nNumIdx,
 				D3DUSAGE_WRITEONLY,
-				D3DFMT_INDEX16,
+				D3DFMT_INDEX32,
 				D3DPOOL_MANAGED,
 				&m_pIdxBuff,
 				NULL);
@@ -983,6 +1000,9 @@ HRESULT CMeshField::ReadData(const char* pFilename)
 
 		// インデックスバッファをアンロックする
 		m_pIdxBuff->Unlock();
+
+		// 法線を設定
+		SetNor();
 
 		// ファイルを閉じる
 		file.close();

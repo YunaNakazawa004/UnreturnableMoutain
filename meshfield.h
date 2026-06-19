@@ -42,6 +42,7 @@ public:
 	void SetScale(const D3DXVECTOR3 scale);
 	D3DXVECTOR3 GetScale(void) { return m_scale; }
 	void SetColor(const D3DXCOLOR col);
+	void SetColor(const int nCntVtx, const D3DXCOLOR col);
 	D3DXCOLOR GetColor(void) { return m_col; }
 	void SetTexUV(const int nCntVtx, const float ftexU, const float ftexV);
 	void SetNor(void);
