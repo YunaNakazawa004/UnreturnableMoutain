@@ -405,8 +405,16 @@ void CPlayer::Update(void)
 	{// アクションモーションが終わった
 		m_bAct = false;
 
+		// とる
+		pEnergyRock->Minus(1);
+
 		// エネルギー回収
 		m_fEnergy += ONE_ENERGY;
+	}
+
+	if (pInputKeyboard->GetTrigger(DIK_H) == true)
+	{// エネルギー鉱石生成
+		CEnergyRock::Create(D3DXVECTOR3(-50.0f, 0.0f, 50.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 	}
 
 	// エネルギー減少

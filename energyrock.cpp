@@ -12,6 +12,7 @@
 //************************************************************************
 // マクロ定義
 //************************************************************************
+#define FIRST_LIFE				(3)					// 取れる数
 
 //========================================================================
 // エネルギー鉱物クラスの生成処理
@@ -63,6 +64,7 @@ CEnergyRock* CEnergyRock::Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot)
 CEnergyRock::CEnergyRock(const int nPriority) :CObjectX(nPriority)
 {
 	// エネルギー鉱物クラスの値をクリア
+	m_nLife = 0;
 }
 
 //========================================================================
@@ -83,6 +85,8 @@ HRESULT CEnergyRock::Init(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot)
 	// 位置/向きを設定
 	CObjectX::SetPosition(pos);
 	CObjectX::SetRotation(rot);
+
+	m_nLife = FIRST_LIFE;
 
 	return S_OK;
 }
@@ -110,6 +114,20 @@ void CEnergyRock::Draw(void)
 {
 	// 描画処理
 	CObjectX::Draw();
+}
+
+//========================================================================
+// 取れる数を減らす
+//========================================================================
+void CEnergyRock::Minus(const int nValue)
+{
+	m_nLife -= nValue;
+
+	if (m_nLife <= 0)
+	{// なくなった
+		// 破棄
+		Uninit();
+	}
 }
 
 //========================================================================

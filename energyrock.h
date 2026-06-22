@@ -31,10 +31,13 @@ public:
 	void Update(void);
 	void Draw(void);
 
+	void Minus(const int nValue);
+
 	static CEnergyRock* Collision(D3DXVECTOR3* pos, D3DXVECTOR3* posOld, D3DXVECTOR3* move,
 		const float fRadius, const float fHeight);
 
 private:
+	int m_nLife;			// ‚ ‚Æ‰½‰ñŽæ‚ê‚é‚©
 };
 
 #endif
