@@ -9,6 +9,8 @@
 #include "renderer.h"
 #include "manager.h"
 
+#include "meshfield.h"
+
 //************************************************************************
 // マクロ定義
 //************************************************************************
@@ -105,6 +107,28 @@ void CEnergyRock::Uninit(void)
 //========================================================================
 void CEnergyRock::Update(void)
 {
+	CMeshField* pMeshField = CManager::GetMeshField();					// メッシュフィールドの取得
+	D3DXVECTOR3 pos = GetPosition();
+
+	float fHeight = 0.0f;		// 地面の高さ
+	D3DXVECTOR2 polygonIdx = { -1.0f,-1.0f };		// ポリゴン番号
+
+	// ポリゴン番号を取得
+	polygonIdx = pMeshField->GetPolygonIdx(pos);
+
+	// 地面の高さを取得
+	fHeight = pMeshField->GetHeight(pos, polygonIdx);
+
+	if (fHeight == ERROR_HEIGHT)
+	{// 無効な高さだったら
+		fHeight = 0.0f;
+	}
+
+	// 高さを代入
+	pos.y = fHeight;
+
+	// 位置を適用
+	SetPosition(pos);
 }
 
 //========================================================================
