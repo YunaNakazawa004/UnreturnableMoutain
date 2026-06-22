@@ -300,6 +300,58 @@ bool CTree::Collision(D3DXVECTOR3* pPos, D3DXVECTOR3* posOld, D3DXVECTOR3* move,
 
 	for (int nCntPri = 0; nCntPri < MAX_PRIORITY_NUM; nCntPri++)
 	{
+#ifdef LIST
+		CObject* pObj = CObject::GetTop(nCntPri);
+
+		while (pObj != NULL)
+		{
+			CObject* pObjNext = pObj->GetNext();			// 次のオブジェクトを保存
+			CObject::TYPE type;
+
+			// オブジェクトの種類を取得
+			type = pObj->GetType();
+
+			if (type == CObject::TYPE_TREE)
+			{// 木オブジェクトなら当たり判定する
+				D3DXVECTOR3 posObj, dist;
+
+				// 木の位置を取得
+				posObj = pObj->GetPosition();
+
+				// 距離を計算
+				dist = *pPos - posObj;
+
+				// サイズを代入
+				D3DXVECTOR3 Radius = dynamic_cast<CTree*>(pObj)->m_apModel[0]->GetVtxMax();
+
+				if ((D3DXVec3Length(&dist) < Radius.x + fRadius) &&
+					pPos->y < posObj.y + Radius.y && pPos->y + fHeight > posObj.y)
+				{// 木と重なった
+					// 当たり判定
+					bColl = dynamic_cast<CTree*>(pObj)->m_apModel[0]->Collision(posObj, pPos, posOld, move, fRadius, fHeight);
+
+					if (dynamic_cast<CTree*>(pObj)->GetShake() == true && bColl == true)
+					{// 一度揺らす
+						// 揺らす
+						dynamic_cast<CTree*>(pObj)->Shake(*pPos);
+
+						// 揺れるフラグを消す
+						dynamic_cast<CTree*>(pObj)->SetShake(false);
+					}
+
+					return true;
+				}
+				else
+				{// 遠かった
+					// 揺れるようにする
+					dynamic_cast<CTree*>(pObj)->SetShake(true);
+				}
+			}
+
+			pObj = pObjNext;			// 次のオブジェクトを代入
+		}
+
+#else
 		for (int nCntObj = 0; nCntObj < MAX_OBJECT; nCntObj++)
 		{
 			CObject* pObj;
@@ -352,6 +404,8 @@ bool CTree::Collision(D3DXVECTOR3* pPos, D3DXVECTOR3* posOld, D3DXVECTOR3* move,
 				}
 			}
 		}
+
+#endif
 	}
 
 	return false;

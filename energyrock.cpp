@@ -138,6 +138,41 @@ CEnergyRock* CEnergyRock::Collision(D3DXVECTOR3* pPos, D3DXVECTOR3* posOld, D3DX
 {
 	for (int nCntPri = 0; nCntPri < MAX_PRIORITY_NUM; nCntPri++)
 	{
+#ifdef LIST
+		CObject* pObj = CObject::GetTop(nCntPri);
+
+		while (pObj != NULL)
+		{
+			CObject* pObjNext = pObj->GetNext();			// 次のオブジェクトを保存
+			CObject::TYPE type;
+
+			// オブジェクトの種類を取得
+			type = pObj->GetType();
+
+			if (type == CObject::TYPE_ENERGYROCK)
+			{// エネルギー鉱物オブジェクトなら当たり判定する
+				D3DXVECTOR3 posRock, dist;
+
+				// エネルギー鉱物の位置を取得
+				posRock = pObj->GetPosition();
+
+				// 距離を計算
+				dist = *pPos - posRock;
+
+				if ((D3DXVec3Length(&dist) < ENERGYROCK_RADIUS + fRadius) &&
+					pPos->y < posRock.y + ENERGYROCK_HEIGHT && pPos->y + fHeight > posRock.y)
+				{// エネルギー鉱物と重なった
+					// 当たり判定
+					dynamic_cast<CObjectX*>(pObj)->Collision(pPos, posOld, move, fRadius, fHeight);
+
+					return dynamic_cast<CEnergyRock*>(pObj);
+				}
+			}
+
+			pObj = pObjNext;			// 次のオブジェクトを代入
+		}
+
+#else
 		for (int nCntObj = 0; nCntObj < MAX_OBJECT; nCntObj++)
 		{
 			CObject* pObj;
@@ -173,6 +208,8 @@ CEnergyRock* CEnergyRock::Collision(D3DXVECTOR3* pPos, D3DXVECTOR3* posOld, D3DX
 				}
 			}
 		}
+
+#endif
 	}
 
 	return NULL;

@@ -46,6 +46,10 @@
 #define COLOR_UIBUBBLE		(D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.75f))
 #define COLOR_WHITE_ALPHA	(D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f))
 
+#if 1
+#define LIST				// リスト構造にするかどうか
+#endif
+
 //************************************************************************
 // オブジェクトクラス
 //************************************************************************
@@ -90,16 +94,33 @@ public:
 	static int GetNumAll(void) { return m_nNumAll; }
 	void SetType(const TYPE type) { m_type = type; }
 	TYPE GetType(void) { return m_type; }
+
+#ifdef LIST
+	static CObject* GetTop(const int nPriority) { return m_apTop[nPriority]; }
+	CObject* GetNext(void) { return m_pNext; }
+
+#else
 	static CObject* GetObject(const int nPriority, const int nIdx) { return m_apObject[nPriority][nIdx]; }
+
+#endif
 
 protected:
 	void Release(void);
 
 private:
+#ifdef LIST
+	static CObject* m_apTop[MAX_PRIORITY_NUM];			// 先頭のオブジェクトへのポインタ
+	static CObject* m_apCur[MAX_PRIORITY_NUM];			// 最後尾のオブジェクトへのポインタ
+	CObject* m_pPrev;				// 前のオブジェクトへのポインタ
+	CObject* m_pNext;				// 次のオブジェクトへのポインタ
+
+#else
 	static CObject* m_apObject[MAX_PRIORITY_NUM][MAX_OBJECT];	// オブジェクトのインスタンス
-	static int m_nNumAll;			// オブジェクトの総数
 	int m_nID;						// 自分自身のID
+
+#endif
 	int m_nPriority;				// 自分自身の優先順位
+	static int m_nNumAll;			// オブジェクトの総数
 	TYPE m_type;					// 自分の種類
 };
 
