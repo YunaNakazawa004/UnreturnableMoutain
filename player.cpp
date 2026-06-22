@@ -386,7 +386,9 @@ void CPlayer::Update(void)
 	rot.y += (m_rotDest.y - rot.y) * 0.1f;
 
 	// “–‚½‚è”»’è
-	if (CEnergyRock::Collision(&pos, &m_posOld, &m_move, m_fRadius, m_fHeight) == true && 
+	CEnergyRock* pEnergyRock = CEnergyRock::Collision(&pos, &m_posOld, &m_move, m_fRadius, m_fHeight);
+
+	if (pEnergyRock != NULL &&
 		m_bJump == false && m_pMotion->GetType() != MOTIONTYPE_DEATH)
 	{// ƒGƒlƒ‹ƒM[z•¨‚Æ“–‚½‚Á‚Ä‚¢‚é‚Æ‚«/‹ó’†‚Å‚Í‚È‚¢‚Æ‚«
 		if (pInputKeyboard->GetTrigger(DIK_RETURN) == true || pInputJoypad->GetTrigger(0, CInputJoypad::JOYKEY_X) == true)

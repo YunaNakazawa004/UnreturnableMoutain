@@ -115,7 +115,7 @@ void CEnergyRock::Draw(void)
 //========================================================================
 // ÉGÉlÉãÉMÅ[çzï®Ç∆ÇÃìñÇΩÇËîªíË
 //========================================================================
-bool CEnergyRock::Collision(D3DXVECTOR3* pPos, D3DXVECTOR3* posOld, D3DXVECTOR3* move,
+CEnergyRock* CEnergyRock::Collision(D3DXVECTOR3* pPos, D3DXVECTOR3* posOld, D3DXVECTOR3* move,
 	const float fRadius, const float fHeight)
 {
 	for (int nCntPri = 0; nCntPri < MAX_PRIORITY_NUM; nCntPri++)
@@ -150,12 +150,12 @@ bool CEnergyRock::Collision(D3DXVECTOR3* pPos, D3DXVECTOR3* posOld, D3DXVECTOR3*
 						// ìñÇΩÇËîªíË
 						dynamic_cast<CObjectX*>(pObj)->Collision(pPos, posOld, move, fRadius, fHeight);
 
-						return true;
+						return dynamic_cast<CEnergyRock*>(pObj);
 					}
 				}
 			}
 		}
 	}
 
-	return false;
+	return NULL;
 }
