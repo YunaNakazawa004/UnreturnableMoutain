@@ -72,6 +72,7 @@ public:
 		TYPE_ENERGYROCK,		// ÉGÉlÉãÉMÅ[çzï®
 		TYPE_GRASS,				// ëê
 		TYPE_TREE,				// ñÿ
+		TYPE_ROCK,				// ä‚
 		TYPE_MAX
 	}TYPE;
 

@@ -10,6 +10,7 @@
 
 #include "grass.h"
 #include "tree.h"
+#include "rock.h"
 
 #include <fstream>
 #include <iostream>
@@ -38,6 +39,12 @@ void CMapObject::Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot, const int 
 
 		case MAP_OBJ_TREE:			// ñÿÇê∂ê¨
 			m_apObject[m_nNumObject] = CTree::Create(pos, rot);
+			m_aObjType[m_nNumObject] = mapObj;
+
+			break;
+
+		case MAP_OBJ_ROCK:			// ä‚Çê∂ê¨
+			m_apObject[m_nNumObject] = CRock::Create(pos, rot);
 			m_aObjType[m_nNumObject] = mapObj;
 
 			break;

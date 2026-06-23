@@ -19,6 +19,8 @@
 #include "effect3D.h"
 #include "particle3D.h"
 #include "energyrock.h"
+#include "tree.h"
+#include "rock.h"
 
 #include "object3D.h"
 #include "meshfield.h"
@@ -387,6 +389,8 @@ void CPlayer::Update(void)
 
 	// “–‚½‚è”»’è
 	CEnergyRock* pEnergyRock = CEnergyRock::Collision(&pos, &m_posOld, &m_move, m_fRadius, m_fHeight);
+	CTree::Collision(&pos, &m_posOld, &m_move, m_fRadius, m_fHeight);
+	CRock::Collision(&pos, &m_posOld, &m_move, m_fRadius, m_fHeight);
 
 	if (pEnergyRock != NULL &&
 		m_bJump == false && m_pMotion->GetType() != MOTIONTYPE_DEATH)

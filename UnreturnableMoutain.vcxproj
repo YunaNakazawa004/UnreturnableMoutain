@@ -169,6 +169,7 @@
     <ClCompile Include="particle3D.cpp" />
     <ClCompile Include="player.cpp" />
     <ClCompile Include="renderer.cpp" />
+    <ClCompile Include="rock.cpp" />
     <ClCompile Include="sound.cpp" />
     <ClCompile Include="texture.cpp" />
     <ClCompile Include="tree.cpp" />
@@ -198,6 +199,7 @@
     <ClInclude Include="particle3D.h" />
     <ClInclude Include="player.h" />
     <ClInclude Include="renderer.h" />
+    <ClInclude Include="rock.h" />
     <ClInclude Include="sound.h" />
     <ClInclude Include="texture.h" />
     <ClInclude Include="tree.h" />
