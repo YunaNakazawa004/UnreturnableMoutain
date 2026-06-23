@@ -133,7 +133,7 @@ HRESULT CPlayer::Init(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot)
 	m_pos = pos;
 	m_posOld = pos;
 	m_rot = rot;
-	m_scale = D3DXVECTOR3(1.0f, 1.0f, 1.0f);
+	m_scale = D3DXVECTOR3(0.5f, 0.5f, 0.5f);
 	m_col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 	m_fEnergy = FIRST_ENERGY;
 
@@ -596,7 +596,7 @@ bool CPlayer::Movement(const D3DXVECTOR3 rot)
 	static float fRotCounter = 1.0f;		// 傾きの追加角度
 
 	// 8方向移動時のスピード
-	float fCustomSpeed = (1.5f - (m_fEnergy * 0.01f)) * ((fRotCounter >= MAX_ROTADD) ? 0.1f : 1.0f);
+	float fCustomSpeed = (1.5f - (m_fEnergy * 0.01f)) * ((fRotCounter >= MAX_ROTADD) ? 0.1f : 1.0f) * 0.5f;
 	float fSpeedX = (m_bJump ? AIR_MOVEMENT.x : LAND_MOVEMENT.x) * fCustomSpeed;
 	float fSpeedZ = (m_bJump ? AIR_MOVEMENT.z : LAND_MOVEMENT.z) * fCustomSpeed;
 

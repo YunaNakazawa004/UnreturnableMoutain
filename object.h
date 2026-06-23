@@ -113,6 +113,7 @@ private:
 	static CObject* m_apCur[MAX_PRIORITY_NUM];			// 最後尾のオブジェクトへのポインタ
 	CObject* m_pPrev;				// 前のオブジェクトへのポインタ
 	CObject* m_pNext;				// 次のオブジェクトへのポインタ
+	bool m_bDeath;					// 死亡フラグ
 
 #else
 	static CObject* m_apObject[MAX_PRIORITY_NUM][MAX_OBJECT];	// オブジェクトのインスタンス
