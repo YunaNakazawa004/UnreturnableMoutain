@@ -213,6 +213,8 @@ void CPlayer::Update(void)
 	float fHeight = 0.0f;		// 地面の高さ
 	D3DXVECTOR2 polygonIdx = { -1.0f,-1.0f };		// ポリゴン番号
 
+	bool bLand = false;			// オブジェクトへの着地判定
+
 #if 0
 	// 操作
 	pDebugProc->Print("\n*** プレイヤー ***\n");
@@ -328,49 +330,6 @@ void CPlayer::Update(void)
 	// XZ方向への移動量(動いているかいないか)※Y座標のみの変化はとらない
 	move = D3DXVECTOR2(m_move.x, m_move.z);
 
-	// ポリゴン番号を取得
-	polygonIdx = pMeshField->GetPolygonIdx(pos);
-
-	pDebugProc->Print("乗っているポリゴン番号 : %d %d\n", (int)polygonIdx.x, (int)polygonIdx.y);
-
-	// 地面の高さを取得
-	fHeight = pMeshField->GetHeight(pos, polygonIdx);
-
-	if (fHeight == ERROR_HEIGHT)
-	{// 無効な高さだったら
-		fHeight = 0.0f;
-	}
-
-	if (m_bJump == false)
-	{// 空中ではないとき
-		pos.y = fHeight;
-	}
-
-	if (pos.y <= fHeight)
-	{// 地面との当たり判定
-		if (m_bJump == true && m_pMotion->GetType() != MOTIONTYPE_DEATH)
-		{// 着地
-			// モーションを設定
-			m_pMotion->Set(MOTIONTYPE_LANDING, true, 20);
-			m_bLand = true;
-		}
-
-		pos.y = fHeight;
-		m_move.y = 0.0f;
-		m_bJump = false;
-
-		if (D3DXVec2Length(&move) >= 0.4f)
-		{// 移動している
-			CParticle3D::Create(pos, 1, 3, 1.0f, -0.2f, CEffect3D::TYPE_NORMAL_NULL, CParticle3D::TYPE_NORMAL, 2, 2.0f);
-		}
-
-		if (m_bLand == true && m_pMotion->GetType() == MOTIONTYPE_LANDING && m_pMotion->IsFinish() == true)
-		{// 着地モーションが終わった
-			m_bLand = false;
-			m_bAct = false;
-		}
-	}
-
 	// 目的の向きを修正
 	float fmoveAngle = m_rotDest.y - rot.y;
 
@@ -390,7 +349,54 @@ void CPlayer::Update(void)
 	// 当たり判定
 	CEnergyRock* pEnergyRock = CEnergyRock::Collision(&pos, &m_posOld, &m_move, m_fRadius, m_fHeight);
 	CTree::Collision(&pos, &m_posOld, &m_move, m_fRadius, m_fHeight);
-	CRock::Collision(&pos, &m_posOld, &m_move, m_fRadius, m_fHeight);
+	CRock::Collision(&pos, &m_posOld, &m_move, m_fRadius, m_fHeight, &bLand);
+
+	// ポリゴン番号を取得
+	polygonIdx = pMeshField->GetPolygonIdx(pos);
+
+	// 地面の高さを取得
+	fHeight = pMeshField->GetHeight(pos, polygonIdx);
+
+	if (fHeight == ERROR_HEIGHT)
+	{// 無効な高さだったら
+		fHeight = 0.0f;
+	}
+
+	if (pos.y <= fHeight || bLand == true)
+	{// 地面との当たり判定
+		if (m_bJump == true && m_pMotion->GetType() != MOTIONTYPE_DEATH)
+		{// 着地
+			// モーションを設定
+			m_pMotion->Set(MOTIONTYPE_LANDING, true, 20);
+			m_bLand = true;
+		}
+
+		if (bLand == false)
+		{// オブジェクトの上ではないときだけ
+			pos.y = fHeight;
+		}
+
+		m_move.y = 0.0f;
+		m_bJump = false;
+
+		if (D3DXVec2Length(&move) >= 0.4f)
+		{// 移動している
+			CParticle3D::Create(pos, 1, 3, 1.0f, -0.2f, CEffect3D::TYPE_NORMAL_NULL, CParticle3D::TYPE_NORMAL, 2, 2.0f);
+		}
+
+		if (m_bLand == true && m_pMotion->GetType() == MOTIONTYPE_LANDING && m_pMotion->IsFinish() == true)
+		{// 着地モーションが終わった
+			m_bLand = false;
+			m_bAct = false;
+		}
+	}
+	else if(pos.y > fHeight + 5.0f && bLand == false)
+	{// オブジェクトの上でもない空中
+		m_bJump = true;
+
+		// モーションを設定
+		m_pMotion->Set(MOTIONTYPE_JUMP, true, 20);
+	}
 
 	if (pEnergyRock != NULL &&
 		m_bJump == false && m_pMotion->GetType() != MOTIONTYPE_DEATH)
