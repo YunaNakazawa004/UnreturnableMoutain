@@ -65,6 +65,7 @@ public:
 		TYPE_EFFECT3D,			// エフェクト3D
 		TYPE_PARTICLE2D,		// パーティクル2D
 		TYPE_PARTICLE3D,		// パーティクル3D
+		TYPE_PAUSE,				// ポーズ
 		TYPE_BG,				// 背景
 		TYPE_OBJECTX,			// オブジェクトX
 		TYPE_OBJECTBILLBOARD,	// オブジェクトビルボード

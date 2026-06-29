@@ -11,6 +11,7 @@
 #include "input.h"
 #include "debugproc.h"
 #include "camera.h"
+#include "pause.h"
 
 #include "meshfield.h"
 #include "map_object.h"
@@ -20,6 +21,7 @@
 //************************************************************************
 // 静的メンバ変数宣言
 //************************************************************************
+CPause* CGame::m_pPause = NULL;						// ポーズのインスタンス
 CPlayer* CGame::m_pPlayer = NULL;					// プレイヤーのインスタンス
 CMeshField* CGame::m_pMeshField = NULL;				// メッシュフィールドのインスタンス
 CMapObject* CGame::m_pMapObject = NULL;				// マップオブジェクトのインスタンス
@@ -30,6 +32,7 @@ CMapObject* CGame::m_pMapObject = NULL;				// マップオブジェクトのインスタンス
 CGame::CGame() : CScene(CScene::MODE_GAME)
 {
 	// 値をクリア
+	m_pPause = NULL;
 	m_pPlayer = NULL;
 	m_pMeshField = NULL;
 	m_pMapObject = NULL;
@@ -50,6 +53,19 @@ HRESULT CGame::Init(void)
 	// カメラの設定
 	CCamera* pCamera = CManager::GetCamera();
 	pCamera->SetType(CCamera::TYPE_PLAYER);
+
+	// ポーズを生成
+	if (m_pPause == NULL)
+	{// NULLチェック
+		m_pPause = CPause::Create(CPause::MENU_CONTINUE);
+
+		if (m_pPause == NULL)
+		{// NULLチェック
+			OutputDebugStringA("! ! ! ポーズの生成に失敗しました ! ! !\n");
+
+			return E_FAIL;
+		}
+	}
 
 	// マップオブジェクトの生成
 	if (SUCCEEDED(CManager::CreateInstance(&m_pMapObject)))
@@ -130,6 +146,16 @@ void CGame::Uninit(void)
 	{// NULLチェック
 		delete m_pMapObject;
 		m_pMapObject = NULL;
+	}	
+	
+	// ポーズの破棄
+	if (m_pPause != NULL)
+	{// NULLチェック
+		// 終了処理
+		m_pPause->Uninit();
+
+		delete m_pPause;
+		m_pPause = NULL;
 	}
 }
 
@@ -138,6 +164,27 @@ void CGame::Uninit(void)
 //========================================================================
 void CGame::Update(void)
 {
+	if (m_pPause != NULL)
+	{// NULLチェック
+		// ポーズ画面表示/非表示
+		m_pPause->SetDisp(CManager::GetPause());
+	}
+
+	if (CManager::GetPause() == true)
+	{// ポーズ中
+		if (m_pPause != NULL)
+		{// NULLチェック
+			// 更新処理
+			m_pPause->Update();
+		}
+
+		return;
+	}
+	else
+	{// ポーズじゃないとき
+		m_pPause->SetMenu(CPause::MENU_CONTINUE);
+	}
+
 	CInputKeyboard* pInputKeyboard = CManager::GetInputKeyboard();		// キーボード入力の取得
 
 	// 画面遷移

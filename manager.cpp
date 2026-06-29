@@ -349,18 +349,18 @@ void CManager::Update(void)
 		m_pDebugProc->Print("オブジェクトの総数 : %d\n", CObject::GetNumAll());
 	}
 
+	if (m_pScene != NULL)
+	{// NULLチェック
+		// シーンの更新
+		m_pScene->Update();
+	}
+
 	if (m_bPause == false)
 	{// ポーズしていないときだけ
 		if (m_pRenderer != NULL)
 		{// NULLチェック
 			// レンダラーの更新
 			m_pRenderer->Update();
-		}
-
-		if (m_pScene != NULL)
-		{// NULLチェック
-			// シーンの更新
-			m_pScene->Update();
 		}
 
 		if (m_pCamera != NULL)
@@ -466,6 +466,8 @@ void CManager::SetMode(const CScene::MODE mode)
 	{// NULLチェック
 		m_pScene = CScene::Create(mode); 
 	}
+
+	SetPause(false);
 }
 
 //========================================================================
