@@ -25,12 +25,14 @@ CParticle2D* CParticle2D::Create(const D3DXVECTOR3 posP, const int nLifeP, const
 	const int nLifeE, const float fSpeedE, const D3DXCOLOR col, const float fDist,
 	const bool bHoming, const D3DXVECTOR3 HomingPos, const float fSpeedHoming)
 {
+#ifndef LIST
 	if (CObject::GetNumAll() >= MAX_OBJECT)
 	{// 最大数のオブジェクトが存在する
 		OutputDebugStringA("! ! ! オブジェクトの最大数に達しています ! ! !\n");
 
 		return NULL;
 	}
+#endif
 
 	CParticle2D* pParticle2D = NULL;
 

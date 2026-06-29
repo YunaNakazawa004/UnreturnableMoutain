@@ -150,6 +150,7 @@
     <ClCompile Include="effect2D.cpp" />
     <ClCompile Include="effect3D.cpp" />
     <ClCompile Include="energyrock.cpp" />
+    <ClCompile Include="game.cpp" />
     <ClCompile Include="grass.cpp" />
     <ClCompile Include="input.cpp" />
     <ClCompile Include="light.cpp" />
@@ -169,9 +170,12 @@
     <ClCompile Include="particle3D.cpp" />
     <ClCompile Include="player.cpp" />
     <ClCompile Include="renderer.cpp" />
+    <ClCompile Include="result.cpp" />
     <ClCompile Include="rock.cpp" />
+    <ClCompile Include="scene.cpp" />
     <ClCompile Include="sound.cpp" />
     <ClCompile Include="texture.cpp" />
+    <ClCompile Include="title.cpp" />
     <ClCompile Include="tree.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -180,6 +184,7 @@
     <ClInclude Include="effect2D.h" />
     <ClInclude Include="effect3D.h" />
     <ClInclude Include="energyrock.h" />
+    <ClInclude Include="game.h" />
     <ClInclude Include="grass.h" />
     <ClInclude Include="input.h" />
     <ClInclude Include="light.h" />
@@ -199,9 +204,12 @@
     <ClInclude Include="particle3D.h" />
     <ClInclude Include="player.h" />
     <ClInclude Include="renderer.h" />
+    <ClInclude Include="result.h" />
     <ClInclude Include="rock.h" />
+    <ClInclude Include="scene.h" />
     <ClInclude Include="sound.h" />
     <ClInclude Include="texture.h" />
+    <ClInclude Include="title.h" />
     <ClInclude Include="tree.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -23,12 +23,14 @@
 CObject3D* CObject3D::Create(const D3DXVECTOR3 pos, const float fWidth, const float fHeight, const float fDepth,
 	const CObject::TYPE type, const char* pFilename, const int nPriority)
 {
+#ifndef LIST
 	if (CObject::GetNumAll() >= MAX_OBJECT)
 	{// 最大数のオブジェクトが存在する
 		OutputDebugStringA("! ! ! オブジェクトの最大数に達しています ! ! !\n");
 
 		return NULL;
 	}
+#endif
 
 	CObject3D* pObject3D = NULL;
 

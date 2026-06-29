@@ -11,6 +11,7 @@
 #include "debugproc.h"
 #include "input.h"
 
+#include "game.h"
 #include "player.h"
 
 //*****************************************************************************
@@ -109,13 +110,13 @@ void CCamera::Update(void)
 	CInputMouse* pInputMouse = CManager::GetInputMouse();				// マウス入力の取得
 	CInputJoypad* pInputJoypad = CManager::GetInputJoypad();			// ジョイパッド入力の取得
 	CDebugProc* pDebugProc = CManager::GetDebugProc();					// デバッグ表示の取得
-	CPlayer* pPlayer = CManager::GetPlayer();							// プレイヤー取得
+	CPlayer* pPlayer;							// プレイヤー取得
 	D3DXVECTOR3 MousePos;
 	static D3DXVECTOR3 ClickPos, CameraRot;		// クリックされた位置、クリックされた瞬間のカメラの向き
 	static float fCameraAngle;					// クリックされた瞬間のカメラの上下角度
 	static int nAutoCameraCounter = 0;			// カメラの回り込みまでのカウンター
-	D3DXVECTOR3 pos = pPlayer->GetPosition();
-	D3DXVECTOR3 rot = pPlayer->GetRotation();
+	D3DXVECTOR3 pos;
+	D3DXVECTOR3 rot;
 
 	// マウス移動用
 	MousePos.x = (float)pInputMouse->GetPosition().x;
@@ -135,6 +136,10 @@ void CCamera::Update(void)
 	switch (m_type)
 	{
 	case TYPE_PLAYER:
+		pPlayer = CGame::GetPlayer();							// プレイヤー取得
+		pos = pPlayer->GetPosition();
+		rot = pPlayer->GetRotation();
+
 		int nValueH, nValueV;
 		nAutoCameraCounter++;
 

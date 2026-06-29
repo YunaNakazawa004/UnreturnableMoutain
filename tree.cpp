@@ -14,6 +14,7 @@
 
 #include "camera.h"
 #include "model.h"
+#include "game.h"
 
 #include "meshfield.h"
 
@@ -27,12 +28,14 @@
 //========================================================================
 CTree* CTree::Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot)
 {
+#ifndef LIST
 	if (CObject::GetNumAll() >= MAX_OBJECT)
 	{// 最大数のオブジェクトが存在する
 		OutputDebugStringA("! ! ! オブジェクトの最大数に達しています ! ! !\n");
 
 		return NULL;
 	}
+#endif
 
 	CTree* pTree = NULL;
 
@@ -136,7 +139,7 @@ void CTree::Uninit(void)
 //========================================================================
 void CTree::Update(void)
 {
-	CMeshField* pMeshField = CManager::GetMeshField();					// メッシュフィールドの取得
+	CMeshField* pMeshField = CGame::GetMeshField();					// メッシュフィールドの取得
 	D3DXVECTOR3 pos = GetPosition();
 	D3DXVECTOR3 posM = m_apModel[0]->GetPosition();
 

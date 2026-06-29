@@ -8,6 +8,7 @@
 #define _MANAGER_H_		// 2重インクルード防止のマクロを定義する
 
 #include "main.h"
+#include "scene.h"
 
 //************************************************************************
 // 前方宣言
@@ -21,10 +22,7 @@ class CDebugProc;
 class CCamera;
 class CLight;
 class CTexture;
-class CPlayer;
-class CObject3D;
-class CMeshField;
-class CMapObject;
+class CScene;
 
 //************************************************************************
 // マネージャークラス
@@ -49,10 +47,9 @@ public:
 	static CCamera* GetCamera(void) { return m_pCamera; }
 	static CLight* GetLight(void) { return m_pLight; }
 	static CTexture* GetTexture(void) { return m_pTexture; }
-	static CPlayer* GetPlayer(void) { return m_pPlayer; }
-	static CObject3D* GetObject3D(void) { return m_pObject3D; }
-	static CMeshField* GetMeshField(void) { return m_pMeshField; }
-	static CMapObject* GeMapObject(void) { return m_pMapObject; }
+
+	static void SetMode(const CScene::MODE mode);
+	static CScene::MODE GetMode(void) { return m_pScene->GetMode(); }
 
 	static int GetFPS(void) { return m_nCountFPS; }
 	static void SetFPS(const int nCountFPS) { m_nCountFPS = nCountFPS; };
@@ -61,7 +58,7 @@ public:
 
 	static void Retry(void);
 
-	template <class T> HRESULT CreateInstance(T** instance);
+	template <class T> static HRESULT CreateInstance(T** instance);
 
 private:
 	static CRenderer* m_pRenderer;					// レンダラーのインスタンス
@@ -73,10 +70,7 @@ private:
 	static CCamera* m_pCamera;						// カメラのインスタンス
 	static CLight* m_pLight;						// ライトのインスタンス
 	static CTexture* m_pTexture;					// テクスチャのインスタンス
-	static CPlayer* m_pPlayer;						// プレイヤーのインスタンス
-	static CObject3D* m_pObject3D;					// オブジェクト3Dのインスタンス
-	static CMeshField* m_pMeshField;				// メッシュフィールドのインスタンス
-	static CMapObject* m_pMapObject;				// マップオブジェクトのインスタンス
+	static CScene* m_pScene;						// シーンのインスタンス
 		
 	static int m_nCountFPS;							// FPSカウンター
 	static bool m_bPause;							// ポーズするかしないか

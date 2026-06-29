@@ -62,12 +62,14 @@ CEffect3D* CEffect3D::Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 move, cons
 	const int nLife, const float fRadius, const float fAddRadius, CEffect3D::TYPE type,
 	const D3DXCOLOR col, const bool bHoming, const D3DXVECTOR3 HomingPos, const float fSpeedHoming)
 {
+#ifndef LIST
 	if (CObject::GetNumAll() >= MAX_OBJECT)
 	{// 最大数のオブジェクトが存在する
 		OutputDebugStringA("! ! ! オブジェクトの最大数に達しています ! ! !\n");
 
 		return NULL;
 	}
+#endif
 
 	CEffect3D* pEffect3D = NULL;
 

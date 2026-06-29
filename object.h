@@ -14,7 +14,8 @@
 //************************************************************************
 #define MAX_OBJECT			(1024)			// 最大オブジェクト数
 #define MAX_PRIORITY_NUM	(8)				// 最大優先順位数
-#define BG_PRIORITY			(0)				// デフォルト背景優先順位
+#define SCENE_PRIORITY		(0)				// デフォルトシーン優先順位
+#define BG_PRIORITY			(1)				// デフォルト背景優先順位
 #define BULLET_PRIORITY		(1)				// デフォルト弾優先順位
 #define OBJECT_PRIORITY		(2)				// デフォルトオブジェクト優先順位
 #define PLAYER_PRIORITY		(3)				// デフォルトプレイヤー優先順位
@@ -64,7 +65,7 @@ public:
 		TYPE_EFFECT3D,			// エフェクト3D
 		TYPE_PARTICLE2D,		// パーティクル2D
 		TYPE_PARTICLE3D,		// パーティクル3D
-		TYPE_OBJECT3D,			// オブジェクト3D
+		TYPE_BG,				// 背景
 		TYPE_OBJECTX,			// オブジェクトX
 		TYPE_OBJECTBILLBOARD,	// オブジェクトビルボード
 		TYPE_MESHFIELD,			// メッシュフィールド

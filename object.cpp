@@ -155,6 +155,69 @@ void CObject::ReleaseAll(void)
 
 #endif
 	}
+
+#ifdef LIST
+	for (int nCntPri = 0; nCntPri < MAX_PRIORITY_NUM; nCntPri++)
+	{
+		CObject* pObject = m_apTop[nCntPri];		// 先頭のオブジェクトを代入
+
+		while (pObject != NULL)
+		{
+			CObject* pObjectNext = pObject->m_pNext;			// 次のオブジェクトを保存
+
+			if (pObject->m_bDeath == true)
+			{// 死亡フラグが立っている
+				CObject* pObjectPrev = pObject->m_pPrev;		// 前のオブジェクト
+				CObject* pObjectNext = pObject->m_pNext;		// 次のオブジェクト
+				int nPriority = pObject->m_nPriority;		// 優先順位を保存
+
+				if (m_apTop[nPriority] != pObject && m_apCur[nPriority] != pObject)
+				{// 先頭でも最後尾でもない
+					if (pObjectPrev != NULL && pObjectNext != NULL)
+					{// NULLチェック
+						// 前のオブジェクトの次のオブジェクトに、自分の次のオブジェクトを代入
+						pObjectPrev->m_pNext = pObjectNext;
+
+						// 次のオブジェクトの前のオブジェクトに、自分の前のオブジェクトを代入
+						pObjectNext->m_pPrev = pObjectPrev;
+					}
+				}
+
+				if (m_apTop[nPriority] == pObject)
+				{// 自分が先頭の場合
+					if (pObjectNext != NULL)
+					{// NULLチェック
+						// 次のオブジェクトの前のオブジェクトをNULLにする
+						pObjectNext->m_pPrev = NULL;
+					}
+
+					// 先頭のオブジェクトを次のオブジェクトにする
+					m_apTop[nPriority] = pObjectNext;
+				}
+
+				if (m_apCur[nPriority] == pObject)
+				{// 自分が最後尾の場合
+					if (pObjectPrev != NULL)
+					{// NULLチェック
+						// 前のオブジェクトの次のオブジェクトをNULLにする
+						pObjectPrev->m_pNext = NULL;
+					}
+
+					// 最後尾のオブジェクトを前のオブジェクトにする
+					m_apCur[nPriority] = pObjectPrev;
+				}
+
+				// オブジェクトの破棄
+				delete pObject;
+				pObject = NULL;
+
+				m_nNumAll--;		// オブジェクトの総数を減らす
+			}
+
+			pObject = pObjectNext;			// 次のオブジェクトを代入
+		}
+	}
+#endif
 }
 
 //========================================================================

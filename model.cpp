@@ -21,12 +21,14 @@
 //========================================================================
 CModel* CModel::Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot, const char* pFilename)
 {
+#ifndef LIST
 	if (CObject::GetNumAll() >= MAX_OBJECT)
 	{// 最大数のオブジェクトが存在する
 		OutputDebugStringA("! ! ! オブジェクトの最大数に達しています ! ! !\n");
 
 		return NULL;
 	}
+#endif
 
 	CModel* pModel = NULL;
 

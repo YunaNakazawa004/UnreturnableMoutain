@@ -20,7 +20,7 @@ public:
 	virtual ~CObject2D();
 
 	static CObject2D* Create(const D3DXVECTOR3 pos, const float fWidth, const float fHeight, const CObject::TYPE type, 
-		const int nPriority = BG_PRIORITY);
+		const char* pFilename, const int nPriority = BG_PRIORITY);
 	HRESULT Init(void);
 	HRESULT Init(const D3DXVECTOR3 pos, const float fWidth, const float fHeight);
 	HRESULT Init(const D3DXVECTOR3 pos, const float fWidth, const float fHeight, const bool bLeft);

@@ -1,0 +1,155 @@
+//========================================================================
+// 
+// ゲーム画面 [game.cpp]
+// Author : Nakazawa Yuna
+// 
+//========================================================================
+#include "game.h"
+
+#include "renderer.h"
+#include "manager.h"
+#include "input.h"
+#include "debugproc.h"
+#include "camera.h"
+
+#include "meshfield.h"
+#include "map_object.h"
+#include "player.h"
+#include "energyrock.h"
+
+//************************************************************************
+// 静的メンバ変数宣言
+//************************************************************************
+CPlayer* CGame::m_pPlayer = NULL;					// プレイヤーのインスタンス
+CMeshField* CGame::m_pMeshField = NULL;				// メッシュフィールドのインスタンス
+CMapObject* CGame::m_pMapObject = NULL;				// マップオブジェクトのインスタンス
+
+//========================================================================
+// ゲーム画面クラスのコンストラクタ
+//========================================================================
+CGame::CGame() : CScene(CScene::MODE_GAME)
+{
+	// 値をクリア
+	m_pPlayer = NULL;
+	m_pMeshField = NULL;
+	m_pMapObject = NULL;
+}
+
+//========================================================================
+// ゲーム画面クラスのデストラクタ
+//========================================================================
+CGame::~CGame()
+{
+}
+
+//========================================================================
+// ゲーム画面クラスの初期化処理
+//========================================================================
+HRESULT CGame::Init(void)
+{
+	// カメラの設定
+	CCamera* pCamera = CManager::GetCamera();
+	pCamera->SetType(CCamera::TYPE_PLAYER);
+
+	// マップオブジェクトの生成
+	if (SUCCEEDED(CManager::CreateInstance(&m_pMapObject)))
+	{// マップオブジェクトの生成に成功
+		// 初期化処理
+		if (FAILED(m_pMapObject->Init()))
+		{// 初期化処理が失敗した場合
+			OutputDebugStringA("! ! ! マップオブジェクトの初期化に失敗しました ! ! !\n");
+
+			return E_FAIL;
+		}
+
+		// マップオブジェクトのデータを読み込む
+		if (FAILED(m_pMapObject->ReadData("data\\map_object.bin")))
+		{// もし失敗したら
+			return E_FAIL;
+		}
+	}
+
+	// メッシュフィールドを生成
+	if (m_pMeshField == NULL)
+	{// NULLチェック
+		m_pMeshField = CMeshField::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR2(32.0f, 32.0f),
+			D3DXVECTOR2(10.0f, 10.0f), CObject::TYPE_MESHFIELD, 3);
+
+		if (m_pMeshField == NULL)
+		{// NULLチェック
+			OutputDebugStringA("! ! ! メッシュフィールドの生成に失敗しました ! ! !\n");
+
+			return E_FAIL;
+		}
+
+		// ステージのデータを読み込む
+		if (FAILED(m_pMeshField->ReadData("data\\stage.bin")))
+		{// もし失敗したら
+			return E_FAIL;
+		}
+	}
+
+	// プレイヤーを生成
+	if (m_pPlayer == NULL)
+	{// NULLチェック
+		m_pPlayer = CPlayer::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+
+		if (m_pPlayer == NULL)
+		{// NULLチェック
+			OutputDebugStringA("! ! ! プレイヤーの生成に失敗しました ! ! !\n");
+
+			return E_FAIL;
+		}
+	}
+
+	// エネルギー鉱物を生成
+	CEnergyRock::Create(D3DXVECTOR3(-50.0f, 0.0f, 50.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+
+	return S_OK;
+}
+
+//========================================================================
+// ゲーム画面クラスの終了処理
+//========================================================================
+void CGame::Uninit(void)
+{
+	// プレイヤーの破棄
+	if (m_pPlayer != NULL)
+	{// NULLチェック
+		m_pPlayer = NULL;
+	}
+
+	// メッシュフィールドの破棄
+	if (m_pMeshField != NULL)
+	{// NULLチェック
+		m_pMeshField = NULL;
+	}
+
+	// マップオブジェクトの破棄
+	if (m_pMapObject != NULL)
+	{// NULLチェック
+		delete m_pMapObject;
+		m_pMapObject = NULL;
+	}
+}
+
+//========================================================================
+// ゲーム画面クラスの更新処理
+//========================================================================
+void CGame::Update(void)
+{
+	CInputKeyboard* pInputKeyboard = CManager::GetInputKeyboard();		// キーボード入力の取得
+
+	// 画面遷移
+	if (pInputKeyboard->GetTrigger(DIK_RETURN) == true)
+	{// ENTERが押された
+		CManager::SetMode(MODE_RESULT);
+	}
+}
+
+//========================================================================
+// ゲーム画面クラスの描画処理
+//========================================================================
+void CGame::Draw(void)
+{
+}

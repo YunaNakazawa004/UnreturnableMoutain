@@ -39,6 +39,7 @@ public:
 private:
 	LPDIRECT3DTEXTURE9 m_apTexture[MAX_TEXTURE];		// テクスチャへのポインタ
 	const char* m_pFilename[MAX_TEXTURE];				// テクスチャのファイル名収納
+	char m_aCopyFilename[MAX_TEXTURE][256];				// テクスチャのファイル名コピー用
 	static const char* c_apFilername[TYPE_MAX];			// 固定テクスチャファイル名
 	static int m_nNumAll;			// テクスチャの使用数
 };

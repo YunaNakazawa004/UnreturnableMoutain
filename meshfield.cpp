@@ -21,18 +21,55 @@
 // マクロ定義
 //************************************************************************
 
+//************************************************************************
+// 静的メンバ変数宣言
+//************************************************************************
+int CMeshField::m_nIdxTexture = -1;				// テクスチャのインデックス
+
+//========================================================================
+// テクスチャの生成
+//========================================================================
+HRESULT CMeshField::Load(void)
+{
+	// ローカル変数宣言
+	CTexture* pTexture = CManager::GetTexture();			// テクスチャへのポインタ
+
+	// テクスチャの設定
+	m_nIdxTexture = pTexture->Register("data\\TEXTURE\\field002.jpg");
+
+	if (m_nIdxTexture == -1)
+	{// テクスチャが設定できていない
+		OutputDebugStringA("! ! ! テクスチャの設定に失敗しました ! ! !\n");
+
+		return E_FAIL;
+	}
+
+	return S_OK;
+}
+
+//========================================================================
+// テクスチャの破棄
+//========================================================================
+void CMeshField::Unload(void)
+{
+	// テクスチャのインデックスを削除
+	m_nIdxTexture = -1;
+}
+
 //========================================================================
 // メッシュフィールドクラスの生成処理
 //========================================================================
 CMeshField* CMeshField::Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot, const D3DXVECTOR2 block,
-	const D3DXVECTOR2 size, const CObject::TYPE type, const char* pFilename, const int nPriority)
+	const D3DXVECTOR2 size, const CObject::TYPE type, const int nPriority)
 {
+#ifndef LIST
 	if (CObject::GetNumAll() >= MAX_OBJECT)
 	{// 最大数のオブジェクトが存在する
 		OutputDebugStringA("! ! ! オブジェクトの最大数に達しています ! ! !\n");
 
 		return NULL;
 	}
+#endif
 
 	CMeshField* pMeshFIeld = NULL;
 
@@ -52,12 +89,11 @@ CMeshField* CMeshField::Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot, con
 			return NULL;
 		}
 
-		// テクスチャを設定
-		CTexture* pTexture = CManager::GetTexture();			// テクスチャへのポインタ
-		pMeshFIeld->m_nIdxTexture = pTexture->Register(pFilename);
-
 		// 種類を設定
 		pMeshFIeld->SetType(type);
+
+		// テクスチャの割り当て
+		pMeshFIeld->BindTexture(m_nIdxTexture);
 
 		return pMeshFIeld;
 	}
@@ -75,7 +111,6 @@ CMeshField::CMeshField(const int nPriority) :CObject(nPriority)
 	// メッシュフィールドクラスの値をクリア
 	m_pVtxBuff = NULL;
 	m_pIdxBuff = NULL;
-	m_nIdxTexture = -1;
 	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_scale = D3DXVECTOR3(0.0f, 0.0f, 0.0f);

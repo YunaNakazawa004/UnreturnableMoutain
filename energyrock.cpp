@@ -9,6 +9,7 @@
 #include "renderer.h"
 #include "manager.h"
 
+#include "game.h"
 #include "meshfield.h"
 
 //************************************************************************
@@ -21,12 +22,14 @@
 //========================================================================
 CEnergyRock* CEnergyRock::Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot)
 {
+#ifndef LIST
 	if (CObject::GetNumAll() >= MAX_OBJECT)
 	{// 最大数のオブジェクトが存在する
 		OutputDebugStringA("! ! ! オブジェクトの最大数に達しています ! ! !\n");
 
 		return NULL;
 	}
+#endif
 
 	CEnergyRock* pEnergyRock = NULL;
 
@@ -107,7 +110,7 @@ void CEnergyRock::Uninit(void)
 //========================================================================
 void CEnergyRock::Update(void)
 {
-	CMeshField* pMeshField = CManager::GetMeshField();					// メッシュフィールドの取得
+	CMeshField* pMeshField = CGame::GetMeshField();					// メッシュフィールドの取得
 	D3DXVECTOR3 pos = GetPosition();
 
 	float fHeight = 0.0f;		// 地面の高さ

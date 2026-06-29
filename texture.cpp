@@ -26,6 +26,7 @@ CTexture::CTexture()
 	// テクスチャクラスの値をクリア
 	memset(&m_apTexture[0], NULL, sizeof m_apTexture);
 	memset(&m_pFilename[0], '\0', sizeof m_pFilename);
+	memset(&m_aCopyFilename[0][0], '\0', sizeof m_aCopyFilename);
 	m_nNumAll = 0;
 }
 
@@ -124,8 +125,11 @@ int CTexture::Register(const char* pFilename)
 		return -1;
 	}
 
+	// ファイル名をコピー
+	strcpy(&m_aCopyFilename[nIdx][0], pFilename);
+
 	// ファイル名を保存
-	m_pFilename[nIdx] = pFilename;
+	m_pFilename[nIdx] = &m_aCopyFilename[nIdx][0];
 
 	// 総数を増やす
 	m_nNumAll++;

@@ -18,15 +18,16 @@
 #include "object3D.h"
 #include "objectX.h"
 #include "ObjectBillboard.h"
-#include "meshfield.h"
 #include "number.h"
 #include "model.h"
-#include "map_object.h"
+
+#include "title.h"
+#include "game.h"
+#include "result.h"
 
 #include "effect2D.h"
 #include "effect3D.h"
-#include "player.h"
-#include "energyrock.h"
+#include "meshfield.h"
 #include "grass.h"
 
 //************************************************************************
@@ -41,10 +42,7 @@ CDebugProc* CManager::m_pDebugProc = NULL;				// デバッグ表示のインスタンス
 CCamera* CManager::m_pCamera = NULL;					// カメラのインスタンス
 CLight* CManager::m_pLight = NULL;						// ライトのインスタンス
 CTexture* CManager::m_pTexture = NULL;					// テクスチャのインスタンス
-CPlayer* CManager::m_pPlayer = NULL;					// プレイヤーのインスタンス
-CObject3D* CManager::m_pObject3D = NULL;				// オブジェクト3Dのインスタンス
-CMeshField* CManager::m_pMeshField = NULL;				// メッシュフィールドのインスタンス
-CMapObject* CManager::m_pMapObject = NULL;				// マップオブジェクトのインスタンス
+CScene* CManager::m_pScene = NULL;						// シーンのインスタンス
 int CManager::m_nCountFPS = 0;							// FPSカウンター
 bool CManager::m_bPause = false;						// ポーズするかしないか
 
@@ -63,10 +61,7 @@ CManager::CManager()
 	m_pCamera = NULL;
 	m_pLight = NULL;
 	m_pTexture = NULL;
-	m_pPlayer = NULL;
-	m_pObject3D = NULL;
-	m_pMeshField = NULL;
-	m_pMapObject = NULL;
+	m_pScene = NULL;
 	m_nCountFPS = 0;
 	m_bPause = false;
 }
@@ -197,61 +192,21 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	CEffect2D::Load();
 	CEffect3D::Load();
 	CNumber::Load();
+	CMeshField::Load();
 	CGrass::Load();
 
-	// マップオブジェクトの生成
-	if (SUCCEEDED(CreateInstance(&m_pMapObject)))
-	{// マップオブジェクトの生成に成功
-		// 初期化処理
-		if (FAILED(m_pMapObject->Init()))
-		{// 初期化処理が失敗した場合
-			OutputDebugStringA("! ! ! マップオブジェクトの初期化に失敗しました ! ! !\n");
-
-			return E_FAIL;
-		}
-
-		// マップオブジェクトのデータを読み込む
-		if (FAILED(m_pMapObject->ReadData("data\\map_object.bin")))
-		{// もし失敗したら
-			return E_FAIL;
-		}
-	}
-
-	// メッシュフィールドを生成
-	if (m_pMeshField == NULL)
+	// シーンの生成
+	if (m_pScene == NULL)
 	{// NULLチェック
-		m_pMeshField = CMeshField::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR2(32.0f, 32.0f),
-			D3DXVECTOR2(10.0f, 10.0f), CObject::TYPE_MESHFIELD, "data\\TEXTURE\\field002.jpg", 3);
+		m_pScene = CScene::Create(CScene::MODE_TITLE);
 
-		if (m_pMeshField == NULL)
+		if (m_pScene == NULL)
 		{// NULLチェック
-			OutputDebugStringA("! ! ! メッシュフィールドの生成に失敗しました ! ! !\n");
-
-			return E_FAIL;
-		}
-
-		// ステージのデータを読み込む
-		if (FAILED(m_pMeshField->ReadData("data\\stage.bin")))
-		{// もし失敗したら
-			return E_FAIL;
-		}
-	}
-	
-	// プレイヤーを生成
-	if (m_pPlayer == NULL)
-	{// NULLチェック
-		m_pPlayer = CPlayer::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
-
-		if (m_pPlayer == NULL)
-		{// NULLチェック
-			OutputDebugStringA("! ! ! プレイヤーの生成に失敗しました ! ! !\n");
+			OutputDebugStringA("! ! ! シーンの生成に失敗しました ! ! !\n");
 
 			return E_FAIL;
 		}
 	}
-
-	// エネルギー鉱物を生成
-	CEnergyRock::Create(D3DXVECTOR3(-50.0f, 0.0f, 50.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 
 	// FPSカウンタを初期化
 	m_nCountFPS = 0;
@@ -269,29 +224,18 @@ void CManager::Uninit(void)
 
 	// オブジェクトのテクスチャを破棄
 	CGrass::Unload();
+	CMeshField::Unload();
 	CNumber::Unload();
 	CEffect3D::Unload();
 	CEffect2D::Unload();
 
-	// オブジェクト3Dの破棄
-	if (m_pObject3D != NULL)
+	// シーンの破棄
+	if (m_pScene != NULL)
 	{// NULLチェック
-		m_pObject3D = NULL;
-	}
-	
-	// プレイヤーの破棄
-	if (m_pPlayer != NULL)
-	{// NULLチェック
-		m_pPlayer = NULL;
+		delete m_pScene;
+		m_pScene = NULL;
 	}
 
-	// マップオブジェクトの破棄
-	if (m_pMapObject != NULL)
-	{// NULLチェック
-		delete m_pMapObject;
-		m_pMapObject = NULL;
-	}
-	
 	// テクスチャの破棄
 	if (m_pTexture != NULL)
 	{// NULLチェック
@@ -396,6 +340,11 @@ void CManager::Update(void)
 		// FPS を表示
 		m_pDebugProc->Print("FPS : %d\n", m_nCountFPS);
 
+		// 現在のシーン名を表示
+		m_pDebugProc->Print("現在のシーン : %s\n",
+			(m_pScene->GetMode() == CScene::MODE_TITLE) ? "タイトル画面" :
+			(m_pScene->GetMode() == CScene::MODE_GAME) ? "ゲーム画面" : "リザルト画面");
+
 		// オブジェクトの総数を表示
 		m_pDebugProc->Print("オブジェクトの総数 : %d\n", CObject::GetNumAll());
 	}
@@ -406,6 +355,12 @@ void CManager::Update(void)
 		{// NULLチェック
 			// レンダラーの更新
 			m_pRenderer->Update();
+		}
+
+		if (m_pScene != NULL)
+		{// NULLチェック
+			// シーンの更新
+			m_pScene->Update();
 		}
 
 		if (m_pCamera != NULL)
@@ -479,6 +434,37 @@ void CManager::Draw(void)
 	{// NULLチェック
 		// レンダラーの描画
 		m_pRenderer->Draw();
+	}
+}
+
+//========================================================================
+// シーンモード設定
+//========================================================================
+void CManager::SetMode(const CScene::MODE mode)
+{
+	// サウンドの停止
+	if (m_pSound != NULL)
+	{// NULLチェック
+		m_pSound->StopSound();
+	}
+
+	// 現在のモードの破棄
+	if (m_pScene != NULL)
+	{// NULLチェック
+		// 終了処理
+		m_pScene->Uninit();
+
+		delete m_pScene;
+		m_pScene = NULL;
+	}
+
+	// 全てのオブジェクトの破棄
+	CObject::ReleaseAll();
+
+	// 新しいモードの作成
+	if (m_pScene == NULL)
+	{// NULLチェック
+		m_pScene = CScene::Create(mode); 
 	}
 }
 

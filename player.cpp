@@ -12,6 +12,7 @@
 #include "input.h"
 #include "texture.h"
 
+#include "game.h"
 #include "camera.h"
 #include "model.h"
 #include "motion.h"
@@ -54,12 +55,14 @@
 //========================================================================
 CPlayer* CPlayer::Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot)
 {
+#ifndef LIST
 	if (CObject::GetNumAll() >= MAX_OBJECT)
 	{// 最大数のオブジェクトが存在する
 		OutputDebugStringA("! ! ! オブジェクトの最大数に達しています ! ! !\n");
 
 		return NULL;
 	}
+#endif
 
 	CPlayer* pPlayer = NULL;
 
@@ -202,7 +205,7 @@ void CPlayer::Update(void)
 	CInputKeyboard* pInputKeyboard = CManager::GetInputKeyboard();		// キーボード入力の取得
 	CInputJoypad* pInputJoypad = CManager::GetInputJoypad();			// ジョイパッド入力の取得
 	CDebugProc* pDebugProc = CManager::GetDebugProc();					// デバッグ表示の取得
-	CMeshField* pMeshField = CManager::GetMeshField();					// メッシュフィールドの取得
+	CMeshField* pMeshField = CGame::GetMeshField();					// メッシュフィールドの取得
 	D3DXVECTOR3 pos = CPlayer::GetPosition();				// プレイヤーの位置	
 	D3DXVECTOR3 rot = CPlayer::GetRotation();				// プレイヤーの向き
 	D3DXVECTOR2 move = { 0.0f,0.0f };						// XZ方向に動いているかどうかの判断用
