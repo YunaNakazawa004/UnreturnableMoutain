@@ -157,6 +157,11 @@ void CGame::Uninit(void)
 		delete m_pPause;
 		m_pPause = NULL;
 	}
+
+#ifdef ENABLE_INHERITANCE_COBJECT
+	// 自分自身を破棄
+	CObject::Release();
+#endif
 }
 
 //========================================================================
@@ -182,7 +187,10 @@ void CGame::Update(void)
 	}
 	else
 	{// ポーズじゃないとき
-		m_pPause->SetMenu(CPause::MENU_CONTINUE);
+		if (m_pPause != NULL)
+		{// NULLチェック
+			m_pPause->SetMenu(CPause::MENU_CONTINUE);
+		}
 	}
 
 	CInputKeyboard* pInputKeyboard = CManager::GetInputKeyboard();		// キーボード入力の取得
@@ -191,6 +199,8 @@ void CGame::Update(void)
 	if (pInputKeyboard->GetTrigger(DIK_RETURN) == true)
 	{// ENTERが押された
 		CManager::SetMode(MODE_RESULT);
+
+		return;
 	}
 }
 

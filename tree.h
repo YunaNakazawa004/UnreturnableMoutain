@@ -68,7 +68,7 @@ private:
 	D3DXCOLOR m_col;			// êF
 
 	bool m_bShake;				// óhÇÁÇ∑Ç©Ç«Ç§Ç©
-	bool m_bDisp;					// ï\é¶Ç∑ÇÈÇ©Ç«Ç§Ç©
+	bool m_bDisp;				// ï\é¶Ç∑ÇÈÇ©Ç«Ç§Ç©
 };
 
 #endif

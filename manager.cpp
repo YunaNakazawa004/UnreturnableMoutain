@@ -453,9 +453,11 @@ void CManager::SetMode(const CScene::MODE mode)
 
 #ifdef ENABLE_INHERITANCE_COBJECT
 		m_pScene = NULL;
+
 #else
 		delete m_pScene;
 		m_pScene = NULL;
+
 #endif
 	}
 

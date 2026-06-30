@@ -70,6 +70,11 @@ void CResult::Uninit(void)
 	{// NULLチェック
 		m_pObject2D = NULL;
 	}
+
+#ifdef ENABLE_INHERITANCE_COBJECT
+	// 自分自身を破棄
+	CObject::Release();
+#endif
 }
 
 //========================================================================
