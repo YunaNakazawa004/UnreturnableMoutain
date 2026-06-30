@@ -937,6 +937,135 @@ float CMeshField::GetHeight(const D3DXVECTOR3 pos, const D3DXVECTOR2 polygonIdx)
 }
 
 //========================================================================
+// 現在位置の傾斜を取得
+//========================================================================
+float CMeshField::GetSlope(const D3DXVECTOR3 pos, const D3DXVECTOR2 polygonIdx)
+{
+	if (polygonIdx.x < 0 || polygonIdx.y < 0)
+	{// 範囲外の数値
+		return 1.0f;
+	}
+
+	// ローカル変数
+	CDebugProc* pDebugProc = CManager::GetDebugProc();					// デバッグ表示の取得
+	D3DXVECTOR3 aVecLine[3], aVecToPos[3];		// 境界線ベクトル、現在位置へのベクトル
+	float fposLine;			// 外積
+	int nCntLine = 0;		// 内側にいた回数
+	int nVtx = (int)polygonIdx.x + ((int)polygonIdx.y * ((int)m_block.x + 1));		// 現在位置の頂点
+	int nMainVtx = -1;		// 主となる頂点
+	VERTEX_3D* pVtx;
+
+	// 頂点バッファをロックし、頂点情報へのポインタを取得
+	m_pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
+
+	// 下の点を主頂点にする(△)
+	nMainVtx = nVtx + (int)m_block.x + 1;
+
+	// プレイヤーが対象ポリゴン(nMainVtx - (nMainVtx - m_block.x + 1) - nMainVtx + 1)の内側にいるかどうか
+	// nMainVtx - (nMainVtx - (int)m_block.x + 1) 間のベクトル
+	aVecLine[0] = pVtx[nMainVtx - ((int)m_block.x + 1)].pos - pVtx[nMainVtx].pos;		// 辺のベクトル
+	aVecToPos[0] = pos - pVtx[nMainVtx].pos;										// 現在位置へのベクトル
+
+	// (nMainVtx - (int)m_block.x + 1) - nMainVtx + 1 間のベクトル
+	aVecLine[1] = pVtx[nMainVtx + 1].pos - pVtx[nMainVtx - ((int)m_block.x + 1)].pos;	// 辺のベクトル
+	aVecToPos[1] = pos - pVtx[nMainVtx - ((int)m_block.x + 1)].pos;					// 現在位置へのベクトル
+
+	// nMainVtx + 1 - nMainVtx 間のベクトル
+	aVecLine[2] = pVtx[nMainVtx].pos - pVtx[nMainVtx + 1].pos;						// 辺のベクトル
+	aVecToPos[2] = pos - pVtx[nMainVtx + 1].pos;									// 現在位置へのベクトル
+
+	for (int nCnt = 0; nCnt < 3; nCnt++)
+	{
+		// 外積を計算
+		fposLine = (float)((int)(((aVecLine[nCnt].z * aVecToPos[nCnt].x) - (aVecLine[nCnt].x * aVecToPos[nCnt].z)) * 1.0f) / (int)1);
+
+		if (fposLine >= 0.0f)
+		{// 内側にいる
+			nCntLine++;
+		}
+	}
+
+	if (nCntLine >= 3)
+	{// 対象ポリゴン(nMainVtx - (nMainVtx - m_block.x + 1) - nMainVtx + 1)の内側にいる
+		D3DXVECTOR3 vec1, vec2, nor;	// ベクトル、法線
+		float fHeight = 0.0f;			// 求める高さ
+
+		// ベクトルを取得
+		vec1 = pVtx[nMainVtx - ((int)m_block.x + 1)].pos - pVtx[nMainVtx].pos;
+		vec2 = pVtx[nMainVtx + 1].pos - pVtx[nMainVtx].pos;
+
+		// 法線の計算
+		D3DXVec3Cross(&nor, &vec1, &vec2);
+
+		// 法線を正規化
+		D3DXVec3Normalize(&nor, &nor);
+
+		return nor.y;
+	}
+	else
+	{// 内側にいない→次のポリゴンの内側にいるかどうか調べる
+		nCntLine = 0;		// リセット
+	}
+
+	// 右の点を主頂点にする(▽)
+	nMainVtx = nVtx + 1;
+
+	// プレイヤーが対象ポリゴン(nMainVtx - (nMainVtx + m_block.x + 1) - (nMainVtx - 1))の内側にいるかどうか
+	// nMainVtx - (nMainVtx + (int)m_block.x + 1) 間のベクトル
+	aVecLine[0] = pVtx[nMainVtx + ((int)m_block.x + 1)].pos - pVtx[nMainVtx].pos;		// 辺のベクトル
+	aVecToPos[0] = pos - pVtx[nMainVtx].pos;										// 現在位置へのベクトル
+
+	// (nMainVtx + (int)m_block.x + 1) - (nMainVtx - 1) 間のベクトル
+	aVecLine[1] = pVtx[nMainVtx - 1].pos - pVtx[nMainVtx + ((int)m_block.x + 1)].pos;	// 辺のベクトル
+	aVecToPos[1] = pos - pVtx[nMainVtx + ((int)m_block.x + 1)].pos;					// 現在位置へのベクトル
+
+	// (nMainVtx - 1) - nMainVtx 間のベクトル
+	aVecLine[2] = pVtx[nMainVtx].pos - pVtx[nMainVtx - 1].pos;						// 辺のベクトル
+	aVecToPos[2] = pos - pVtx[nMainVtx - 1].pos;									// 現在位置へのベクトル
+
+	for (int nCnt = 0; nCnt < 3; nCnt++)
+	{
+		// 外積を計算
+		fposLine = (float)((int)(((aVecLine[nCnt].z * aVecToPos[nCnt].x) - (aVecLine[nCnt].x * aVecToPos[nCnt].z)) * 1.0f) / (int)1);
+
+		if (fposLine >= 0.0f)
+		{// 内側にいる
+			nCntLine++;
+		}
+	}
+
+	if (nCntLine >= 3)
+	{// 対象ポリゴン(3-2-1)の内側にいる
+		D3DXVECTOR3 vec1, vec2, nor;	// ベクトル、法線
+		float fHeight = 0.0f;			// 求める高さ
+
+		// ベクトルを取得
+		vec1 = pVtx[nMainVtx + ((int)m_block.x + 1)].pos - pVtx[nMainVtx].pos;
+		vec2 = pVtx[nMainVtx - 1].pos - pVtx[nMainVtx].pos;
+
+		// 法線の計算
+		D3DXVec3Cross(&nor, &vec1, &vec2);
+
+		// 法線を正規化
+		D3DXVec3Normalize(&nor, &nor);
+
+		return nor.y;
+	}
+	else
+	{// どちらのポリゴンの内側にもいない
+		// 頂点バッファをアンロックする
+		m_pVtxBuff->Unlock();
+
+		return 1.0f;
+	}
+
+	// 頂点バッファをアンロックする
+	m_pVtxBuff->Unlock();
+
+	return 1.0f;
+}
+
+//========================================================================
 // 外部ファイルから頂点情報を読み込む
 //========================================================================
 HRESULT CMeshField::ReadData(const char* pFilename)

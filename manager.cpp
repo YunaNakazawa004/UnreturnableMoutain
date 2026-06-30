@@ -198,7 +198,11 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	// シーンの生成
 	if (m_pScene == NULL)
 	{// NULLチェック
+#ifdef _DEBUG
+		m_pScene = CScene::Create(CScene::MODE_GAME);
+#else
 		m_pScene = CScene::Create(CScene::MODE_TITLE);
+#endif
 
 		if (m_pScene == NULL)
 		{// NULLチェック

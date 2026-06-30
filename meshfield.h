@@ -53,6 +53,7 @@ public:
 
 	D3DXVECTOR2 GetPolygonIdx(const D3DXVECTOR3 pos);
 	float GetHeight(const D3DXVECTOR3 pos, const D3DXVECTOR2 polygonIdx);
+	float GetSlope(const D3DXVECTOR3 pos, const D3DXVECTOR2 polygonIdx);
 
 	HRESULT ReadData(const char* pFilename);
 

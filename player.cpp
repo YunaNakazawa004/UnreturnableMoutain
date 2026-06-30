@@ -218,10 +218,11 @@ void CPlayer::Update(void)
 
 	bool bLand = false;			// オブジェクトへの着地判定
 
-#ifdef ENABLE_EXPLANATION
-	// 操作
 	pDebugProc->Print("\n*** プレイヤー ***\n");
 	pDebugProc->Print("エネルギー残量:%f\n", m_fEnergy);
+
+	// 操作
+#ifdef ENABLE_EXPLANATION
 	pDebugProc->Print("\n\n*** 操作説明 ***\n");
 	pDebugProc->Print("\n[キーボード]\n");
 	pDebugProc->Print("WASD:移動\n");
@@ -354,6 +355,8 @@ void CPlayer::Update(void)
 	CTree::Collision(&pos, &m_posOld, &m_move, m_fRadius, m_fHeight);
 	CRock::Collision(&pos, &m_posOld, &m_move, m_fRadius, m_fHeight, &bLand);
 
+	pDebugProc->Print("オブジェクトへの着地 : %d\n", bLand);
+
 	// ポリゴン番号を取得
 	polygonIdx = pMeshField->GetPolygonIdx(pos);
 
@@ -382,11 +385,6 @@ void CPlayer::Update(void)
 		m_move.y = 0.0f;
 		m_bJump = false;
 
-		if (D3DXVec2Length(&move) >= 0.4f)
-		{// 移動している
-			CParticle3D::Create(pos, 1, 3, 1.0f, -0.2f, CEffect3D::TYPE_NORMAL_NULL, CParticle3D::TYPE_NORMAL, 2, 2.0f);
-		}
-
 		if (m_bLand == true && m_pMotion->GetType() == MOTIONTYPE_LANDING && m_pMotion->IsFinish() == true)
 		{// 着地モーションが終わった
 			m_bLand = false;
@@ -399,6 +397,29 @@ void CPlayer::Update(void)
 
 		// モーションを設定
 		m_pMotion->Set(MOTIONTYPE_JUMP, true, 20);
+	}
+
+	pDebugProc->Print("傾斜 : %f\n", pMeshField->GetSlope(pos, polygonIdx));
+
+	if (m_bJump == false)
+	{// 地上にいるときだけ
+		// 傾斜によって進む距離を調整
+		if (m_posOld.y - pos.y < 0)
+		{// 登っているとき
+			pos = m_posOld + ((pos - m_posOld) * pMeshField->GetSlope(pos, polygonIdx));
+		}
+		else
+		{// 下りているとき
+			pos = m_posOld + ((pos - m_posOld) * (2.0f - pMeshField->GetSlope(pos, polygonIdx)));
+		}
+	}
+
+	if (pos.y <= fHeight || bLand == true)
+	{// 地上
+		if (D3DXVec2Length(&move) >= 0.4f)
+		{// 移動している
+			CParticle3D::Create(pos, 1, 3, 1.0f, -0.2f, CEffect3D::TYPE_NORMAL_NULL, CParticle3D::TYPE_NORMAL, 2, 2.0f);
+		}
 	}
 
 	if (pEnergyRock != NULL &&
@@ -433,7 +454,14 @@ void CPlayer::Update(void)
 	// エネルギー減少
 	if (m_nEnergyCounter > MINUS_ENERGY)
 	{// 一定時間移動し続けると減少
-		m_fEnergy -= 1.0f;		// 減らす
+		if (m_bJump == false)
+		{// 地上
+			m_fEnergy -= 2.0f - pMeshField->GetSlope(pos, polygonIdx);		// 減らす
+		}
+		else
+		{// 空中
+			m_fEnergy -= 1.0f;
+		}
 
 		m_nEnergyCounter = 0;	// リセット
 	}
