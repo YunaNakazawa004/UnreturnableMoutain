@@ -1,6 +1,6 @@
 //========================================================================
 // 
-// メッシュフィールド [meshfield.cpp]
+// メッシュフィールド [ meshfield.cpp ]
 // Author : Nakazawa Yuna
 // 
 //========================================================================
@@ -111,12 +111,12 @@ CMeshField::CMeshField(const int nPriority) :CObject(nPriority)
 	// メッシュフィールドクラスの値をクリア
 	m_pVtxBuff = NULL;
 	m_pIdxBuff = NULL;
-	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	m_rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	m_scale = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	m_block = D3DXVECTOR2(0.0f, 0.0f);
-	m_size = D3DXVECTOR2(0.0f, 0.0f);
-	m_col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+	m_pos = DEFAULT_VECTER3;
+	m_rot = DEFAULT_VECTER3;
+	m_scale = DEFAULT_VECTER3;
+	m_block = DEFAULT_VECTER2;
+	m_size = DEFAULT_VECTER2;
+	m_col = COLOR_WHITE;
 	m_nNumVtx = 0;
 	m_nNumIdx = 0;
 	m_bDisp = true;

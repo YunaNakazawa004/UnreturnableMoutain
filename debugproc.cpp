@@ -1,6 +1,6 @@
 //=============================================================================
 // 
-// デバッグ表示 [debugproc.cpp]
+// デバッグ表示 [ debugproc.cpp ]
 // Author : 中澤優奈
 // 
 //=============================================================================
@@ -11,6 +11,11 @@
 #include "input.h"
 
 #include "object.h"
+
+//*****************************************************************************
+// マクロ定義
+//*****************************************************************************
+#define FONT_SIZE			(22)			// フォントの大きさ
 
 //*****************************************************************************
 // 静的メンバ変数宣言
@@ -47,7 +52,7 @@ HRESULT CDebugProc::Init(void)
 	LPDIRECT3DDEVICE9 pDevice = pRenderer->GetDevice();			// デバイスへのポインタ
 
 	// デバッグ表示用フォントの生成
-	D3DXCreateFont(pDevice, 22, 0, 0, 0, FALSE,
+	D3DXCreateFont(pDevice, FONT_SIZE, 0, 0, 0, FALSE,
 		SHIFTJIS_CHARSET, OUT_DEFAULT_PRECIS,
 		DEFAULT_QUALITY, DEFAULT_PITCH,
 		"Terminal", &m_pFont);
@@ -61,7 +66,6 @@ HRESULT CDebugProc::Init(void)
 #else
 	m_bDebug = false;
 #endif
-	m_bDebug = true;		// 操作説明を表示
 
 	return S_OK;
 }

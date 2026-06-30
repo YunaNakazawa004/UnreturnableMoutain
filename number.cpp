@@ -1,6 +1,6 @@
 //========================================================================
 // 
-// 数字 [number.cpp]
+// 数字 [ number.cpp ]
 // Author : Nakazawa Yuna
 // 
 //========================================================================
@@ -91,7 +91,7 @@ CNumber::CNumber()
 {
 	// 数字クラスの値をクリア
 	m_pVtxBuff = NULL;
-	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_pos = DEFAULT_VECTER3;
 	m_fWidth = 0.0f;
 	m_fHeight = 0.0f;
 }

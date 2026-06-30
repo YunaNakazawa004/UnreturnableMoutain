@@ -39,18 +39,18 @@ public:
 	static CParticle2D* Create(const D3DXVECTOR3 posP, const int nLifeP, const int nValue,
 		const float fRadius, const float fAddRadius, CEffect2D::TYPE typeE, CParticle2D::TYPE typeP,
 		const int nLifeE, const float fSpeedE, const D3DXCOLOR col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), const float fDist = 0.0f,
-		const bool bHoming = false, const D3DXVECTOR3 HomingPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f), const float fSpeedHoming = 0.0f);
+		const bool bHoming = false, const D3DXVECTOR3 HomingPos = DEFAULT_VECTER3, const float fSpeedHoming = 0.0f);
 	HRESULT Init(void) { return S_OK; }
 	HRESULT Init(const D3DXVECTOR3 posP, const int nLifeP, const int nValue,
 		const float fRadius, const float fAddRadius, CEffect2D::TYPE typeE, CParticle2D::TYPE typeP,
 		const int nLifeE, const float fSpeedE, const D3DXCOLOR col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), const float fDist = 0.0f,
-		const bool bHoming = false, const D3DXVECTOR3 HomingPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f), const float fSpeedHoming = 0.0f);
+		const bool bHoming = false, const D3DXVECTOR3 HomingPos = DEFAULT_VECTER3, const float fSpeedHoming = 0.0f);
 	void Uninit(void);
 	void Update(void);
 	void Draw(void);
 
 	D3DXVECTOR3 GetPosition(void) { return m_posP; }
-	D3DXVECTOR3 GetRotation(void) { return D3DXVECTOR3(0.0f, 0.0f, 0.0f); }
+	D3DXVECTOR3 GetRotation(void) { return DEFAULT_VECTER3; }
 
 private:
 	CEffect2D* m_apEffect[PARTICLE2D_EFFECT];		// エフェクトのインスタンス

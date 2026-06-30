@@ -1,6 +1,6 @@
 //========================================================================
 // 
-// 木 [tree.cpp]
+// 木 [ tree.cpp ]
 // Author : Nakazawa Yuna
 // 
 //========================================================================
@@ -22,6 +22,8 @@
 // マクロ定義
 //************************************************************************
 #define TREE_RADIUS			(30.0f)			// 木の幹の半径
+#define SHAKE_MOVE			(3.0f)			// 揺れの大きさ
+#define SHAKE_INERTIA		(0.3f)			// 揺れの慣性
 
 //========================================================================
 // 木クラスの生成処理
@@ -74,10 +76,10 @@ CTree::CTree(const int nPriority) :CObject(nPriority)
 	// 木クラスの値をクリア
 	memset(&m_apModel[0], NULL, sizeof m_apModel);
 	m_nNumModel = 0;
-	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	m_move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	m_rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	m_scale = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_pos = DEFAULT_VECTER3;
+	m_move = DEFAULT_VECTER3;
+	m_rot = DEFAULT_VECTER3;
+	m_scale = DEFAULT_VECTER3;
 	m_col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 	m_bShake = true;
 	m_bDisp = true;
@@ -102,7 +104,7 @@ HRESULT CTree::Init(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot)
 	m_col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 
 	// モデルを設定
-	m_apModel[0] = CModel::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), m_rot, "data\\MODEL\\TREE\\tree.x");
+	m_apModel[0] = CModel::Create(DEFAULT_VECTER3, m_rot, "data\\MODEL\\TREE\\tree.x");
 	m_apModel[0]->SetParent(NULL);
 	m_apModel[1] = CModel::Create(D3DXVECTOR3(0.0f, 150.0f, 0.0f), m_rot, "data\\MODEL\\TREE\\treeleaf.x");
 	m_apModel[1]->SetParent(m_apModel[0]);
@@ -164,8 +166,8 @@ void CTree::Update(void)
 	SetPosition(pos);
 
 	// モデルの位置を戻す
-	posM.x = (0.0f - posM.x) * 0.3f;
-	posM.z = (0.0f - posM.z) * 0.3f;
+	posM.x = (0.0f - posM.x) * SHAKE_INERTIA;
+	posM.z = (0.0f - posM.z) * SHAKE_INERTIA;
 
 	// モデルの位置を適用
 	m_apModel[0]->SetPosition(posM);
@@ -431,8 +433,8 @@ void CTree::Shake(const D3DXVECTOR3 posP)
 	D3DXVec3Normalize(&dist, &dist);
 
 	// 位置のオフセットに代入
-	posM.x = sinf(dist.z) * cosf(rot.y) * 3.0f;
-	posM.z = sinf(dist.x) * cosf(rot.y + D3DX_PI) * 3.0f;
+	posM.x = sinf(dist.z) * cosf(rot.y) * SHAKE_MOVE;
+	posM.z = sinf(dist.x) * cosf(rot.y + D3DX_PI) * SHAKE_MOVE;
 
 	// 位置を適用
 	m_apModel[0]->SetPosition(posM);

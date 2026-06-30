@@ -1,6 +1,6 @@
 //========================================================================
 // 
-// マネージャー [manager.cpp]
+// マネージャー [ manager.cpp ]
 // Author : Nakazawa Yuna
 // 
 //========================================================================
@@ -232,8 +232,12 @@ void CManager::Uninit(void)
 	// シーンの破棄
 	if (m_pScene != NULL)
 	{// NULLチェック
+#ifdef ENABLE_INHERITANCE_COBJECT
+		m_pScene = NULL;
+#else
 		delete m_pScene;
 		m_pScene = NULL;
+#endif
 	}
 
 	// テクスチャの破棄
@@ -349,11 +353,13 @@ void CManager::Update(void)
 		m_pDebugProc->Print("オブジェクトの総数 : %d\n", CObject::GetNumAll());
 	}
 
+#ifndef ENABLE_INHERITANCE_COBJECT
 	if (m_pScene != NULL)
 	{// NULLチェック
 		// シーンの更新
 		m_pScene->Update();
 	}
+#endif
 
 	if (m_bPause == false)
 	{// ポーズしていないときだけ
@@ -386,15 +392,6 @@ void CManager::Update(void)
 			m_bPause = m_bPause ? false : true;
 
 			m_pSound->PlaySoundA(CSound::SOUND_SE_PAUSE);
-		}
-
-		if (m_pInputKeyboard->GetTrigger(DIK_R) == true)
-		{// リトライ
-			Retry();
-
-			m_pSound->PlaySoundA(CSound::SOUND_SE_ENTER);
-
-			return;
 		}
 
 		if (m_pInputKeyboard->GetTrigger(DIK_F8) == true)
@@ -454,8 +451,12 @@ void CManager::SetMode(const CScene::MODE mode)
 		// 終了処理
 		m_pScene->Uninit();
 
+#ifdef ENABLE_INHERITANCE_COBJECT
+		m_pScene = NULL;
+#else
 		delete m_pScene;
 		m_pScene = NULL;
+#endif
 	}
 
 	// 全てのオブジェクトの破棄
@@ -468,16 +469,4 @@ void CManager::SetMode(const CScene::MODE mode)
 	}
 
 	SetPause(false);
-}
-
-//========================================================================
-// リトライ処理
-//========================================================================
-void CManager::Retry(void)
-{
-	// ゲームオブジェクトの破棄
-	CObject::ReleaseAll();
-
-	// ポーズを解除
-	m_bPause = false;
 }

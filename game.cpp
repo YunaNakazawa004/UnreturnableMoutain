@@ -1,6 +1,6 @@
 //========================================================================
 // 
-// ゲーム画面 [game.cpp]
+// ゲーム画面 [ game.cpp ]
 // Author : Nakazawa Yuna
 // 
 //========================================================================
@@ -88,7 +88,7 @@ HRESULT CGame::Init(void)
 	// メッシュフィールドを生成
 	if (m_pMeshField == NULL)
 	{// NULLチェック
-		m_pMeshField = CMeshField::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR2(32.0f, 32.0f),
+		m_pMeshField = CMeshField::Create(DEFAULT_VECTER3, DEFAULT_VECTER3, D3DXVECTOR2(32.0f, 32.0f),
 			D3DXVECTOR2(10.0f, 10.0f), CObject::TYPE_MESHFIELD, 3);
 
 		if (m_pMeshField == NULL)
@@ -108,7 +108,7 @@ HRESULT CGame::Init(void)
 	// プレイヤーを生成
 	if (m_pPlayer == NULL)
 	{// NULLチェック
-		m_pPlayer = CPlayer::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+		m_pPlayer = CPlayer::Create(DEFAULT_VECTER3, DEFAULT_VECTER3);
 
 		if (m_pPlayer == NULL)
 		{// NULLチェック
@@ -119,7 +119,7 @@ HRESULT CGame::Init(void)
 	}
 
 	// エネルギー鉱物を生成
-	CEnergyRock::Create(D3DXVECTOR3(-50.0f, 0.0f, 50.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+	CEnergyRock::Create(D3DXVECTOR3(-50.0f, 0.0f, 50.0f), DEFAULT_VECTER3);
 
 	return S_OK;
 }

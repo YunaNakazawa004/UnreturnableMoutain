@@ -1,6 +1,6 @@
 //========================================================================
 // 
-// オブジェクトビルボードヘッダー [objectBillboard.h]
+// オブジェクトビルボードヘッダー [ objectBillboard.h ]
 // Author : Nakazawa Yuna
 // 
 //========================================================================
@@ -31,7 +31,7 @@ public:
 
 	void SetPosition(const D3DXVECTOR3 pos);
 	D3DXVECTOR3 GetPosition(void) { return m_pos; }
-	D3DXVECTOR3 GetRotation(void) { return D3DXVECTOR3(0.0f, 0.0f, 0.0f); }
+	D3DXVECTOR3 GetRotation(void) { return DEFAULT_VECTER3; }
 	void SetScale(const D3DXVECTOR3 scale);
 	D3DXVECTOR3 GetScale(void) { return m_scale; }
 	void SetSize(const float fRadius);

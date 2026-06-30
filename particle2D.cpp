@@ -1,6 +1,6 @@
 //========================================================================
 // 
-// パーティクル2D [particle2D.cpp]
+// パーティクル2D [ particle2D.cpp ]
 // Author : Nakazawa Yuna
 // 
 //========================================================================
@@ -16,6 +16,7 @@
 //************************************************************************
 // マクロ定義
 //************************************************************************
+#define RANDOM_ROT		((float)(rand() % 629 - 314) / 100.0f)		// 角度をランダム
 
 //========================================================================
 // パーティクル2Dクラスの生成処理
@@ -71,7 +72,7 @@ CParticle2D::CParticle2D(const int nPriority) :CObject(nPriority)
 {
 	// パーティクル2Dクラスの値をクリア
 	memset(&m_apEffect[0], NULL, sizeof m_apEffect);
-	m_posP = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_posP = DEFAULT_VECTER3;
 	m_nLifeP = 0;
 	m_nValue = 0;
 	m_fRadius = 0.0f;
@@ -83,7 +84,7 @@ CParticle2D::CParticle2D(const int nPriority) :CObject(nPriority)
 	m_col = COLOR_WHITE;
 	m_fDist = 0.0f;
 	m_bHoming = false;
-	m_HomingPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_HomingPos = DEFAULT_VECTER3;
 	m_fSpeedHoming = 0.0f;
 }
 
@@ -163,8 +164,8 @@ void CParticle2D::Update(void)
 			{
 			case TYPE_NORMAL:		// 通常
 
-				rot.x = (float)(rand() % 629 - 314) / 100.0f;		// 角度を設定
-				rot.y = (float)(rand() % 629 - 314) / 100.0f;		// 角度を設定
+				rot.x = RANDOM_ROT;		// 角度を設定
+				rot.y = RANDOM_ROT;		// 角度を設定
 				rot.z = 0.0f;
 
 				D3DXVec3Normalize(&rot, &rot);						// 正規化
@@ -175,8 +176,8 @@ void CParticle2D::Update(void)
 
 			case TYPE_HOMING:		// ホーミング
 
-				rot.x = (float)(rand() % 629 - 314) / 100.0f;		// 角度を設定
-				rot.y = (float)(rand() % 629 - 314) / 100.0f;		// 角度を設定
+				rot.x = RANDOM_ROT;		// 角度を設定
+				rot.y = RANDOM_ROT;		// 角度を設定
 				rot.z = 0.0f;
 
 				D3DXVec3Normalize(&rot, &rot);						// 正規化
@@ -187,8 +188,8 @@ void CParticle2D::Update(void)
 
 			case TYPE_BURST:		// バースト
 
-				rot.x = (float)(rand() % 629 - 314) / 100.0f;		// 角度を設定
-				rot.y = (float)(rand() % 629 - 314) / 100.0f;		// 角度を設定
+				rot.x = RANDOM_ROT;		// 角度を設定
+				rot.y = RANDOM_ROT;		// 角度を設定
 				rot.z = 0.0f;
 
 				D3DXVec3Normalize(&rot, &rot);						// 正規化

@@ -1,6 +1,6 @@
 //========================================================================
 // 
-// オブジェクト2D [object2D.cpp]
+// オブジェクト2D [ object2D.cpp ]
 // Author : Nakazawa Yuna
 // 
 //========================================================================
@@ -72,9 +72,9 @@ CObject2D::CObject2D(const int nPriority) :CObject(nPriority)
 	// オブジェクト2Dクラスの値をクリア
 	m_pVtxBuff = NULL;
 	m_nIdxTexture = -1;
-	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	m_rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	m_col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+	m_pos = DEFAULT_VECTER3;
+	m_rot = DEFAULT_VECTER3;
+	m_col = COLOR_WHITE;
 	m_fAngle = 0.0f;
 	m_fLength = 0.0f;
 	m_bDisp = true;

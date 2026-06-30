@@ -1,6 +1,6 @@
 //========================================================================
 // 
-// オブジェクトヘッダー [object.h]
+// オブジェクトヘッダー [ object.h ]
 // Author : Nakazawa Yuna
 // 
 //========================================================================
@@ -24,32 +24,30 @@
 #define UI_PRIORITY			(6)				// デフォルトUI優先順位
 #define FADE_PRIORITY		(7)				// デフォルトフェード優先順位
 
-#define COLOR_RED			(D3DXCOLOR(1.0f,0.0f,0.0f,1.0f))
-#define COLOR_GREEN			(D3DXCOLOR(0.0f,0.5f,0.0f,1.0f))
-#define COLOR_BLUE			(D3DXCOLOR(0.0f,0.0f,1.0f,1.0f))
-#define COLOR_YELLOW		(D3DXCOLOR(1.0f,1.0f,0.0f,1.0f))
-#define COLOR_WHITE			(D3DXCOLOR(1.0f,1.0f,1.0f,1.0f))
-#define COLOR_BLACK			(D3DXCOLOR(0.0f,0.0f,0.0f,0.0f))
-#define COLOR_DARKGRAY		(D3DXCOLOR(0.3f,0.3f,0.3f,1.0f))
-#define COLOR_BLUEGRAY		(D3DXCOLOR(0.439f,0.501f,0.564f,1.0f))
-#define COLOR_CYAN			(D3DXCOLOR(0.0f,1.0f,1.0f,1.0f))
-#define COLOR_MAGENTA		(D3DXCOLOR(1.0f,0.0f,1.0f,1.0f))
-#define COLOR_VIOLET		(D3DXCOLOR(0.933f,0.509f,0.933f,1.0f))
-#define COLOR_ORANGE		(D3DXCOLOR(1.0f,0.647f,0.0f,1.0f))
-#define COLOR_LIMEGREEN		(D3DXCOLOR(0.0f,1.0f,0.0f,1.0f))
-#define COLOR_SKYBLUE		(D3DXCOLOR(0.529f,0.807f,0.921f,1.0f))
-#define COLOR_HISUI			(D3DXCOLOR(0.219f,0.705f,0.545f,1.0f))
-#define COLOR_RETROFILTER	(D3DXCOLOR(1.000f,	1.000f,	1.000f,	0.080f))
-#define COLOR_DISALPHA		(D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.35f))
-#define COLOR_GREENBATTERY	(D3DXCOLOR(0.027f, 1.000f, 0.525f, 1.0f))
-#define COLOR_YELLOWBATTERY	(D3DXCOLOR(1.000f, 0.615f, 0.011f, 1.00f))
-#define COLOR_REDBATTERY	(D3DXCOLOR(0.85f, 0.00f, 0.00f, 1.0f))
-#define COLOR_UIBUBBLE		(D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.75f))
-#define COLOR_WHITE_ALPHA	(D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f))
+#define DEFAULT_VECTER3		(D3DXVECTOR3(0.0f,0.0f,0.0f))		// デフォルトのVec3座標
+#define DEFAULT_VECTER2		(D3DXVECTOR2(0.0f,0.0f))			// デフォルトのVec2座標
 
-#if 1
+#define COLOR_RED			(D3DXCOLOR(1.0f,0.0f,0.0f,1.0f))				// 赤
+#define COLOR_GREEN			(D3DXCOLOR(0.0f,0.5f,0.0f,1.0f))				// 緑
+#define COLOR_BLUE			(D3DXCOLOR(0.0f,0.0f,1.0f,1.0f))				// 青
+#define COLOR_YELLOW		(D3DXCOLOR(1.0f,1.0f,0.0f,1.0f))				// 黄
+#define COLOR_WHITE			(D3DXCOLOR(1.0f,1.0f,1.0f,1.0f))				// 白
+#define COLOR_BLACK			(D3DXCOLOR(0.0f,0.0f,0.0f,0.0f))				// 黒
+#define COLOR_DARKGRAY		(D3DXCOLOR(0.3f,0.3f,0.3f,1.0f))				// 灰
+#define COLOR_BLUEGRAY		(D3DXCOLOR(0.439f,0.501f,0.564f,1.0f))			// 青灰
+#define COLOR_CYAN			(D3DXCOLOR(0.0f,1.0f,1.0f,1.0f))				// シアン
+#define COLOR_MAGENTA		(D3DXCOLOR(1.0f,0.0f,1.0f,1.0f))				// マゼンタ
+#define COLOR_VIOLET		(D3DXCOLOR(0.933f,0.509f,0.933f,1.0f))			// 紫
+#define COLOR_ORANGE		(D3DXCOLOR(1.0f,0.647f,0.0f,1.0f))				// 橙
+#define COLOR_LIMEGREEN		(D3DXCOLOR(0.0f,1.0f,0.0f,1.0f))				// ライムグリーン
+#define COLOR_SKYBLUE		(D3DXCOLOR(0.529f,0.807f,0.921f,1.0f))			// 空色
+#define COLOR_HISUI			(D3DXCOLOR(0.219f,0.705f,0.545f,1.0f))			// 翡翠色
+#define COLOR_RETROFILTER	(D3DXCOLOR(1.000f,	1.000f,	1.000f,	0.080f))	// レトロ風
+#define COLOR_DISALPHA		(D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.35f))			// ほぼ透明
+#define COLOR_WHITE_ALPHA	(D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f))				// 半透明（白）
+
 #define LIST				// リスト構造にするかどうか
-#endif
+//#undef LIST
 
 //************************************************************************
 // オブジェクトクラス
@@ -89,7 +87,7 @@ public:
 
 	virtual D3DXVECTOR3 GetPosition(void) = 0;
 	virtual D3DXVECTOR3 GetRotation(void) = 0;
-	
+
 	static void ReleaseAll(void);
 	static void UpdateAll(void);
 	static void DrawAll(void);

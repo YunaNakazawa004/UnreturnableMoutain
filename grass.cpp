@@ -1,6 +1,6 @@
 //========================================================================
 // 
-// 草 [grass.cpp]
+// 草 [ grass.cpp ]
 // Author : Nakazawa Yuna
 // 
 //========================================================================
@@ -19,7 +19,8 @@
 //************************************************************************
 #define GRASS_WIDTH			(5.0f)				// 草の幅
 #define GRASS_HEIGHT		(25.0f)				// 草の高さ
-#define FIRST_ROT_X			(-D3DX_PI * 0.03f)	// 初期のX軸向き
+#define SHAKE_SPEED			(0.005f)			// 揺れるスピード
+#define SHAKE_VALUE			(0.0005f)			// どれくらい揺れるか
 #define PLAYER_DIST			(25.0f)				// プレイヤーとの最長距離(これより小さいときに傾く)
 
 //************************************************************************
@@ -109,7 +110,7 @@ CGrass* CGrass::Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot)
 CGrass::CGrass(const int nPriority) :CObject3D(nPriority)
 {
 	// 値をクリア
-	m_rotOff = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_rotOff = DEFAULT_VECTER3;
 	m_fShake = 0.0f;
 }
 
@@ -162,8 +163,8 @@ void CGrass::Update(void)
 	rot -= m_rotOff;
 
 	// ゆらゆら
-	m_fShake += 0.005f;
-	rot.x += cosf(m_fShake) * 0.0005f;
+	m_fShake += SHAKE_SPEED;
+	rot.x += cosf(m_fShake) * SHAKE_VALUE;
 
 	// プレイヤーとの当たり判定
 	CollisionPlayer();

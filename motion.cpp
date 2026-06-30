@@ -1,6 +1,6 @@
 //========================================================================
 // 
-// モーション [motion.cpp]
+// モーション [ motion.cpp ]
 // Author : Nakazawa Yuna
 // 
 //========================================================================
@@ -518,9 +518,4 @@ void CMotion::Update(void)
 			}
 		}
 	}
-
-#if 0		// モーション確認用
-	pDebugProc->Print("%d / %d\n", m_nCounter, m_aInfo[m_nType].aKeyInfo[m_nKey].nFrame);
-	pDebugProc->Print("%d / %d\n", m_nKey, m_aInfo[m_nType].nNumKey);
-#endif
 }

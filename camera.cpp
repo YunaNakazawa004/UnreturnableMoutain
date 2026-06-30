@@ -1,6 +1,6 @@
 //=============================================================================
 // 
-// カメラ [camera.cpp]
+// カメラ [ camera.cpp ]
 // Author : Nakazawa Yuna
 // 
 //=============================================================================
@@ -21,6 +21,9 @@
 #define FIRST_ROT_X				(200.0f)								// 視点と注視点間の距離
 #define HEIGHT					(0.0f)									// 視点の高さ
 #define MOVEMENT				(D3DXVECTOR3(5.0f, 5.0f, 5.0f))			// 移動量
+#define MAUSE_MOVEV				(0.005f)								// マウス使用時の視点移動量
+#define MAUSE_MOVER				(0.003f)								// マウス使用時の注視点移動量
+#define STICK_MOVE				(0.000002f)								// スティック使用時の移動量
 #define ROT						(D3DXVECTOR3(0.035f, 0.035f, 0.035f))	// 向き移動量
 #define AUTO_ROT				(D3DXVECTOR3(0.005f, 0.005f, 0.005f))	// 自動回転移動量
 #define AUTOROTATE_COUNT		(180)									// 回り込みまでのカウント
@@ -32,18 +35,21 @@
 #define MAX_Y					(300.0f)								// 上の制限
 #define MIN_Y					(-300.0f)								// 下の制限
 #define MIN_DISTANCE			(20.0f)									// カメラの距離の最低値
+#define MOVE_DIST				(10.0f)									// 距離の移動量
+#define MIN_VIEW_DIST			(10.0f)									// ビューボリュームの近平面までの距離
+#define MAX_VIEW_DIST			(80000.0f)								// ビューボリュームの遠平面までの距離
 
 //=============================================================================
 // カメラクラスのコンストラクタ
 //=============================================================================
 CCamera::CCamera()
 {
-	m_posV = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	m_posR = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	m_posVDest = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	m_posRDest = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	m_vecU = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	m_rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_posV = DEFAULT_VECTER3;
+	m_posR = DEFAULT_VECTER3;
+	m_posVDest = DEFAULT_VECTER3;
+	m_posRDest = DEFAULT_VECTER3;
+	m_vecU = DEFAULT_VECTER3;
+	m_rot = DEFAULT_VECTER3;
 	m_fAngle = 0.0f;
 	m_fDistance = 0.0f;
 	m_fRDistance = 0.0f;
@@ -66,11 +72,11 @@ HRESULT CCamera::Init(void)
 {
 	// カメラ情報の初期化
 	m_posV = CAMERA_POS;
-	m_posR = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_posR = DEFAULT_VECTER3;
 	m_posVDest = CAMERA_POS;
-	m_posRDest = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_posRDest = DEFAULT_VECTER3;
 	m_vecU = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
-	m_rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_rot = DEFAULT_VECTER3;
 
 	D3DXVECTOR3 dist = m_posV - m_posR;
 	D3DXVECTOR2 distXZ = D3DXVECTOR2(dist.x, dist.z);
@@ -225,8 +231,8 @@ void CCamera::Update(void)
 			D3DXVECTOR3 dist = MousePos - ClickPos;
 
 			// 視点移動
-			m_rot.y = CameraRot.y + dist.x * 0.005f;
-			m_fAngle = fCameraAngle + dist.y * 0.005f;
+			m_rot.y = CameraRot.y + dist.x * MAUSE_MOVEV;
+			m_fAngle = fCameraAngle + dist.y * MAUSE_MOVEV;
 
 			if (m_fAngle > D3DX_PI * 0.4f)
 			{// 上の制限
@@ -253,8 +259,8 @@ void CCamera::Update(void)
 			D3DXVECTOR3 dist = MousePos - ClickPos;
 
 			// 視点移動
-			m_rot.y += (float)(nValueH) * 0.000002f;
-			m_fAngle -= (float)(nValueV) * 0.000002f;
+			m_rot.y += (float)(nValueH)*STICK_MOVE;
+			m_fAngle -= (float)(nValueV)*STICK_MOVE;
 
 			if (m_fAngle > D3DX_PI * 0.4f)
 			{// 上の制限
@@ -277,7 +283,7 @@ void CCamera::Update(void)
 		// カメラのズーム
 		if (pInputMouse->GetWheel() != 0)
 		{// ホイールが回転したとき
-			m_fDistance += (float)(pInputMouse->GetWheel() / 120) * 10.0f;
+			m_fDistance += (float)(pInputMouse->GetWheel() / ONE_TICK) * MOVE_DIST;
 
 			if (m_fDistance <= MIN_DISTANCE)
 			{// 最低値
@@ -292,12 +298,6 @@ void CCamera::Update(void)
 		{// プレイヤーの入力がない場合回り込む
 			m_rot.y += ((rot.y - D3DX_PI) - m_rot.y) * INERTIA_ROT;
 		}
-
-#if 0
-		pDebugProc->Print("*** カメラ ***\n");
-		pDebugProc->Print("視点の位置 : ( %f %f %f )\n", m_posV.x, m_posV.y, m_posV.z);
-		pDebugProc->Print("注視点の位置 : ( %f %f %f )\n", m_posR.x, m_posR.y, m_posR.z);
-#endif
 
 		// カメラ向きを調整
 		CorrectAngle(&m_rot.y, m_rot.y);
@@ -319,8 +319,8 @@ void CCamera::Update(void)
 			D3DXVECTOR3 dist = MousePos - ClickPos;
 
 			// 視点移動
-			m_rot.y = CameraRot.y + dist.x * 0.005f;
-			m_fAngle = fCameraAngle + dist.y * 0.005f;
+			m_rot.y = CameraRot.y + dist.x * MAUSE_MOVEV;
+			m_fAngle = fCameraAngle + dist.y * MAUSE_MOVEV;
 
 			if (m_fAngle > D3DX_PI * 0.4f)
 			{// 上の制限
@@ -345,8 +345,8 @@ void CCamera::Update(void)
 			D3DXVECTOR3 dist = MousePos - ClickPos;
 
 			// 注視点移動
-			m_rot.y = CameraRot.y + dist.x * 0.003f;
-			m_fAngle = fCameraAngle + dist.y * 0.003f;
+			m_rot.y = CameraRot.y + dist.x * MAUSE_MOVER;
+			m_fAngle = fCameraAngle + dist.y * MAUSE_MOVER;
 
 			if (m_fAngle > D3DX_PI * 0.4f)
 			{// 上の制限
@@ -520,7 +520,7 @@ void CCamera::Update(void)
 		// カメラのズーム
 		if (pInputMouse->GetWheel() != 0)
 		{// ホイールが回転したとき
-			m_fDistance += (float)(pInputMouse->GetWheel() / 120) * 10.0f;
+			m_fDistance += (float)(pInputMouse->GetWheel() / ONE_TICK) * MOVE_DIST;
 
 			if (m_fDistance <= MIN_DISTANCE)
 			{// 最低値
@@ -534,11 +534,11 @@ void CCamera::Update(void)
 		// リセット
 		if (pInputKeyboard->GetPress(DIK_RETURN) == true)
 		{
-			m_posV = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-			m_posR = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-			m_posVDest = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-			m_posRDest = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-			m_rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+			m_posV = DEFAULT_VECTER3;
+			m_posR = DEFAULT_VECTER3;
+			m_posVDest = DEFAULT_VECTER3;
+			m_posRDest = DEFAULT_VECTER3;
+			m_rot = DEFAULT_VECTER3;
 		}
 
 		// カメラ向きを調整
@@ -605,16 +605,16 @@ void CCamera::SetCamera(void)
 	D3DXMatrixPerspectiveFovLH(&m_mtxProjection,
 		D3DXToRadian(m_fViewAngle),								// 視野角
 		(float)m_viewport.Width / (float)m_viewport.Height,		// 画面のアスペクト比
-		10.0f,													// カメラから一番近い描画距離
-		80000.0f);												// 最大描画距離
+		MIN_VIEW_DIST,											// カメラから一番近い描画距離
+		MAX_VIEW_DIST);											// 最大描画距離
 
 #else		// 平行投影
 	// プロジェクションマトリックスを作成
 	D3DXMatrixOrthoLH(&m_mtxProjection,
 		(float)m_viewport.Width,		// ビューボリュームの幅
 		(float)m_viewport.Height,		// ビューボリュームの高さ
-		10.0f,							// ビューボリュームの近平面までの距離
-		80000.0f);						// ビューボリュームの遠平面までの距離
+		MIN_VIEW_DIST,					// ビューボリュームの近平面までの距離
+		MAX_VIEW_DIST);					// ビューボリュームの遠平面までの距離
 #endif
 
 	// プロジェクションマトリックスの設定

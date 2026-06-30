@@ -1,6 +1,6 @@
 //========================================================================
 // 
-// マネージャーヘッダー [manager.h]
+// マネージャーヘッダー [ manager.h ]
 // Author : Nakazawa Yuna
 // 
 //========================================================================
@@ -55,8 +55,6 @@ public:
 	static void SetFPS(const int nCountFPS) { m_nCountFPS = nCountFPS; };
 	static bool GetPause(void) { return m_bPause; }
 	static void SetPause(const bool bPause) { m_bPause = bPause; }
-
-	static void Retry(void);
 
 	template <class T> static HRESULT CreateInstance(T** instance);
 

@@ -1,6 +1,6 @@
 //========================================================================
 // 
-// 3Dエフェクト [effect3D.cpp]
+// 3Dエフェクト [ effect3D.cpp ]
 // Author : Nakazawa Yuna
 // 
 //========================================================================
@@ -113,14 +113,14 @@ CEffect3D* CEffect3D::Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 move, cons
 CEffect3D::CEffect3D(const int nPriority) :CObjectBillboard(nPriority)
 {
 	// 3Dエフェクトクラスの値をクリア
-	m_move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_move = DEFAULT_VECTER3;
 	m_fSpeed = 0.0f;
 	m_nLife = 0;
 	m_fRadius = 0.0f;
 	m_fAddRadius = 0.0f;
 	m_type = TYPE_NORMAL;
 	m_bHoming = false;
-	m_HomingPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_HomingPos = DEFAULT_VECTER3;
 	m_fSpeedHoming = 0.0f;
 }
 

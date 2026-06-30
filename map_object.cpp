@@ -1,6 +1,6 @@
 //========================================================================
 // 
-// マップオブジェクト [map_object.cpp]
+// マップオブジェクト [ map_object.cpp ]
 // Author : Nakazawa Yuna
 // 
 //========================================================================
@@ -173,8 +173,8 @@ HRESULT CMapObject::ReadData(const char* pFilename)
 
 		for (int nCnt = 0; nCnt < nNumObject; nCnt++)
 		{
-			D3DXVECTOR3 pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-			D3DXVECTOR3 rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+			D3DXVECTOR3 pos = DEFAULT_VECTER3;
+			D3DXVECTOR3 rot = DEFAULT_VECTER3;
 
 			file.read((char*)&m_aObjType[nCnt], sizeof(int));
 			file.read((char*)&pos, sizeof(pos));

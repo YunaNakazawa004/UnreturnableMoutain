@@ -1,6 +1,6 @@
 //========================================================================
 // 
-// オブジェクト3D [object3D.cpp]
+// オブジェクト3D [ object3D.cpp ]
 // Author : Nakazawa Yuna
 // 
 //========================================================================
@@ -73,10 +73,10 @@ CObject3D::CObject3D(const int nPriority) :CObject(nPriority)
 	// オブジェクト3Dクラスの値をクリア
 	m_pVtxBuff = NULL;
 	m_nIdxTexture = -1;
-	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	m_rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	m_scale = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	m_col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+	m_pos = DEFAULT_VECTER3;
+	m_rot = DEFAULT_VECTER3;
+	m_scale = DEFAULT_VECTER3;
+	m_col = COLOR_WHITE;
 	m_bDisp = true;
 }
 
@@ -399,10 +399,6 @@ float CObject3D::GetHeight(const D3DXVECTOR3 pos)
 
 	fDist = sqrtf((((m_pos.x - pos.x) * 2) * ((m_pos.x - pos.x) * 2)) + 
 		(((m_pos.z - pos.z) * 2) * ((m_pos.z - pos.z) * 2))) * 0.5f;
-
-	// 現在位置に角度分の調整
-	//posCorrect.x = pos.x + sinf(D3DX_PI + m_rot.y) * fDist;
-	//posCorrect.z = pos.z + cosf((D3DX_PI * 0.5f) + m_rot.y) * fDist;
 
 	// 頂点バッファをロックし、頂点情報へのポインタを取得
 	m_pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);

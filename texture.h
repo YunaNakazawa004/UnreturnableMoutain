@@ -1,6 +1,6 @@
 //=============================================================================
 // 
-// テクスチャヘッダー [texture.h]
+// テクスチャヘッダー [ texture.h ]
 // Author : Nakazawa Yuna
 // 
 //=============================================================================
@@ -13,6 +13,7 @@
 // マクロ定義
 //*****************************************************************************
 #define MAX_TEXTURE			(128)			// テクスチャの最大数
+#define MAX_STRING			(256)			// ファイル名の文字数
 
 //*****************************************************************************
 // テクスチャクラス
@@ -39,7 +40,7 @@ public:
 private:
 	LPDIRECT3DTEXTURE9 m_apTexture[MAX_TEXTURE];		// テクスチャへのポインタ
 	const char* m_pFilename[MAX_TEXTURE];				// テクスチャのファイル名収納
-	char m_aCopyFilename[MAX_TEXTURE][256];				// テクスチャのファイル名コピー用
+	char m_aCopyFilename[MAX_TEXTURE][MAX_STRING];		// テクスチャのファイル名コピー用
 	static const char* c_apFilername[TYPE_MAX];			// 固定テクスチャファイル名
 	static int m_nNumAll;			// テクスチャの使用数
 };

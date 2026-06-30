@@ -1,6 +1,6 @@
 //========================================================================
 // 
-// プレイヤー [player.cpp]
+// プレイヤー [ player.cpp ]
 // Author : Nakazawa Yuna
 // 
 //========================================================================
@@ -103,13 +103,13 @@ CPlayer::CPlayer(const int nPriority) :CObject(nPriority)
 	memset(&m_apModel[0], NULL, sizeof m_apModel);
 	m_nNumModel = 0;
 	m_pMotion = NULL;
-	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	m_posOld = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	m_move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	m_rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	m_rotDest = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	m_scale = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	m_col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+	m_pos = DEFAULT_VECTER3;
+	m_posOld = DEFAULT_VECTER3;
+	m_move = DEFAULT_VECTER3;
+	m_rot = DEFAULT_VECTER3;
+	m_rotDest = DEFAULT_VECTER3;
+	m_scale = DEFAULT_VECTER3;
+	m_col = COLOR_WHITE;
 	m_fRadius = 0.0f;
 	m_fHeight = 0.0f;
 	m_fJumpHigh = 0.0f;
@@ -218,7 +218,7 @@ void CPlayer::Update(void)
 
 	bool bLand = false;			// オブジェクトへの着地判定
 
-#if 0
+#ifdef ENABLE_EXPLANATION
 	// 操作
 	pDebugProc->Print("\n*** プレイヤー ***\n");
 	pDebugProc->Print("エネルギー残量:%f\n", m_fEnergy);
@@ -304,11 +304,11 @@ void CPlayer::Update(void)
 
 	if (pInputKeyboard->GetTrigger(DIK_BACKSPACE) == true || pInputJoypad->GetTrigger(0, CInputJoypad::JOYKEY_START) == true)
 	{// 位置回転リセット
-		pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-		m_posOld = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-		rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-		m_rotDest = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-		m_move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+		pos = DEFAULT_VECTER3;
+		m_posOld = DEFAULT_VECTER3;
+		rot = DEFAULT_VECTER3;
+		m_rotDest = DEFAULT_VECTER3;
+		m_move = DEFAULT_VECTER3;
 
 		m_nEnergyCounter = 0;
 		m_fEnergy = FIRST_ENERGY;
@@ -427,7 +427,7 @@ void CPlayer::Update(void)
 
 	if (pInputKeyboard->GetTrigger(DIK_H) == true)
 	{// エネルギー鉱石生成
-		CEnergyRock::Create(D3DXVECTOR3(-50.0f, 0.0f, 50.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+		CEnergyRock::Create(D3DXVECTOR3(-50.0f, 0.0f, 50.0f), DEFAULT_VECTER3);
 	}
 
 	// エネルギー減少
@@ -794,8 +794,8 @@ HRESULT CPlayer::SetModel(const char* pFilename)
 	// パーツセット用の変数
 	int nIdx = -1;			// モデル番号
 	int nIdxParent = -1;	// 親のモデル番号
-	D3DXVECTOR3 pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 位置
-	D3DXVECTOR3 rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 向き
+	D3DXVECTOR3 pos = DEFAULT_VECTER3;		// 位置
+	D3DXVECTOR3 rot = DEFAULT_VECTER3;		// 向き
 
 	// モーションセット用の変数
 	CMotion::INFO info = {};	// モーション情報

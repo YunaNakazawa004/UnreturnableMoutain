@@ -1,6 +1,6 @@
 //========================================================================
 // 
-// オブジェクトX [objectX.cpp]
+// オブジェクトX [ objectX.cpp ]
 // Author : Nakazawa Yuna
 // 
 //========================================================================
@@ -76,12 +76,12 @@ CObjectX::CObjectX(const int nPriority) :CObject(nPriority)
 	memset(&m_apTexture[0], -1, sizeof m_apTexture);
 	m_pStrFileName = NULL;
 	m_dwNumMat = 0;
-	m_VtxMax = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	m_VtxMin = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	m_rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	m_scale = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	m_col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+	m_VtxMax = DEFAULT_VECTER3;
+	m_VtxMin = DEFAULT_VECTER3;
+	m_pos = DEFAULT_VECTER3;
+	m_rot = DEFAULT_VECTER3;
+	m_scale = DEFAULT_VECTER3;
+	m_col = COLOR_WHITE;
 	m_bDisp = true;
 }
 
@@ -298,9 +298,9 @@ void CObjectX::Update(void)
 
 	if (pInputKeyboard->GetTrigger(DIK_BACKSPACE) == true)
 	{// 位置回転リセット
-		pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-		rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-		move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+		pos = DEFAULT_VECTER3;
+		rot = DEFAULT_VECTER3;
+		move = DEFAULT_VECTER3;
 	}
 
 	// 位置に移動量を加算

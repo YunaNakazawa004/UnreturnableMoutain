@@ -1,6 +1,6 @@
 //========================================================================
 // 
-// オブジェクトビルボード [objectBillboard.cpp]
+// オブジェクトビルボード [ objectBillboard.cpp ]
 // Author : Nakazawa Yuna
 // 
 //========================================================================
@@ -72,10 +72,10 @@ CObjectBillboard::CObjectBillboard(const int nPriority) :CObject(nPriority)
 	// オブジェクトビルボードクラスの値をクリア
 	m_pVtxBuff = NULL;
 	m_nTextureIdx = -1;
-	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	m_scale = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_pos = DEFAULT_VECTER3;
+	m_scale = DEFAULT_VECTER3;
 	m_fRadius = 0.0f;
-	m_col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+	m_col = COLOR_WHITE;
 	m_bDisp = true;
 }
 

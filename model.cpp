@@ -1,6 +1,6 @@
 //========================================================================
 // 
-// ƒ‚ƒfƒ‹ [model.cpp]
+// ƒ‚ƒfƒ‹ [ model.cpp ]
 // Author : Nakazawa Yuna
 // 
 //========================================================================
@@ -70,16 +70,16 @@ CModel::CModel()
 	memset(&m_apTexture[0], -1, sizeof m_apTexture);
 	m_pFileName = NULL;
 	m_dwNumMat = 0;
-	m_VtxMax = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	m_VtxMin = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	m_rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	m_posOff = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	m_rotOff = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	m_posOffC = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	m_rotOffC = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	m_scale = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	m_col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+	m_VtxMax = DEFAULT_VECTER3;
+	m_VtxMin = DEFAULT_VECTER3;
+	m_pos = DEFAULT_VECTER3;
+	m_rot = DEFAULT_VECTER3;
+	m_posOff = DEFAULT_VECTER3;
+	m_rotOff = DEFAULT_VECTER3;
+	m_posOffC = DEFAULT_VECTER3;
+	m_rotOffC = DEFAULT_VECTER3;
+	m_scale = DEFAULT_VECTER3;
+	m_col = COLOR_WHITE;
 	m_bDisp = true;
 	m_pParent = NULL;
 }

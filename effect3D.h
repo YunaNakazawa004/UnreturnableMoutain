@@ -1,6 +1,6 @@
 //========================================================================
 // 
-// 3Dエフェクトヘッダー [effect3D.h]
+// 3Dエフェクトヘッダー [ effect3D.h ]
 // Author : Nakazawa Yuna
 // 
 //========================================================================
@@ -41,12 +41,12 @@ public:
 	static CEffect3D* Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 move, const float fSpeed,
 		const int nLife, const float fRadius, const float fAddRadius, CEffect3D::TYPE type,
 		const D3DXCOLOR col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), const bool bHoming = false,
-		const D3DXVECTOR3 HomingPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f), const float fSpeedHoming = 0.0f);
+		const D3DXVECTOR3 HomingPos = DEFAULT_VECTER3, const float fSpeedHoming = 0.0f);
 
 	HRESULT Init(const D3DXVECTOR3 pos, const D3DXVECTOR3 move, const float fSpeed,
 		const int nLife, const float fRadius, const float fAddRadius, CEffect3D::TYPE type,
 		const D3DXCOLOR col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), const bool bHoming = false,
-		const D3DXVECTOR3 HomingPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f), const float fSpeedHoming = 0.0f);
+		const D3DXVECTOR3 HomingPos = DEFAULT_VECTER3, const float fSpeedHoming = 0.0f);
 	void Uninit(void);
 	void Update(void);
 	void Draw(void);
