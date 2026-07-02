@@ -360,6 +360,17 @@ void CPlayer::Update(void)
 	// ポリゴン番号を取得
 	polygonIdx = pMeshField->GetPolygonIdx(pos);
 
+	pDebugProc->Print("傾斜 : %f\n", pMeshField->GetSlope(pos, polygonIdx));
+
+	if (m_bJump == false)
+	{// 地上にいるときだけ
+		// 傾斜によって進む距離を調整
+		pos = m_posOld + ((pos - m_posOld) * pMeshField->GetSlope(pos, polygonIdx));
+	}
+
+	// 乗っているポリゴン番号を再計算
+	polygonIdx = pMeshField->GetPolygonIdx(pos);
+
 	// 地面の高さを取得
 	fHeight = pMeshField->GetHeight(pos, polygonIdx);
 
@@ -377,7 +388,7 @@ void CPlayer::Update(void)
 			m_bLand = true;
 		}
 
-		if (bLand == false)
+		if (pos.y <= fHeight)
 		{// オブジェクトの上ではないときだけ
 			pos.y = fHeight;
 		}
@@ -397,21 +408,6 @@ void CPlayer::Update(void)
 
 		// モーションを設定
 		m_pMotion->Set(MOTIONTYPE_JUMP, true, 20);
-	}
-
-	pDebugProc->Print("傾斜 : %f\n", pMeshField->GetSlope(pos, polygonIdx));
-
-	if (m_bJump == false)
-	{// 地上にいるときだけ
-		// 傾斜によって進む距離を調整
-		if (m_posOld.y - pos.y < 0)
-		{// 登っているとき
-			pos = m_posOld + ((pos - m_posOld) * pMeshField->GetSlope(pos, polygonIdx));
-		}
-		else
-		{// 下りているとき
-			pos = m_posOld + ((pos - m_posOld) * (2.0f - pMeshField->GetSlope(pos, polygonIdx)));
-		}
 	}
 
 	if (pos.y <= fHeight || bLand == true)

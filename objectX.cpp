@@ -582,7 +582,7 @@ bool CObjectX::Collision(D3DXVECTOR3* pPos, D3DXVECTOR3* pPosOld, D3DXVECTOR3* p
 				if ((m_pos.y + m_VtxMin.y - fHeight <= pPos->y) &&
 					(m_pos.y + m_VtxMax.y >= pPos->y))
 				{// 範囲内
-					bLand = true;		// 着地フラグ		*(すり抜けバグの原因)ただし未解決
+					//bLand = true;		// 着地フラグ		*(すり抜けバグの原因)ただし未解決
 				}
 
 				// 位置調整
