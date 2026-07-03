@@ -22,8 +22,8 @@
 // パーティクル3Dクラスの生成処理
 //========================================================================
 CParticle3D* CParticle3D::Create(const D3DXVECTOR3 posP, const int nLifeP, const int nValue,
-	const float fRadius, const float fAddRadius, CEffect3D::TYPE typeE, CParticle3D::TYPE typeP,
-	const int nLifeE, const float fSpeedE, const D3DXCOLOR col, const float fDist,
+	const float fRadius, const float fAddRadius, const float fMinusAlpha, CEffect3D::TYPE typeE, CParticle3D::TYPE typeP,
+	const int nLifeE, const float fSpeedE, const bool bSpeedEInertia, const D3DXCOLOR col, const float fDist,
 	const bool bHoming, const D3DXVECTOR3 HomingPos, const float fSpeedHoming)
 {
 #ifndef LIST
@@ -46,8 +46,8 @@ CParticle3D* CParticle3D::Create(const D3DXVECTOR3 posP, const int nLifeP, const
 	if (pParticle3D != NULL)
 	{// NULLチェック
 		// 初期化処理
-		if (FAILED(pParticle3D->Init(posP, nLifeP, nValue, fRadius, fAddRadius, typeE, typeP, nLifeE, fSpeedE,
-			col, fDist, bHoming, HomingPos, fSpeedHoming)))
+		if (FAILED(pParticle3D->Init(posP, nLifeP, nValue, fRadius, fAddRadius, fMinusAlpha, typeE, typeP, nLifeE, 
+			fSpeedE, bSpeedEInertia, col, fDist, bHoming, HomingPos, fSpeedHoming)))
 		{// もし失敗した場合
 			OutputDebugStringA("! ! ! パーティクル3Dの初期化に失敗しました ! ! !\n");
 
@@ -99,8 +99,8 @@ CParticle3D::~CParticle3D()
 // パーティクル3Dクラスの初期化処理
 //========================================================================
 HRESULT CParticle3D::Init(const D3DXVECTOR3 posP, const int nLifeP, const int nValue,
-	const float fRadius, const float fAddRadius, CEffect3D::TYPE typeE, CParticle3D::TYPE typeP,
-	const int nLifeE, const float fSpeedE, const D3DXCOLOR col, const float fDist,
+	const float fRadius, const float fAddRadius, const float fMinusAlpha, CEffect3D::TYPE typeE, CParticle3D::TYPE typeP,
+	const int nLifeE, const float fSpeedE, const bool bSpeedEInertia, const D3DXCOLOR col, const float fDist,
 	const bool bHoming, const D3DXVECTOR3 HomingPos, const float fSpeedHoming)
 {
 	// パーティクル3Dクラスの値を初期化
@@ -116,10 +116,12 @@ HRESULT CParticle3D::Init(const D3DXVECTOR3 posP, const int nLifeP, const int nV
 
 	m_fRadius = fRadius;
 	m_fAddRadius = fAddRadius;
+	m_fMinusAlpha = fMinusAlpha;
 	m_typeE = typeE;
 	m_typeP = typeP;
 	m_nLifeE = nLifeE;
 	m_fSpeedE = fSpeedE;
+	m_bSpeedEInertia = bSpeedEInertia;
 	m_col = col;
 	m_fDist = fDist;
 	m_bHoming = bHoming;
@@ -188,8 +190,8 @@ void CParticle3D::Update(void)
 			}
 
 			// 3Dエフェクトの生成
-			m_apEffect[nCntAppear] = CEffect3D::Create(pos, rot, m_fSpeedE, m_nLifeE, m_fRadius, m_fAddRadius,
-				m_typeE, m_col, m_bHoming, m_HomingPos, m_fSpeedHoming);
+			m_apEffect[nCntAppear] = CEffect3D::Create(pos, rot, m_fSpeedE, m_bSpeedEInertia, m_nLifeE, m_fRadius, 
+				m_fAddRadius, m_fMinusAlpha, m_typeE, m_col, m_bHoming, m_HomingPos, m_fSpeedHoming);
 		}
 	}
 

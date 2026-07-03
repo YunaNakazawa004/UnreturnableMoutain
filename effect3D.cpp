@@ -58,8 +58,8 @@ void CEffect3D::Unload(void)
 //========================================================================
 // 3Dエフェクトクラスの生成処理
 //========================================================================
-CEffect3D* CEffect3D::Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 move, const float fSpeed,
-	const int nLife, const float fRadius, const float fAddRadius, CEffect3D::TYPE type,
+CEffect3D* CEffect3D::Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 move, const float fSpeed, const bool bSpeedInertia,
+	const int nLife, const float fRadius, const float fAddRadius, const float fMinusAlpha, CEffect3D::TYPE type,
 	const D3DXCOLOR col, const bool bHoming, const D3DXVECTOR3 HomingPos, const float fSpeedHoming)
 {
 #ifndef LIST
@@ -82,7 +82,7 @@ CEffect3D* CEffect3D::Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 move, cons
 	if (pEffect3D != NULL)
 	{// NULLチェック
 		// 初期化処理
-		if (FAILED(pEffect3D->Init(pos, move, fSpeed, nLife, fRadius, fAddRadius, type,
+		if (FAILED(pEffect3D->Init(pos, move, fSpeed, bSpeedInertia, nLife, fRadius, fAddRadius, fMinusAlpha, type,
 			col, bHoming, HomingPos, fSpeedHoming)))
 		{// もし失敗した場合
 			OutputDebugStringA("! ! ! 3Dエフェクトの初期化に失敗しました ! ! !\n");
@@ -115,9 +115,11 @@ CEffect3D::CEffect3D(const int nPriority) :CObjectBillboard(nPriority)
 	// 3Dエフェクトクラスの値をクリア
 	m_move = DEFAULT_VECTER3;
 	m_fSpeed = 0.0f;
+	m_bSpeedInertia = false;
 	m_nLife = 0;
 	m_fRadius = 0.0f;
 	m_fAddRadius = 0.0f;
+	m_fMinusAlpha = 0.0f;
 	m_type = TYPE_NORMAL;
 	m_bHoming = false;
 	m_HomingPos = DEFAULT_VECTER3;
@@ -134,8 +136,8 @@ CEffect3D::~CEffect3D()
 //========================================================================
 // 3Dエフェクトクラスの初期化処理
 //========================================================================
-HRESULT CEffect3D::Init(const D3DXVECTOR3 pos, const D3DXVECTOR3 move, const float fSpeed,
-	const int nLife, const float fRadius, const float fAddRadius, CEffect3D::TYPE type,
+HRESULT CEffect3D::Init(const D3DXVECTOR3 pos, const D3DXVECTOR3 move, const float fSpeed, const bool bSpeedInertia,
+	const int nLife, const float fRadius, const float fAddRadius, const float fMinusAlpha, CEffect3D::TYPE type,
 	const D3DXCOLOR col, const bool bHoming, const D3DXVECTOR3 HomingPos, const float fSpeedHoming)
 {
 	if (FAILED(CObjectBillboard::Init(pos, fRadius, fRadius)))
@@ -151,9 +153,11 @@ HRESULT CEffect3D::Init(const D3DXVECTOR3 pos, const D3DXVECTOR3 move, const flo
 	// 3Dエフェクトクラスの値を初期化
 	m_move = move;
 	m_fSpeed = fSpeed;
+	m_bSpeedInertia = bSpeedInertia;
 	m_nLife = nLife;
 	m_fRadius = fRadius;
 	m_fAddRadius = fAddRadius;
+	m_fMinusAlpha = fMinusAlpha;
 	m_type = type;
 	m_bHoming = bHoming;
 	m_HomingPos = HomingPos;
@@ -197,14 +201,17 @@ void CEffect3D::Update(void)
 		}
 	}
 
-	// 慣性
-	m_fSpeed += (0.0f - m_fSpeed) * EFFECT_INERTIA;
+	if (m_bSpeedInertia == true)
+	{// 慣性あり
+		// 慣性
+		m_fSpeed += (0.0f - m_fSpeed) * EFFECT_INERTIA;
+	}
 
 	// サイズを変更する
 	m_fRadius += m_fAddRadius;
 
 	// 不透明度を減らす
-	col.a -= ALPHA_MINUS;
+	col.a -= m_fMinusAlpha;
 
 	// 位置/サイズ/色を適用
 	SetPosition(pos);

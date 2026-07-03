@@ -36,13 +36,13 @@ public:
 	~CParticle3D();
 
 	static CParticle3D* Create(const D3DXVECTOR3 posP, const int nLifeP, const int nValue,
-		const float fRadius, const float fAddRadius, CEffect3D::TYPE typeE, CParticle3D::TYPE typeP,
-		const int nLifeE, const float fSpeedE, const D3DXCOLOR col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), const float fDist = 0.0f,
+		const float fRadius, const float fAddRadius, const float fMinusAlpha, CEffect3D::TYPE typeE, CParticle3D::TYPE typeP,
+		const int nLifeE, const float fSpeedE, const bool bSpeedEInertia, const D3DXCOLOR col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), const float fDist = 0.0f,
 		const bool bHoming = false, const D3DXVECTOR3 HomingPos = DEFAULT_VECTER3, const float fSpeedHoming = 0.0f);
 	HRESULT Init(void) { return S_OK; }
 	HRESULT Init(const D3DXVECTOR3 posP, const int nLifeP, const int nValue,
-		const float fRadius, const float fAddRadius, CEffect3D::TYPE typeE, CParticle3D::TYPE typeP,
-		const int nLifeE, const float fSpeedE, const D3DXCOLOR col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), const float fDist = 0.0f,
+		const float fRadius, const float fAddRadius, const float fMinusAlpha, CEffect3D::TYPE typeE, CParticle3D::TYPE typeP,
+		const int nLifeE, const float fSpeedE, const bool bSpeedEInertia, const D3DXCOLOR col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), const float fDist = 0.0f,
 		const bool bHoming = false, const D3DXVECTOR3 HomingPos = DEFAULT_VECTER3, const float fSpeedHoming = 0.0f);
 	void Uninit(void);
 	void Update(void);
@@ -58,10 +58,12 @@ private:
 	int m_nValue;				// 出すエフェクトの量
 	float m_fRadius;			// エフェクトの半径
 	float m_fAddRadius;			// エフェクトの半径の変化量
+	float m_fMinusAlpha;		// エフェクトの透明度の変化量
 	CEffect3D::TYPE m_typeE;	// エフェクトの種類
 	CParticle3D::TYPE m_typeP;	// パーティクルの種類
 	int m_nLifeE;				// エフェクトの寿命
 	float m_fSpeedE;			// エフェクトの移動量
+	bool m_bSpeedEInertia;		// エフェクトの移動量に慣性をつけるかどうか
 	D3DXCOLOR m_col;			// 色
 	float m_fDist;				// 中心からの距離
 	bool m_bHoming;				// ホーミングするかどうか

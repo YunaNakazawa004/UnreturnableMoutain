@@ -89,7 +89,7 @@ HRESULT CGame::Init(void)
 	if (m_pMeshField == NULL)
 	{// NULLチェック
 		m_pMeshField = CMeshField::Create(DEFAULT_VECTER3, DEFAULT_VECTER3, D3DXVECTOR2(32.0f, 32.0f),
-			D3DXVECTOR2(10.0f, 10.0f), CObject::TYPE_MESHFIELD, 3);
+			D3DXVECTOR2(10.0f, 10.0f), CObject::TYPE_MESHFIELD, OBJECT_PRIORITY);
 
 		if (m_pMeshField == NULL)
 		{// NULLチェック
@@ -191,6 +191,12 @@ void CGame::Update(void)
 		{// NULLチェック
 			m_pPause->SetMenu(CPause::MENU_CONTINUE);
 		}
+	}
+
+	if (m_pMapObject != NULL)
+	{// NULLチェック
+		// マップオブジェクトの更新
+		m_pMapObject->Update();
 	}
 
 	CInputKeyboard* pInputKeyboard = CManager::GetInputKeyboard();		// キーボード入力の取得

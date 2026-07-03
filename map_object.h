@@ -1,6 +1,6 @@
 //========================================================================
 // 
-// マップオブジェクトヘッダー [ map_object.h ]
+// マップオブジェクトヘッダー [map_object.h]
 // Author : Nakazawa Yuna
 // 
 //========================================================================
@@ -12,7 +12,7 @@
 //************************************************************************
 // マクロ定義
 //************************************************************************
-#define MAX_MAP_OBJECT			(4000)			// 持てるオブジェクトの最大数
+#define MAX_MAP_OBJECT			(2000)			// 持てるオブジェクトの最大数
 
 //************************************************************************
 // 前方宣言
@@ -35,20 +35,28 @@ public:
 		MAP_OBJ_MAX
 	};
 
+	// オブジェクトの保存情報
+	typedef struct
+	{
+		CObject* m_apObject;		// 配置したオブジェクトの情報
+		int m_aObjType;				// 配置したオブジェクトの種類
+		bool m_bCollect;			// 配置したオブジェクトが収集アイテムかどうか
+	}Map_Obj;
+
 	CMapObject();
 	virtual ~CMapObject();
 
-	static void Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot, const int mapObj);
+	static void Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot, const int mapObj, const bool bCollect);
 	HRESULT Init(void);
 	void Uninit(void);
+	void Update(void);
 
 	void ResetData(void);
 	HRESULT WriteData(const char* pFilename);
 	HRESULT ReadData(const char* pFilename);
 
 private:
-	static CObject* m_apObject[MAX_MAP_OBJECT];			// 配置したオブジェクトの情報
-	static int m_aObjType[MAX_MAP_OBJECT];				// 配置したオブジェクトの種類
+	static Map_Obj m_aMapObject[MAX_MAP_OBJECT];		// オブジェクトの保存情報
 	static int m_nNumObject;							// 現在オブジェクトの総数
 };
 

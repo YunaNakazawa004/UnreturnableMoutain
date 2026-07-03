@@ -19,7 +19,7 @@
 #define BULLET_PRIORITY		(1)				// デフォルト弾優先順位
 #define OBJECT_PRIORITY		(2)				// デフォルトオブジェクト優先順位
 #define PLAYER_PRIORITY		(3)				// デフォルトプレイヤー優先順位
-#define EFFECT_PRIORITY		(4)				// デフォルトエフェクト優先順位
+#define EFFECT_PRIORITY		(2)				// デフォルトエフェクト優先順位
 #define FRAME_PRIORITY		(5)				// デフォルトUIフレーム優先順位
 #define UI_PRIORITY			(6)				// デフォルトUI優先順位
 #define FADE_PRIORITY		(7)				// デフォルトフェード優先順位

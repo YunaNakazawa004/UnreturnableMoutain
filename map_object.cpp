@@ -1,12 +1,13 @@
 //========================================================================
 // 
-// マップオブジェクト [ map_object.cpp ]
+// マップオブジェクト [map_object.cpp]
 // Author : Nakazawa Yuna
 // 
 //========================================================================
 #include "map_object.h"
 
 #include "object.h"
+#include "particle3D.h"
 
 #include "grass.h"
 #include "tree.h"
@@ -19,46 +20,52 @@
 //************************************************************************
 // 静的メンバ変数宣言
 //************************************************************************
-CObject* CMapObject::m_apObject[MAX_MAP_OBJECT] = {};	  	// 配置したオブジェクトの情報
-int CMapObject::m_aObjType[MAX_MAP_OBJECT] = {};		  	// 配置したオブジェクトの種類
-int CMapObject::m_nNumObject = 0;						  	// 現在オブジェクトの総数
+CMapObject::Map_Obj CMapObject::m_aMapObject[MAX_MAP_OBJECT] = {};	  	// 配置したオブジェクトの情報
+int CMapObject::m_nNumObject = 0;						  				// 現在オブジェクトの総数
 
 //========================================================================
 // 生成処理
 //========================================================================
-void CMapObject::Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot, const int mapObj)
+void CMapObject::Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot, const int mapObj, const bool bCollect)
 {
-	if (m_apObject[m_nNumObject] == NULL)
+	if (m_aMapObject[m_nNumObject].m_apObject == NULL)
 	{// NULLチェック
 		switch (mapObj)
 		{
 		case MAP_OBJ_GRASS:			// 草を生成
-			m_apObject[m_nNumObject] = CGrass::Create(pos, rot);
-			m_aObjType[m_nNumObject] = mapObj;
+			m_aMapObject[m_nNumObject].m_apObject = CGrass::Create(pos, rot);
+			m_aMapObject[m_nNumObject].m_aObjType = mapObj;
+			m_aMapObject[m_nNumObject].m_bCollect = bCollect;
 
 			break;
 
 		case MAP_OBJ_TREE:			// 木を生成
-			m_apObject[m_nNumObject] = CTree::Create(pos, rot);
-			m_aObjType[m_nNumObject] = mapObj;
+			m_aMapObject[m_nNumObject].m_apObject = CTree::Create(pos, rot);
+			m_aMapObject[m_nNumObject].m_aObjType = mapObj;
+			m_aMapObject[m_nNumObject].m_bCollect = bCollect;
 
 			break;
 
 		case MAP_OBJ_ROCK:			// 岩を生成
-			m_apObject[m_nNumObject] = CRock::Create(pos, rot);
-			m_aObjType[m_nNumObject] = mapObj;
+			m_aMapObject[m_nNumObject].m_apObject = CRock::Create(pos, rot);
+			m_aMapObject[m_nNumObject].m_aObjType = mapObj;
+			m_aMapObject[m_nNumObject].m_bCollect = bCollect;
 
 			break;
 
 		case MAP_OBJ_FLOWER:		// 花を生成
-			m_apObject[m_nNumObject] = CFlower::Create(pos, rot);
-			m_aObjType[m_nNumObject] = mapObj;
+			m_aMapObject[m_nNumObject].m_apObject = CFlower::Create(pos, rot);
+			m_aMapObject[m_nNumObject].m_aObjType = mapObj;
+			m_aMapObject[m_nNumObject].m_bCollect = bCollect;
 
 			break;
 		}
 
-		// 総数をカウントアップ
-		m_nNumObject++;
+		if (m_aMapObject[m_nNumObject].m_apObject != NULL)
+		{// 生成できた
+			// 総数をカウントアップ
+			m_nNumObject++;
+		}
 	}
 }
 
@@ -68,8 +75,7 @@ void CMapObject::Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot, const int 
 CMapObject::CMapObject()
 {
 	// 値のクリア
-	memset(&m_apObject[0], NULL, sizeof(m_apObject));
-	memset(&m_aObjType[0], MAP_OBJ_GRASS, sizeof(m_aObjType));
+	memset(&m_aMapObject[0], NULL, sizeof(m_aMapObject));
 	m_nNumObject = 0;
 }
 
@@ -86,8 +92,7 @@ CMapObject::~CMapObject()
 HRESULT CMapObject::Init(void)
 {
 	// 値の初期化
-	memset(&m_apObject[0], NULL, sizeof(m_apObject));
-	memset(&m_aObjType[0], MAP_OBJ_GRASS, sizeof(m_aObjType));
+	memset(&m_aMapObject[0], NULL, sizeof(m_aMapObject));
 	m_nNumObject = 0;
 
 	return S_OK;
@@ -100,12 +105,30 @@ void CMapObject::Uninit(void)
 {
 	for (int nCnt = 0; nCnt < MAX_MAP_OBJECT; nCnt++)
 	{
-		if (m_apObject[nCnt] != NULL)
+		if (m_aMapObject[nCnt].m_apObject != NULL)
 		{// NULLチェック
 			// 終了処理
-			m_apObject[nCnt]->Uninit();
+			m_aMapObject[nCnt].m_apObject->Uninit();
 
-			m_apObject[nCnt] = NULL;
+			m_aMapObject[nCnt].m_apObject = NULL;
+		}
+	}
+}
+
+//========================================================================
+// マップオブジェクトの更新処理
+//========================================================================
+void CMapObject::Update(void)
+{
+	for (int nCnt = 0; nCnt < MAX_MAP_OBJECT; nCnt++)
+	{
+		if (m_aMapObject[nCnt].m_apObject != NULL)
+		{// NULLチェック
+			if (m_aMapObject[nCnt].m_bCollect == true)
+			{// 収集アイテムだったら
+				CParticle3D::Create(m_aMapObject[nCnt].m_apObject->GetPosition(), 1, 1, 1.0f, 0.1f, 0.03f,
+					CEffect3D::TYPE_BLENDADD, CParticle3D::TYPE_NORMAL, 100, 0.3f, false);
+			}
 		}
 	}
 }
@@ -137,12 +160,13 @@ HRESULT CMapObject::WriteData(const char* pFilename)
 
 		for (int nCnt = 0; nCnt < m_nNumObject; nCnt++)
 		{
-			D3DXVECTOR3 pos = m_apObject[nCnt]->GetPosition();
-			D3DXVECTOR3 rot = m_apObject[nCnt]->GetRotation();
+			D3DXVECTOR3 pos = m_aMapObject[nCnt].m_apObject->GetPosition();
+			D3DXVECTOR3 rot = m_aMapObject[nCnt].m_apObject->GetRotation();
 
-			file.write((const char*)&m_aObjType[nCnt], sizeof(int));
+			file.write((const char*)&m_aMapObject[nCnt].m_aObjType, sizeof(int));
 			file.write((const char*)&pos, sizeof(pos));
 			file.write((const char*)&rot, sizeof(rot));
+			file.write((const char*)&m_aMapObject[nCnt].m_bCollect, sizeof(bool));
 		}
 
 		// ファイルを閉じる
@@ -180,15 +204,16 @@ HRESULT CMapObject::ReadData(const char* pFilename)
 
 		for (int nCnt = 0; nCnt < nNumObject; nCnt++)
 		{
-			D3DXVECTOR3 pos = DEFAULT_VECTER3;
-			D3DXVECTOR3 rot = DEFAULT_VECTER3;
+			D3DXVECTOR3 pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+			D3DXVECTOR3 rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 
-			file.read((char*)&m_aObjType[nCnt], sizeof(int));
+			file.read((char*)&m_aMapObject[nCnt].m_aObjType, sizeof(int));
 			file.read((char*)&pos, sizeof(pos));
 			file.read((char*)&rot, sizeof(rot));
+			file.read((char*)&m_aMapObject[nCnt].m_bCollect, sizeof(bool));
 
 			// オブジェクトの生成
-			Create(pos, rot, m_aObjType[nCnt]);
+			Create(pos, rot, m_aMapObject[nCnt].m_aObjType, m_aMapObject[nCnt].m_bCollect);
 		}
 
 		// 総数を確認

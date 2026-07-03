@@ -416,7 +416,7 @@ void CPlayer::Update(void)
 	{// ’nã
 		if (D3DXVec2Length(&move) >= 0.4f)
 		{// ˆÚ“®‚µ‚Ä‚¢‚é
-			CParticle3D::Create(pos, 1, 3, 1.0f, -0.2f, CEffect3D::TYPE_NORMAL_NULL, CParticle3D::TYPE_NORMAL, 2, 2.0f);
+			CParticle3D::Create(pos, 1, 3, 1.0f, -0.2f, 0.1f, CEffect3D::TYPE_NORMAL_NULL, CParticle3D::TYPE_NORMAL, 2, 2.0f, true);
 		}
 	}
 
