@@ -414,34 +414,13 @@ void CObjectX::SetScale(const D3DXVECTOR3 scale)
 void CObjectX::SetRotation(const D3DXVECTOR3 rot)
 {
 	// X向きを調整
-	if (m_rot.x > D3DX_PI)
-	{
-		m_rot.x -= D3DX_PI * 2.0f;
-	}
-	else if (m_rot.x < -D3DX_PI)
-	{
-		m_rot.x += D3DX_PI * 2.0f;
-	}
+	CorrectAngle(&m_rot.x, m_rot.x);
 
 	// Y向きを調整
-	if (m_rot.y > D3DX_PI)
-	{
-		m_rot.y -= D3DX_PI * 2.0f;
-	}
-	else if (m_rot.y < -D3DX_PI)
-	{
-		m_rot.y += D3DX_PI * 2.0f;
-	}
+	CorrectAngle(&m_rot.y, m_rot.y);
 
 	// Z向きを調整
-	if (m_rot.z > D3DX_PI)
-	{
-		m_rot.z -= D3DX_PI * 2.0f;
-	}
-	else if (m_rot.z < -D3DX_PI)
-	{
-		m_rot.z += D3DX_PI * 2.0f;
-	}
+	CorrectAngle(&m_rot.z, m_rot.z);
 
 	// 向きを変更
 	m_rot = rot;
@@ -485,14 +464,7 @@ bool CObjectX::Collision(D3DXVECTOR3* pPos, D3DXVECTOR3* pPosOld, D3DXVECTOR3* p
 		float fCos = cosf(-m_rot.y);		// 現在向きのcos
 
 		// Y向きを調整
-		if (m_rot.y > D3DX_PI)
-		{
-			m_rot.y -= D3DX_PI * 2.0f;
-		}
-		else if (m_rot.y < -D3DX_PI)
-		{
-			m_rot.y += D3DX_PI * 2.0f;
-		}
+		CorrectAngle(&m_rot.y, m_rot.y);
 
 		// 始点のXZ座標
 		fXS = fOffXS * fCos - fOffZS * fSin;

@@ -316,14 +316,7 @@ void CMotion::Update(void)
 			rotDest.x = rotCurrent.x + (fDiffBlend * fRateBlend);		// 求める値
 
 			// 向きを調整
-			if (rotDest.x > D3DX_PI)
-			{
-				rotDest.x -= D3DX_PI * 2;
-			}
-			else if (rotDest.x < -D3DX_PI)
-			{
-				rotDest.x += D3DX_PI * 2;
-			}
+			CObject::CorrectAngle(&rotDest.x, rotDest.x);
 
 			// 向きY
 			fDiffKey = pKeyNext->fRotY - pKey->fRotY;					// 現在のモーション
@@ -334,14 +327,7 @@ void CMotion::Update(void)
 			rotDest.y = rotCurrent.y + (fDiffBlend * fRateBlend);		// 求める値
 
 			// 向きを調整
-			if (rotDest.y > D3DX_PI)
-			{
-				rotDest.y -= D3DX_PI * 2;
-			}
-			else if (rotDest.y < -D3DX_PI)
-			{
-				rotDest.y += D3DX_PI * 2;
-			}
+			CObject::CorrectAngle(&rotDest.y, rotDest.y);
 
 			// 向きZ
 			fDiffKey = pKeyNext->fRotZ - pKey->fRotZ;					// 現在のモーション
@@ -352,14 +338,7 @@ void CMotion::Update(void)
 			rotDest.z = rotCurrent.z + (fDiffBlend * fRateBlend);		// 求める値
 
 			// 向きを調整
-			if (rotDest.z > D3DX_PI)
-			{
-				rotDest.z -= D3DX_PI * 2;
-	}
-			else if (rotDest.z < -D3DX_PI)
-			{
-				rotDest.z += D3DX_PI * 2;
-			}
+			CObject::CorrectAngle(&rotDest.z, rotDest.z);
 }
 		else
 		{// ブレンドなし
@@ -381,42 +360,21 @@ void CMotion::Update(void)
 			rotDest.x = pKey->fRotX + (fDiffKey * fRateKey);
 
 			// 向きを調整
-			if (rotDest.x > D3DX_PI)
-			{
-				rotDest.x -= D3DX_PI * 2;
-			}
-			else if (rotDest.x < -D3DX_PI)
-			{
-				rotDest.x += D3DX_PI * 2;
-			}
+			CObject::CorrectAngle(&rotDest.x, rotDest.x);
 
 			// 向きY
 			fDiffKey = pKeyNext->fRotY - pKey->fRotY;
 			rotDest.y = pKey->fRotY + (fDiffKey * fRateKey);
 
 			// 向きを調整
-			if (rotDest.y > D3DX_PI)
-			{
-				rotDest.y -= D3DX_PI * 2;
-			}
-			else if (rotDest.y < -D3DX_PI)
-			{
-				rotDest.y += D3DX_PI * 2;
-			}
+			CObject::CorrectAngle(&rotDest.y, rotDest.y);
 
 			// 向きZ
 			fDiffKey = pKeyNext->fRotZ - pKey->fRotZ;
 			rotDest.z = pKey->fRotZ + (fDiffKey * fRateKey);
 
 			// 向きを調整
-			if (rotDest.z > D3DX_PI)
-			{
-				rotDest.z -= D3DX_PI * 2;
-			}
-			else if (rotDest.z < -D3DX_PI)
-			{
-				rotDest.z += D3DX_PI * 2;
-			}
+			CObject::CorrectAngle(&rotDest.z, rotDest.z);
 		}
 
 		// パーツの位置/向きを設定

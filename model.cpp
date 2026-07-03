@@ -11,6 +11,7 @@
 #include "input.h"
 #include "texture.h"
 #include "debugproc.h"
+#include "object.h"
 
 //************************************************************************
 // マクロ定義
@@ -351,34 +352,13 @@ void CModel::SetRotation(const D3DXVECTOR3 rot)
 	m_rot = rot;
 
 	// X向きを調整
-	if (m_rot.x > D3DX_PI)
-	{
-		m_rot.x -= D3DX_PI * 2.0f;
-	}
-	else if (m_rot.x < -D3DX_PI)
-	{
-		m_rot.x += D3DX_PI * 2.0f;
-	}
+	CObject::CorrectAngle(&m_rot.x, m_rot.x);
 
 	// Y向きを調整
-	if (m_rot.y > D3DX_PI)
-	{
-		m_rot.y -= D3DX_PI * 2.0f;
-	}
-	else if (m_rot.y < -D3DX_PI)
-	{
-		m_rot.y += D3DX_PI * 2.0f;
-	}
+	CObject::CorrectAngle(&m_rot.y, m_rot.y);
 
 	// Z向きを調整
-	if (m_rot.z > D3DX_PI)
-	{
-		m_rot.z -= D3DX_PI * 2.0f;
-	}
-	else if (m_rot.z < -D3DX_PI)
-	{
-		m_rot.z += D3DX_PI * 2.0f;
-	}
+	CObject::CorrectAngle(&m_rot.z, m_rot.z);
 }
 
 //========================================================================
@@ -390,34 +370,13 @@ void CModel::SetRotOff(const D3DXVECTOR3 rot)
 	m_rotOff = rot;
 
 	// X向きを調整
-	if (m_rotOff.x > D3DX_PI)
-	{
-		m_rotOff.x -= D3DX_PI * 2.0f;
-	}
-	else if (m_rotOff.x < -D3DX_PI)
-	{
-		m_rotOff.x += D3DX_PI * 2.0f;
-	}
+	CObject::CorrectAngle(&m_rotOff.x, m_rotOff.x);
 
 	// Y向きを調整
-	if (m_rotOff.y > D3DX_PI)
-	{
-		m_rotOff.y -= D3DX_PI * 2.0f;
-	}
-	else if (m_rotOff.y < -D3DX_PI)
-	{
-		m_rotOff.y += D3DX_PI * 2.0f;
-	}
+	CObject::CorrectAngle(&m_rotOff.y, m_rotOff.y);
 
 	// Z向きを調整
-	if (m_rotOff.z > D3DX_PI)
-	{
-		m_rotOff.z -= D3DX_PI * 2.0f;
-	}
-	else if (m_rotOff.z < -D3DX_PI)
-	{
-		m_rotOff.z += D3DX_PI * 2.0f;
-	}
+	CObject::CorrectAngle(&m_rotOff.z, m_rotOff.z);
 }
 
 //========================================================================
@@ -459,14 +418,7 @@ bool CModel::Collision(const D3DXVECTOR3 posMe, D3DXVECTOR3* pPos, D3DXVECTOR3* 
 		float fCos = cosf(-m_rot.y);		// 現在向きのcos
 
 		// Y向きを調整
-		if (m_rot.y > D3DX_PI)
-		{
-			m_rot.y -= D3DX_PI * 2.0f;
-		}
-		else if (m_rot.y < -D3DX_PI)
-		{
-			m_rot.y += D3DX_PI * 2.0f;
-		}
+		CObject::CorrectAngle(&m_rot.y, m_rot.y);
 
 		// 始点のXZ座標
 		fXS = fOffXS * fCos - fOffZS * fSin;

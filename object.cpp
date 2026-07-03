@@ -379,3 +379,19 @@ void CObject::DrawAll(void)
 #endif
 	}
 }
+
+//=============================================================================
+// Šp“x‚ðC³
+//=============================================================================
+void CObject::CorrectAngle(float* pAngle, float fAngle)
+{
+	// Œü‚«‚ð’²®
+	if (fAngle > D3DX_PI)
+	{
+		*pAngle -= D3DX_PI * 2.0f;
+	}
+	else if (fAngle < -D3DX_PI)
+	{
+		*pAngle += D3DX_PI * 2.0f;
+	}
+}

@@ -97,6 +97,8 @@ public:
 	void SetType(const TYPE type) { m_type = type; }
 	TYPE GetType(void) { return m_type; }
 
+	static void CorrectAngle(float* pAngle, float fAngle);
+
 #ifdef LIST
 	static CObject* GetTop(const int nPriority) { return m_apTop[nPriority]; }
 	CObject* GetNext(void) { return m_pNext; }

@@ -332,34 +332,13 @@ void CMeshField::SetScale(const D3DXVECTOR3 scale)
 void CMeshField::SetRotation(const D3DXVECTOR3 rot)
 {
 	// XŒü‚«‚ð’²®
-	if (m_rot.x > D3DX_PI)
-	{
-		m_rot.x -= D3DX_PI * 2.0f;
-	}
-	else if (m_rot.x < -D3DX_PI)
-	{
-		m_rot.x += D3DX_PI * 2.0f;
-	}
+	CorrectAngle(&m_rot.x, m_rot.x);
 
 	// YŒü‚«‚ð’²®
-	if (m_rot.y > D3DX_PI)
-	{
-		m_rot.y -= D3DX_PI * 2.0f;
-	}
-	else if (m_rot.y < -D3DX_PI)
-	{
-		m_rot.y += D3DX_PI * 2.0f;
-	}
+	CorrectAngle(&m_rot.y, m_rot.y);
 
 	// ZŒü‚«‚ð’²®
-	if (m_rot.z > D3DX_PI)
-	{
-		m_rot.z -= D3DX_PI * 2.0f;
-	}
-	else if (m_rot.z < -D3DX_PI)
-	{
-		m_rot.z += D3DX_PI * 2.0f;
-	}
+	CorrectAngle(&m_rot.z, m_rot.z);
 
 	// Œü‚«‚ð•ÏX
 	m_rot = rot;

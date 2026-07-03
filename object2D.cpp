@@ -457,14 +457,7 @@ void CObject2D::SetRotation(const D3DXVECTOR3 rot)
 	m_rot = rot;
 
 	// 向きを調整
-	if (m_rot.z > D3DX_PI)
-	{
-		m_rot.z -= D3DX_PI * 2.0f;
-	}
-	else if (m_rot.z < -D3DX_PI)
-	{
-		m_rot.z += D3DX_PI * 2.0f;
-	}
+	CorrectAngle(&m_rot.z, m_rot.z);
 
 	// 頂点バッファをロックし、頂点情報へのポインタを取得
 	m_pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);

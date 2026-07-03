@@ -250,45 +250,17 @@ void CGrass::CollisionPlayer(void)
 	}
 
 	// XŒü‚«‚ð’²®
-	if (rotDest.x > D3DX_PI)
-	{
-		rotDest.x -= D3DX_PI * 2.0f;
-	}
-	else if (rotDest.x < -D3DX_PI)
-	{
-		rotDest.x += D3DX_PI * 2.0f;
-	}
+	CorrectAngle(&rotDest.x, rotDest.x);
 
 	// ZŒü‚«‚ð’²®
-	if (rotDest.z > D3DX_PI)
-	{
-		rotDest.z -= D3DX_PI * 2.0f;
-	}
-	else if (rotDest.z < -D3DX_PI)
-	{
-		rotDest.z += D3DX_PI * 2.0f;
-	}
+	CorrectAngle(&rotDest.z, rotDest.z);
 
 	m_rotOff.x += (rotDest.x - m_rotOff.x) * 0.1f;
 	m_rotOff.z += (rotDest.z - m_rotOff.z) * 0.1f;
 
 	// XŒü‚«‚ð’²®
-	if (m_rotOff.x > D3DX_PI)
-	{
-		m_rotOff.x -= D3DX_PI * 2.0f;
-	}
-	else if (m_rotOff.x < -D3DX_PI)
-	{
-		m_rotOff.x += D3DX_PI * 2.0f;
-	}
+	CorrectAngle(&m_rotOff.x, m_rotOff.x);
 
 	// ZŒü‚«‚ð’²®
-	if (m_rotOff.z > D3DX_PI)
-	{
-		m_rotOff.z -= D3DX_PI * 2.0f;
-	}
-	else if (m_rotOff.z < -D3DX_PI)
-	{
-		m_rotOff.z += D3DX_PI * 2.0f;
-	}
+	CorrectAngle(&m_rotOff.z, m_rotOff.z);
 }

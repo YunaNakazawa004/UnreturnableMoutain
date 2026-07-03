@@ -49,6 +49,7 @@
 #define FIRST_ENERGY	(80.0f)									// 初期所持エネルギー
 #define ONE_ENERGY		(5.0f)									// 鉱石ひとつあたりのエネルギー
 #define MINUS_ENERGY	(90)									// エネルギー減少の間隔
+#define UNCLIMB_SLOPE	(0.4f)									// 登れない傾斜の角度
 
 //========================================================================
 // プレイヤークラスの生成処理
@@ -339,14 +340,7 @@ void CPlayer::Update(void)
 	float fmoveAngle = m_rotDest.y - rot.y;
 
 	// 向きを調整
-	if (fmoveAngle > D3DX_PI)
-	{
-		m_rotDest.y -= D3DX_PI * 2;
-	}
-	else if (fmoveAngle < -D3DX_PI)
-	{
-		m_rotDest.y += D3DX_PI * 2;
-	}
+	CorrectAngle(&m_rotDest.y, fmoveAngle);
 
 	// 角度を慣性ありで加算
 	rot.y += (m_rotDest.y - rot.y) * 0.1f;
@@ -374,8 +368,13 @@ void CPlayer::Update(void)
 	}
 
 	if (pos.y <= fHeight)
-	{// オブジェクトの上ではないときだけ
+	{// 地面にめり込んだときだけ
 		pos.y = fHeight;
+
+		if (pMeshField->GetSlope(pos, polygonIdx) <= UNCLIMB_SLOPE && m_bJump == false)
+		{// 傾斜の角度的に登れない/地面にいる
+			pos = m_posOld;
+		}
 	}
 
 	// 当たり判定
@@ -409,7 +408,7 @@ void CPlayer::Update(void)
 			m_bAct = false;
 		}
 	}
-	else if(pos.y > fHeight + 5.0f && bLand == false)
+	else if (pos.y > fHeight + 5.0f && bLand == false)
 	{// オブジェクトの上でもない空中
 		m_bJump = true;
 
@@ -480,7 +479,7 @@ void CPlayer::Update(void)
 		// モーションを設定
 		m_pMotion->Set(MOTIONTYPE_DEATH, true, 20);
 
-#ifndef _DEBUG		// デバッグビルドじゃなかったらリザルト画面へ
+#ifndef _DEBUG		// リリースビルドならリザルト画面へ
 		// 画面遷移
 		CManager::SetMode(CScene::MODE_RESULT);
 
@@ -571,34 +570,13 @@ void CPlayer::SetRotation(const D3DXVECTOR3 rot)
 	m_rot = rot;
 
 	// X向きを調整
-	if (m_rot.x > D3DX_PI)
-	{
-		m_rot.x -= D3DX_PI * 2.0f;
-	}
-	else if (m_rot.x < -D3DX_PI)
-	{
-		m_rot.x += D3DX_PI * 2.0f;
-	}
+	CorrectAngle(&m_rot.x, m_rot.x);
 
 	// Y向きを調整
-	if (m_rot.y > D3DX_PI)
-	{
-		m_rot.y -= D3DX_PI * 2.0f;
-	}
-	else if (m_rot.y < -D3DX_PI)
-	{
-		m_rot.y += D3DX_PI * 2.0f;
-	}
+	CorrectAngle(&m_rot.y, m_rot.y);
 
 	// Z向きを調整
-	if (m_rot.z > D3DX_PI)
-	{
-		m_rot.z -= D3DX_PI * 2.0f;
-	}
-	else if (m_rot.z < -D3DX_PI)
-	{
-		m_rot.z += D3DX_PI * 2.0f;
-	}
+	CorrectAngle(&m_rot.z, m_rot.z);
 }
 
 //========================================================================
@@ -644,10 +622,11 @@ bool CPlayer::Movement(const D3DXVECTOR3 rot)
 
 	bool bMove = false;
 	int nValueH, nValueV;
-	static float fRotCounter = 1.0f;		// 傾きの追加角度
+	static float fRotCounterX = 1.0f;		// 傾きの追加角度X
+	static float fRotCounterZ = 1.0f;		// 傾きの追加角度Z
 
 	// 8方向移動時のスピード
-	float fCustomSpeed = (1.5f - (m_fEnergy * 0.01f)) * ((fRotCounter >= MAX_ROTADD) ? 0.1f : 1.0f) * 0.5f;
+	float fCustomSpeed = (1.5f - (m_fEnergy * 0.01f)) * ((fRotCounterZ >= MAX_ROTADD) ? 0.1f : 1.0f) * 0.5f;
 	float fSpeedX = (m_bJump ? AIR_MOVEMENT.x : LAND_MOVEMENT.x) * fCustomSpeed;
 	float fSpeedZ = (m_bJump ? AIR_MOVEMENT.z : LAND_MOVEMENT.z) * fCustomSpeed;
 
@@ -659,8 +638,8 @@ bool CPlayer::Movement(const D3DXVECTOR3 rot)
 		m_move.z += cosf(rot.y) * fSpeed;
 
 		// 進んだ方向にモデルを傾ける
-		UnderRotDest.x = MODEL_ROT * ((nValueV < 0) ? 1 : -1);
-		UnderRotDest.z = MODEL_ROT * ((nValueH < 0) ? -1 : 1) * fRotCounter;
+		UnderRotDest.x = MODEL_ROT * ((nValueV < 0) ? 1 : -1) * fRotCounterX;
+		UnderRotDest.z = MODEL_ROT * ((nValueH < 0) ? -1 : 1) * fRotCounterZ;
 		UpperRotDest.x = MODEL_ROT * ((nValueV < 0) ? 1 : -1);
 		UpperRotDest.z = MODEL_ROT * ((nValueH < 0) ? -1 : 1);
 		TireRot.x += TIRE_ROT * ((nValueV < 0) ? 1 : -1);
@@ -668,7 +647,23 @@ bool CPlayer::Movement(const D3DXVECTOR3 rot)
 		// 進んだ方向に角度を向ける
 		m_rotDest.y = rot.y + ((float)nValueH * 0.00001f * ((nValueV < 0) ? -1 : 1));
 
-		fRotCounter += 0.02f;		// カウンター加算
+		if (nValueV == 0)
+		{// 前後に動いてない
+			fRotCounterX = 1.0f;	// リセット
+		}
+		else if (m_bJump == true)
+		{// 前後にも動いている/空中
+			fRotCounterX += 0.02f;		// カウンター加算
+		}
+
+		if (nValueH == 0)
+		{// 左右に動いてない
+			fRotCounterZ = 1.0f;	// リセット
+		}
+		else
+		{// 左右にも動いている
+			fRotCounterZ += 0.02f;		// カウンター加算
+		}
 
 		bMove = true;
 	}
@@ -680,13 +675,13 @@ bool CPlayer::Movement(const D3DXVECTOR3 rot)
 			m_move.z += cosf(D3DX_PI * 0.75f + rot.y) * fSpeedZ;
 
 			// 進んだ方向にモデルを傾ける
-			UnderRotDest.z = -MODEL_ROT * fRotCounter;
+			UnderRotDest.z = -MODEL_ROT * fRotCounterZ;
 			UpperRotDest.z = -MODEL_ROT;
 
 			// 進んだ方向に角度を向ける
 			m_rotDest.y = rot.y + (-D3DX_PI * 0.15f);
 
-			fRotCounter += 0.02f;		// カウンター加算
+			fRotCounterZ += 0.02f;		// カウンター加算
 		}
 		else if (pInputKeyboard->GetPress(DIK_D) == true || pInputJoypad->GetPress(0, CInputJoypad::JOYKEY_RIGHT) == true)
 		{// 右奥に移動
@@ -694,26 +689,31 @@ bool CPlayer::Movement(const D3DXVECTOR3 rot)
 			m_move.z += cosf(-D3DX_PI * 0.75f + rot.y) * fSpeedZ;
 
 			// 進んだ方向にモデルを傾ける
-			UnderRotDest.z = MODEL_ROT * fRotCounter;
+			UnderRotDest.z = MODEL_ROT * fRotCounterZ;
 			UpperRotDest.z = MODEL_ROT;
 
 			// 進んだ方向に角度を向ける
 			m_rotDest.y = rot.y + (D3DX_PI * 0.15f);
 
-			fRotCounter += 0.02f;		// カウンター加算
+			fRotCounterZ += 0.02f;		// カウンター加算
 		}
 		else if (pInputKeyboard->GetPress(DIK_W) == true || pInputJoypad->GetPress(0, CInputJoypad::JOYKEY_UP) == true)
 		{// 奥に移動
 			m_move.x += sinf(D3DX_PI * 1.0f + rot.y) * fSpeedX;
 			m_move.z += cosf(D3DX_PI * 1.0f + rot.y) * fSpeedZ;
 
-			fRotCounter = 1.0f;	// リセット
+			fRotCounterZ = 1.0f;	// リセット
 		}
 
 		// 進んだ方向にモデルを傾ける
-		UnderRotDest.x = -MODEL_ROT;
+		UnderRotDest.x = -MODEL_ROT * fRotCounterX;
 		UpperRotDest.x = -MODEL_ROT;
 		TireRot.x += -TIRE_ROT;
+
+		if (m_bJump == true)
+		{// 空中
+			fRotCounterX += 0.02f;		// カウンター加算
+		}
 
 		bMove = true;
 	}
@@ -725,13 +725,13 @@ bool CPlayer::Movement(const D3DXVECTOR3 rot)
 			m_move.z += cosf(D3DX_PI * 0.25f + rot.y) * fSpeedZ;
 
 			// 進んだ方向にモデルを傾ける
-			UnderRotDest.z = -MODEL_ROT * fRotCounter;
+			UnderRotDest.z = -MODEL_ROT * fRotCounterZ;
 			UpperRotDest.z = -MODEL_ROT;
 
 			// 進んだ方向に角度を向ける
 			m_rotDest.y = rot.y + (D3DX_PI * 0.15f);
 
-			fRotCounter += 0.02f;		// カウンター加算
+			fRotCounterZ += 0.02f;		// カウンター加算
 		}
 		else if (pInputKeyboard->GetPress(DIK_D) == true || pInputJoypad->GetPress(0, CInputJoypad::JOYKEY_RIGHT) == true)
 		{// 右手前に移動
@@ -739,46 +739,53 @@ bool CPlayer::Movement(const D3DXVECTOR3 rot)
 			m_move.z += cosf(-D3DX_PI * 0.25f + rot.y) * fSpeedZ;
 
 			// 進んだ方向にモデルを傾ける
-			UnderRotDest.z = MODEL_ROT * fRotCounter;
+			UnderRotDest.z = MODEL_ROT * fRotCounterZ;
 			UpperRotDest.z = MODEL_ROT;
 
 			// 進んだ方向に角度を向ける
 			m_rotDest.y = rot.y + (-D3DX_PI * 0.15f);
 
-			fRotCounter += 0.02f;		// カウンター加算
+			fRotCounterZ += 0.02f;		// カウンター加算
 		}
 		else if (pInputKeyboard->GetPress(DIK_S) == true || pInputJoypad->GetPress(0, CInputJoypad::JOYKEY_DOWN) == true)
 		{// 手前に移動
 			m_move.x += sinf(D3DX_PI * 0.0f + rot.y) * fSpeedX;
 			m_move.z += cosf(D3DX_PI * 0.0f + rot.y) * fSpeedZ;
 
-			fRotCounter = 1.0f;	// リセット
+			fRotCounterZ = 1.0f;	// リセット
 		}
 
 		// 進んだ方向にモデルを傾ける
-		UnderRotDest.x = MODEL_ROT;
+		UnderRotDest.x = MODEL_ROT * fRotCounterX;
 		UpperRotDest.x = MODEL_ROT;
 		TireRot.x += TIRE_ROT;
+
+		if (m_bJump == true)
+		{// 空中
+			fRotCounterX += 0.02f;		// カウンター加算
+		}
 
 		bMove = true;
 	}
 	else if (pInputKeyboard->GetPress(DIK_A) == true || pInputJoypad->GetPress(0, CInputJoypad::JOYKEY_LEFT) == true)
 	{// 左に移動
 		// 進んだ方向にモデルを傾ける
-		UnderRotDest.z = -MODEL_ROT * fRotCounter;
+		UnderRotDest.z = -MODEL_ROT * fRotCounterZ;
 		UpperRotDest.z = -MODEL_ROT;
 
-		fRotCounter += 0.02f;		// カウンター加算
+		fRotCounterX = 1.0f;	// リセット
+		fRotCounterZ += 0.02f;		// カウンター加算
 
 		bMove = true;
 	}
 	else if (pInputKeyboard->GetPress(DIK_D) == true || pInputJoypad->GetPress(0, CInputJoypad::JOYKEY_RIGHT) == true)
 	{// 右に移動
 		// 進んだ方向にモデルを傾ける
-		UnderRotDest.z = MODEL_ROT * fRotCounter;
+		UnderRotDest.z = MODEL_ROT * fRotCounterZ;
 		UpperRotDest.z = MODEL_ROT;
 
-		fRotCounter += 0.02f;		// カウンター加算
+		fRotCounterX = 1.0f;	// リセット
+		fRotCounterZ += 0.02f;		// カウンター加算
 
 		bMove = true;
 	}
@@ -788,15 +795,22 @@ bool CPlayer::Movement(const D3DXVECTOR3 rot)
 		UpperRotDest = UpperRotOff;
 		UnderRotDest = UnderRotOff;
 
-		fRotCounter = 1.0f;	// リセット
+		fRotCounterX = 1.0f;	// リセット
+		fRotCounterZ = 1.0f;	// リセット
 
 		bMove = false;
 	}
 
-	if (fRotCounter > MAX_ROTADD)
+	if (fRotCounterZ > MAX_ROTADD)
 	{// 追加角度の最大値
-		fRotCounter = MAX_ROTADD;
+		fRotCounterZ = MAX_ROTADD;
 	}
+
+	// 向きを調整
+	CorrectAngle(&UpperRotDest.x, UpperRotDest.x);
+	CorrectAngle(&UpperRotDest.z, UpperRotDest.z);
+	CorrectAngle(&UnderRotDest.x, UnderRotDest.x);
+	CorrectAngle(&UnderRotDest.z, UnderRotDest.z);
 
 	// モデルの傾きを加算
 	UnderRot += (UnderRotDest - UnderRot) * 0.1f;
