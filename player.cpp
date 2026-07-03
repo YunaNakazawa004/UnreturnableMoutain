@@ -659,7 +659,7 @@ bool CPlayer::Movement(const D3DXVECTOR3 rot)
 		m_move.z += cosf(rot.y) * fSpeed;
 
 		// 進んだ方向にモデルを傾ける
-		UnderRotDest.x = MODEL_ROT * ((nValueV < 0) ? 1 : -1) * fRotCounter;
+		UnderRotDest.x = MODEL_ROT * ((nValueV < 0) ? 1 : -1);
 		UnderRotDest.z = MODEL_ROT * ((nValueH < 0) ? -1 : 1) * fRotCounter;
 		UpperRotDest.x = MODEL_ROT * ((nValueV < 0) ? 1 : -1);
 		UpperRotDest.z = MODEL_ROT * ((nValueH < 0) ? -1 : 1);
@@ -685,6 +685,8 @@ bool CPlayer::Movement(const D3DXVECTOR3 rot)
 
 			// 進んだ方向に角度を向ける
 			m_rotDest.y = rot.y + (-D3DX_PI * 0.15f);
+
+			fRotCounter += 0.02f;		// カウンター加算
 		}
 		else if (pInputKeyboard->GetPress(DIK_D) == true || pInputJoypad->GetPress(0, CInputJoypad::JOYKEY_RIGHT) == true)
 		{// 右奥に移動
@@ -697,19 +699,21 @@ bool CPlayer::Movement(const D3DXVECTOR3 rot)
 
 			// 進んだ方向に角度を向ける
 			m_rotDest.y = rot.y + (D3DX_PI * 0.15f);
+
+			fRotCounter += 0.02f;		// カウンター加算
 		}
 		else if (pInputKeyboard->GetPress(DIK_W) == true || pInputJoypad->GetPress(0, CInputJoypad::JOYKEY_UP) == true)
 		{// 奥に移動
 			m_move.x += sinf(D3DX_PI * 1.0f + rot.y) * fSpeedX;
 			m_move.z += cosf(D3DX_PI * 1.0f + rot.y) * fSpeedZ;
+
+			fRotCounter = 1.0f;	// リセット
 		}
 
 		// 進んだ方向にモデルを傾ける
-		UnderRotDest.x = -MODEL_ROT * fRotCounter;
+		UnderRotDest.x = -MODEL_ROT;
 		UpperRotDest.x = -MODEL_ROT;
 		TireRot.x += -TIRE_ROT;
-
-		fRotCounter += 0.02f;		// カウンター加算
 
 		bMove = true;
 	}
@@ -726,6 +730,8 @@ bool CPlayer::Movement(const D3DXVECTOR3 rot)
 
 			// 進んだ方向に角度を向ける
 			m_rotDest.y = rot.y + (D3DX_PI * 0.15f);
+
+			fRotCounter += 0.02f;		// カウンター加算
 		}
 		else if (pInputKeyboard->GetPress(DIK_D) == true || pInputJoypad->GetPress(0, CInputJoypad::JOYKEY_RIGHT) == true)
 		{// 右手前に移動
@@ -738,37 +744,41 @@ bool CPlayer::Movement(const D3DXVECTOR3 rot)
 
 			// 進んだ方向に角度を向ける
 			m_rotDest.y = rot.y + (-D3DX_PI * 0.15f);
+
+			fRotCounter += 0.02f;		// カウンター加算
 		}
 		else if (pInputKeyboard->GetPress(DIK_S) == true || pInputJoypad->GetPress(0, CInputJoypad::JOYKEY_DOWN) == true)
 		{// 手前に移動
 			m_move.x += sinf(D3DX_PI * 0.0f + rot.y) * fSpeedX;
 			m_move.z += cosf(D3DX_PI * 0.0f + rot.y) * fSpeedZ;
+
+			fRotCounter = 1.0f;	// リセット
 		}
 
 		// 進んだ方向にモデルを傾ける
-		UnderRotDest.x = MODEL_ROT * fRotCounter;
+		UnderRotDest.x = MODEL_ROT;
 		UpperRotDest.x = MODEL_ROT;
 		TireRot.x += TIRE_ROT;
-
-		fRotCounter += 0.02f;		// カウンター加算
 
 		bMove = true;
 	}
 	else if (pInputKeyboard->GetPress(DIK_A) == true || pInputJoypad->GetPress(0, CInputJoypad::JOYKEY_LEFT) == true)
 	{// 左に移動
 		// 進んだ方向にモデルを傾ける
+		UnderRotDest.z = -MODEL_ROT * fRotCounter;
 		UpperRotDest.z = -MODEL_ROT;
 
-		fRotCounter = 1.0f;	// リセット
+		fRotCounter += 0.02f;		// カウンター加算
 
 		bMove = true;
 	}
 	else if (pInputKeyboard->GetPress(DIK_D) == true || pInputJoypad->GetPress(0, CInputJoypad::JOYKEY_RIGHT) == true)
 	{// 右に移動
 		// 進んだ方向にモデルを傾ける
+		UnderRotDest.z = MODEL_ROT * fRotCounter;
 		UpperRotDest.z = MODEL_ROT;
 
-		fRotCounter = 1.0f;	// リセット
+		fRotCounter += 0.02f;		// カウンター加算
 
 		bMove = true;
 	}
