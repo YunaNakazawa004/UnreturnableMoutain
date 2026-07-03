@@ -41,7 +41,7 @@ CRock* CRock::Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot)
 	if (pRock != NULL)
 	{// NULLチェック
 		// モデルファイル設定
-		pRock->BindModel("data\\MODEL\\rock.x");
+		pRock->BindModel("data\\MODEL\\MAP_OBJECT\\rock.x");
 
 		// 初期化処理
 		if (FAILED(pRock->Init(pos, rot)))

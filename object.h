@@ -73,6 +73,7 @@ public:
 		TYPE_GRASS,				// ëê
 		TYPE_TREE,				// ñÿ
 		TYPE_ROCK,				// ä‚
+		TYPE_FLOWER,			// â‘
 		TYPE_MAX
 	}TYPE;
 

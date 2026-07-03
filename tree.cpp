@@ -104,9 +104,9 @@ HRESULT CTree::Init(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot)
 	m_col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 
 	// ƒ‚ƒfƒ‹‚ğİ’è
-	m_apModel[0] = CModel::Create(DEFAULT_VECTER3, m_rot, "data\\MODEL\\TREE\\tree.x");
+	m_apModel[0] = CModel::Create(DEFAULT_VECTER3, m_rot, "data\\MODEL\\MAP_OBJECT\\TREE\\tree.x");
 	m_apModel[0]->SetParent(NULL);
-	m_apModel[1] = CModel::Create(D3DXVECTOR3(0.0f, 150.0f, 0.0f), m_rot, "data\\MODEL\\TREE\\treeleaf.x");
+	m_apModel[1] = CModel::Create(D3DXVECTOR3(0.0f, 150.0f, 0.0f), m_rot, "data\\MODEL\\MAP_OBJECT\\TREE\\treeleaf.x");
 	m_apModel[1]->SetParent(m_apModel[0]);
 
 	// ƒ‚ƒfƒ‹”‚ğİ’è

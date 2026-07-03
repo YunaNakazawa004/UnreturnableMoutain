@@ -150,6 +150,7 @@
     <ClCompile Include="effect2D.cpp" />
     <ClCompile Include="effect3D.cpp" />
     <ClCompile Include="energyrock.cpp" />
+    <ClCompile Include="flower.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="grass.cpp" />
     <ClCompile Include="input.cpp" />
@@ -185,6 +186,7 @@
     <ClInclude Include="effect2D.h" />
     <ClInclude Include="effect3D.h" />
     <ClInclude Include="energyrock.h" />
+    <ClInclude Include="flower.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="grass.h" />
     <ClInclude Include="input.h" />

@@ -31,6 +31,7 @@ public:
 		MAP_OBJ_GRASS = 0,		// ëê
 		MAP_OBJ_TREE,			// ñÿ
 		MAP_OBJ_ROCK,			// ä‚
+		MAP_OBJ_FLOWER,			// â‘
 		MAP_OBJ_MAX
 	};
 

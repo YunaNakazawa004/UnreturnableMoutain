@@ -42,7 +42,7 @@ CEnergyRock* CEnergyRock::Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot)
 	if (pEnergyRock != NULL)
 	{// NULLチェック
 		// モデルファイル設定
-		pEnergyRock->BindModel("data\\MODEL\\energyrock.x");
+		pEnergyRock->BindModel("data\\MODEL\\MAP_OBJECT\\energyrock.x");
 
 		// 初期化処理
 		if (FAILED(pEnergyRock->Init(pos, rot)))
