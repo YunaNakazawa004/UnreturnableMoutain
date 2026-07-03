@@ -1,10 +1,10 @@
 //========================================================================
 // 
-// ‰Ô [Flower.cpp]
+// ‰Ô [ flower.cpp ]
 // Author : Nakazawa Yuna
 // 
 //========================================================================
-#include "Flower.h"
+#include "flower.h"
 
 #include "renderer.h"
 #include "manager.h"
