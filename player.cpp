@@ -373,6 +373,11 @@ void CPlayer::Update(void)
 		fHeight = 0.0f;
 	}
 
+	if (pos.y <= fHeight)
+	{// オブジェクトの上ではないときだけ
+		pos.y = fHeight;
+	}
+
 	// 当たり判定
 	CEnergyRock* pEnergyRock = CEnergyRock::Collision(&pos, &m_posOld, &m_move, m_fRadius, m_fHeight);
 	CTree::Collision(&pos, &m_posOld, &m_move, m_fRadius, m_fHeight);
@@ -390,9 +395,9 @@ void CPlayer::Update(void)
 			m_bLand = true;
 		}
 
-		if (pos.y <= fHeight && bHead == false)
-		{// オブジェクトの上ではない/頭がぶつかっていないときだけ
-			pos.y = fHeight;
+		if (pos.y < fHeight && bHead == true)
+		{// 地面にめり込んで頭もぶつかっていたら
+			pos = m_posOld;		// 進めない
 		}
 
 		m_move.y = 0.0f;
