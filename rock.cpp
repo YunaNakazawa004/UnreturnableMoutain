@@ -143,7 +143,7 @@ void CRock::Draw(void)
 // ä‚Ç∆ÇÃìñÇΩÇËîªíË
 //========================================================================
 CRock* CRock::Collision(D3DXVECTOR3* pPos, D3DXVECTOR3* posOld, D3DXVECTOR3* move,
-	const float fRadius, const float fHeight, bool* pLand)
+	const float fRadius, const float fHeight, bool* pLand, bool* pHead)
 {
 	for (int nCntPri = 0; nCntPri < MAX_PRIORITY_NUM; nCntPri++)
 	{
@@ -172,7 +172,7 @@ CRock* CRock::Collision(D3DXVECTOR3* pPos, D3DXVECTOR3* posOld, D3DXVECTOR3* mov
 					pPos->y < posRock.y + ROCK_HEIGHT && pPos->y + fHeight > posRock.y)
 				{// ä‚Ç∆èdÇ»Ç¡ÇΩ
 					// ìñÇΩÇËîªíË
-					if (dynamic_cast<CObjectX*>(pObj)->Collision(pPos, posOld, move, fRadius, fHeight) == true)
+					if (dynamic_cast<CObjectX*>(pObj)->Collision(pPos, posOld, move, fRadius, fHeight, pHead) == true)
 					{// èÊÇ¡ÇƒÇ¢ÇÈ
 						*pLand = true;
 					}

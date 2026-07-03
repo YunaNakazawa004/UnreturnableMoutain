@@ -32,7 +32,7 @@ public:
 	void Draw(void);
 
 	static CRock* Collision(D3DXVECTOR3* pos, D3DXVECTOR3* posOld, D3DXVECTOR3* move,
-		const float fRadius, const float fHeight, bool* pLand);
+		const float fRadius, const float fHeight, bool* pLand, bool* pHead);
 
 private:
 };

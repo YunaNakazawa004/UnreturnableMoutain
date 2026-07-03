@@ -217,6 +217,7 @@ void CPlayer::Update(void)
 	D3DXVECTOR2 polygonIdx = { -1.0f,-1.0f };		// ポリゴン番号
 
 	bool bLand = false;			// オブジェクトへの着地判定
+	bool bHead = false;			// オブジェクトへの頭ぶつかり判定
 
 	pDebugProc->Print("\n*** プレイヤー ***\n");
 	pDebugProc->Print("エネルギー残量:%f\n", m_fEnergy);
@@ -350,13 +351,6 @@ void CPlayer::Update(void)
 	// 角度を慣性ありで加算
 	rot.y += (m_rotDest.y - rot.y) * 0.1f;
 
-	// 当たり判定
-	CEnergyRock* pEnergyRock = CEnergyRock::Collision(&pos, &m_posOld, &m_move, m_fRadius, m_fHeight);
-	CTree::Collision(&pos, &m_posOld, &m_move, m_fRadius, m_fHeight);
-	CRock::Collision(&pos, &m_posOld, &m_move, m_fRadius, m_fHeight, &bLand);
-
-	pDebugProc->Print("オブジェクトへの着地 : %d\n", bLand);
-
 	// ポリゴン番号を取得
 	polygonIdx = pMeshField->GetPolygonIdx(pos);
 
@@ -379,6 +373,14 @@ void CPlayer::Update(void)
 		fHeight = 0.0f;
 	}
 
+	// 当たり判定
+	CEnergyRock* pEnergyRock = CEnergyRock::Collision(&pos, &m_posOld, &m_move, m_fRadius, m_fHeight);
+	CTree::Collision(&pos, &m_posOld, &m_move, m_fRadius, m_fHeight);
+	CRock::Collision(&pos, &m_posOld, &m_move, m_fRadius, m_fHeight, &bLand, &bHead);
+
+	pDebugProc->Print("オブジェクトへの着地 : %d\n", bLand);
+	pDebugProc->Print("オブジェクトへの頭 : %d\n", bHead);
+
 	if (pos.y <= fHeight || bLand == true)
 	{// 地面との当たり判定
 		if (m_bJump == true && m_pMotion->GetType() != MOTIONTYPE_DEATH)
@@ -388,8 +390,8 @@ void CPlayer::Update(void)
 			m_bLand = true;
 		}
 
-		if (pos.y <= fHeight)
-		{// オブジェクトの上ではないときだけ
+		if (pos.y <= fHeight && bHead == false)
+		{// オブジェクトの上ではない/頭がぶつかっていないときだけ
 			pos.y = fHeight;
 		}
 

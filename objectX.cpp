@@ -189,6 +189,14 @@ HRESULT CObjectX::Init(const D3DXVECTOR3 pos)
 		pVtxBuff += dwSizeFVF;		// 頂点バッファのサイズ分ポインタを進める
 	}
 
+	// オブジェクトの最大値最小値を補正
+	m_VtxMax.x = (float)((int)(m_VtxMax.x * 100.0f) / (int)1) / 100.0f;
+	m_VtxMax.y = (float)((int)(m_VtxMax.y * 100.0f) / (int)1) / 100.0f;
+	m_VtxMax.z = (float)((int)(m_VtxMax.z * 100.0f) / (int)1) / 100.0f;
+	m_VtxMin.x = (float)((int)(m_VtxMin.x * 100.0f) / (int)1) / 100.0f;
+	m_VtxMin.y = (float)((int)(m_VtxMin.y * 100.0f) / (int)1) / 100.0f;
+	m_VtxMin.z = (float)((int)(m_VtxMin.z * 100.0f) / (int)1) / 100.0f;
+
 	// 頂点バッファをアンロック
 	m_pMesh->UnlockVertexBuffer();
 
@@ -451,7 +459,7 @@ void CObjectX::SetColor(const D3DXCOLOR col)
 // 当たり判定
 //========================================================================
 bool CObjectX::Collision(D3DXVECTOR3* pPos, D3DXVECTOR3* pPosOld, D3DXVECTOR3* pMove,
-	const float fRadius, const float fHeight)
+	const float fRadius, const float fHeight, bool* pHead)
 {
 	bool bLand = false;		// 着地しているか
 	int nCntLand = 0;	// 辺の内側に入った数(4回入っていれば、オブジェクトの内側にいる)
@@ -582,7 +590,6 @@ bool CObjectX::Collision(D3DXVECTOR3* pPos, D3DXVECTOR3* pPosOld, D3DXVECTOR3* p
 				if ((m_pos.y + m_VtxMin.y - fHeight <= pPos->y) &&
 					(m_pos.y + m_VtxMax.y >= pPos->y))
 				{// 範囲内
-					//bLand = true;		// 着地フラグ		*(すり抜けバグの原因)ただし未解決
 				}
 
 				// 位置調整
@@ -591,6 +598,8 @@ bool CObjectX::Collision(D3DXVECTOR3* pPos, D3DXVECTOR3* pPosOld, D3DXVECTOR3* p
 				{// 下からの当たり判定
 					pPos->y = m_pos.y + m_VtxMin.y - fHeight;
 					pMove->y = -0.5f;							// 移動量を0にする
+
+					*pHead = true;
 				}
 				else if ((m_pos.y + m_VtxMax.y <= pPosOld->y) &&
 					(m_pos.y + m_VtxMax.y >= pPos->y))

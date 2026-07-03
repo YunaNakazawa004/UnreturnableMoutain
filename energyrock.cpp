@@ -190,7 +190,7 @@ CEnergyRock* CEnergyRock::Collision(D3DXVECTOR3* pPos, D3DXVECTOR3* posOld, D3DX
 					pPos->y < posRock.y + ENERGYROCK_HEIGHT && pPos->y + fHeight > posRock.y)
 				{// エネルギー鉱物と重なった
 					// 当たり判定
-					dynamic_cast<CObjectX*>(pObj)->Collision(pPos, posOld, move, fRadius, fHeight);
+					dynamic_cast<CObjectX*>(pObj)->Collision(pPos, posOld, move, fRadius, fHeight, NULL);
 
 					return dynamic_cast<CEnergyRock*>(pObj);
 				}
