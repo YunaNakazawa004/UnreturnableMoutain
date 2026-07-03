@@ -108,7 +108,7 @@ HRESULT CGame::Init(void)
 	// プレイヤーを生成
 	if (m_pPlayer == NULL)
 	{// NULLチェック
-		m_pPlayer = CPlayer::Create(DEFAULT_VECTER3, DEFAULT_VECTER3);
+		m_pPlayer = CPlayer::Create(D3DXVECTOR3(1500.0f, 0.0f, -1500.0f), DEFAULT_VECTER3);
 
 		if (m_pPlayer == NULL)
 		{// NULLチェック
@@ -146,8 +146,8 @@ void CGame::Uninit(void)
 	{// NULLチェック
 		delete m_pMapObject;
 		m_pMapObject = NULL;
-	}	
-	
+	}
+
 	// ポーズの破棄
 	if (m_pPause != NULL)
 	{// NULLチェック

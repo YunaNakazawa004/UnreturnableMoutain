@@ -41,12 +41,12 @@ public:
 	static CEffect3D* Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 move, const float fSpeed, const bool bSpeedInertia,
 		const int nLife, const float fRadius, const float fAddRadius, const float fMinusAlpha, CEffect3D::TYPE type,
 		const D3DXCOLOR col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), const bool bHoming = false,
-		const D3DXVECTOR3 HomingPos = DEFAULT_VECTER3, const float fSpeedHoming = 0.0f);
+		CObject* HomingObj = NULL, const float fSpeedHoming = 0.0f);
 
 	HRESULT Init(const D3DXVECTOR3 pos, const D3DXVECTOR3 move, const float fSpeed, const bool bSpeedInertia,
 		const int nLife, const float fRadius, const float fAddRadius, const float fMinusAlpha, CEffect3D::TYPE type,
 		const D3DXCOLOR col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), const bool bHoming = false,
-		const D3DXVECTOR3 HomingPos = DEFAULT_VECTER3, const float fSpeedHoming = 0.0f);
+		CObject* HomingObj = NULL, const float fSpeedHoming = 0.0f);
 	void Uninit(void);
 	void Update(void);
 	void Draw(void);
@@ -62,7 +62,7 @@ private:
 	float m_fMinusAlpha;		// 透明度の変更量
 	CEffect3D::TYPE m_type;		// 種類
 	bool m_bHoming;				// ホーミングするかどうか
-	D3DXVECTOR3 m_HomingPos;	// ホーミング対象の位置
+	CObject* m_HomingObj;		// ホーミング対象
 	float m_fSpeedHoming;		// ホーミングの移動量
 };
 

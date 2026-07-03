@@ -51,6 +51,8 @@ public:
 	void Uninit(void);
 	void Update(void);
 
+	bool CollectCollision(const D3DXVECTOR3 pos, const int nIdx);
+
 	void ResetData(void);
 	HRESULT WriteData(const char* pFilename);
 	HRESULT ReadData(const char* pFilename);
@@ -58,6 +60,7 @@ public:
 private:
 	static Map_Obj m_aMapObject[MAX_MAP_OBJECT];		// オブジェクトの保存情報
 	static int m_nNumObject;							// 現在オブジェクトの総数
+	static int m_nNumCollectObj;						// 収集アイテムの総数
 };
 
 #endif

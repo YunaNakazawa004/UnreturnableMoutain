@@ -24,7 +24,7 @@
 CParticle3D* CParticle3D::Create(const D3DXVECTOR3 posP, const int nLifeP, const int nValue,
 	const float fRadius, const float fAddRadius, const float fMinusAlpha, CEffect3D::TYPE typeE, CParticle3D::TYPE typeP,
 	const int nLifeE, const float fSpeedE, const bool bSpeedEInertia, const D3DXCOLOR col, const float fDist,
-	const bool bHoming, const D3DXVECTOR3 HomingPos, const float fSpeedHoming)
+	const bool bHoming, CObject* HomingObj, const float fSpeedHoming)
 {
 #ifndef LIST
 	if (CObject::GetNumAll() >= MAX_OBJECT)
@@ -47,7 +47,7 @@ CParticle3D* CParticle3D::Create(const D3DXVECTOR3 posP, const int nLifeP, const
 	{// NULLチェック
 		// 初期化処理
 		if (FAILED(pParticle3D->Init(posP, nLifeP, nValue, fRadius, fAddRadius, fMinusAlpha, typeE, typeP, nLifeE, 
-			fSpeedE, bSpeedEInertia, col, fDist, bHoming, HomingPos, fSpeedHoming)))
+			fSpeedE, bSpeedEInertia, col, fDist, bHoming, HomingObj, fSpeedHoming)))
 		{// もし失敗した場合
 			OutputDebugStringA("! ! ! パーティクル3Dの初期化に失敗しました ! ! !\n");
 
@@ -84,7 +84,7 @@ CParticle3D::CParticle3D(const int nPriority) :CObject(nPriority)
 	m_col = COLOR_WHITE;
 	m_fDist = 0.0f;
 	m_bHoming = false;
-	m_HomingPos = DEFAULT_VECTER3;
+	m_HomingObj = NULL;
 	m_fSpeedHoming = 0.0f;
 }
 
@@ -101,7 +101,7 @@ CParticle3D::~CParticle3D()
 HRESULT CParticle3D::Init(const D3DXVECTOR3 posP, const int nLifeP, const int nValue,
 	const float fRadius, const float fAddRadius, const float fMinusAlpha, CEffect3D::TYPE typeE, CParticle3D::TYPE typeP,
 	const int nLifeE, const float fSpeedE, const bool bSpeedEInertia, const D3DXCOLOR col, const float fDist,
-	const bool bHoming, const D3DXVECTOR3 HomingPos, const float fSpeedHoming)
+	const bool bHoming, CObject* HomingObj, const float fSpeedHoming)
 {
 	// パーティクル3Dクラスの値を初期化
 	memset(&m_apEffect[0], NULL, sizeof m_apEffect);
@@ -125,7 +125,7 @@ HRESULT CParticle3D::Init(const D3DXVECTOR3 posP, const int nLifeP, const int nV
 	m_col = col;
 	m_fDist = fDist;
 	m_bHoming = bHoming;
-	m_HomingPos = HomingPos;
+	m_HomingObj = HomingObj;
 	m_fSpeedHoming = fSpeedHoming;
 
 	return S_OK;
@@ -191,7 +191,7 @@ void CParticle3D::Update(void)
 
 			// 3Dエフェクトの生成
 			m_apEffect[nCntAppear] = CEffect3D::Create(pos, rot, m_fSpeedE, m_bSpeedEInertia, m_nLifeE, m_fRadius, 
-				m_fAddRadius, m_fMinusAlpha, m_typeE, m_col, m_bHoming, m_HomingPos, m_fSpeedHoming);
+				m_fAddRadius, m_fMinusAlpha, m_typeE, m_col, m_bHoming, m_HomingObj, m_fSpeedHoming);
 		}
 	}
 

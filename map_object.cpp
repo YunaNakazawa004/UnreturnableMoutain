@@ -6,22 +6,34 @@
 //========================================================================
 #include "map_object.h"
 
+#include "manager.h"
+#include "debugproc.h"
+
 #include "object.h"
 #include "particle3D.h"
+#include "game.h"
 
 #include "grass.h"
 #include "tree.h"
 #include "rock.h"
 #include "flower.h"
 
+#include "player.h"
+
 #include <fstream>
 #include <iostream>
+
+//************************************************************************
+// マクロ定義
+//************************************************************************
+#define COLLECT_DIST		(30.0f)			// プレイヤーと収集アイテムとの距離
 
 //************************************************************************
 // 静的メンバ変数宣言
 //************************************************************************
 CMapObject::Map_Obj CMapObject::m_aMapObject[MAX_MAP_OBJECT] = {};	  	// 配置したオブジェクトの情報
 int CMapObject::m_nNumObject = 0;						  				// 現在オブジェクトの総数
+int CMapObject::m_nNumCollectObj = 0;					  				// 収集アイテムの総数
 
 //========================================================================
 // 生成処理
@@ -65,6 +77,12 @@ void CMapObject::Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot, const int 
 		{// 生成できた
 			// 総数をカウントアップ
 			m_nNumObject++;
+
+			if (bCollect == true)
+			{// 収集アイテムなら
+				// 収集アイテムの総数をカウントアップ
+				m_nNumCollectObj++;
+			}
 		}
 	}
 }
@@ -77,6 +95,7 @@ CMapObject::CMapObject()
 	// 値のクリア
 	memset(&m_aMapObject[0], NULL, sizeof(m_aMapObject));
 	m_nNumObject = 0;
+	m_nNumCollectObj = 0;
 }
 
 //========================================================================
@@ -94,6 +113,7 @@ HRESULT CMapObject::Init(void)
 	// 値の初期化
 	memset(&m_aMapObject[0], NULL, sizeof(m_aMapObject));
 	m_nNumObject = 0;
+	m_nNumCollectObj = 0;
 
 	return S_OK;
 }
@@ -120,6 +140,8 @@ void CMapObject::Uninit(void)
 //========================================================================
 void CMapObject::Update(void)
 {
+	CDebugProc* pDebugProc = CManager::GetDebugProc();					// デバッグ表示の取得
+
 	for (int nCnt = 0; nCnt < MAX_MAP_OBJECT; nCnt++)
 	{
 		if (m_aMapObject[nCnt].m_apObject != NULL)
@@ -128,9 +150,41 @@ void CMapObject::Update(void)
 			{// 収集アイテムだったら
 				CParticle3D::Create(m_aMapObject[nCnt].m_apObject->GetPosition(), 1, 1, 1.0f, 0.1f, 0.03f,
 					CEffect3D::TYPE_BLENDADD, CParticle3D::TYPE_NORMAL, 100, 0.3f, false);
+
+				CollectCollision(m_aMapObject[nCnt].m_apObject->GetPosition(), nCnt);
 			}
 		}
 	}
+
+	pDebugProc->Print("収集アイテムの総数 : %d\n", m_nNumCollectObj);
+}
+
+//========================================================================
+// プレイヤーと収集アイテムの当たり判定
+//========================================================================
+bool CMapObject::CollectCollision(const D3DXVECTOR3 pos, const int nIdx)
+{
+	D3DXVECTOR3 posPlayer = CGame::GetPlayer()->GetPosition();
+	D3DXVECTOR3 dist;
+
+	// 距離を計算
+	dist = pos - posPlayer;
+
+	if (D3DXVec3Length(&dist) <= COLLECT_DIST)
+	{// 収集アイテムと距離が近い
+		m_aMapObject[nIdx].m_bCollect = false;
+
+		CParticle3D::Create(pos, 5, 10, 1.0f, 0.1f, 0.01f,
+			CEffect3D::TYPE_BLENDADD, CParticle3D::TYPE_NORMAL, 600, 0.3f, false,
+			COLOR_WHITE, 0.0f, true, CGame::GetPlayer(), 0.05f);
+
+		// 総数を減らす
+		m_nNumCollectObj--;
+
+		return true;
+	}
+
+	return false;
 }
 
 //========================================================================
@@ -143,6 +197,7 @@ void CMapObject::ResetData(void)
 
 	// カウントリセット
 	m_nNumObject = 0;
+	m_nNumCollectObj = 0;
 }
 
 //========================================================================
@@ -198,6 +253,7 @@ HRESULT CMapObject::ReadData(const char* pFilename)
 		// カウントリセット
 		int nNumObject = 0;
 		m_nNumObject = 0;
+		m_nNumCollectObj = 0;
 
 		// ファイルから読み込む
 		file.read((char*)&nNumObject, sizeof(nNumObject));

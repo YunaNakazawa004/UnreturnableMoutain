@@ -60,7 +60,7 @@ void CEffect3D::Unload(void)
 //========================================================================
 CEffect3D* CEffect3D::Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 move, const float fSpeed, const bool bSpeedInertia,
 	const int nLife, const float fRadius, const float fAddRadius, const float fMinusAlpha, CEffect3D::TYPE type,
-	const D3DXCOLOR col, const bool bHoming, const D3DXVECTOR3 HomingPos, const float fSpeedHoming)
+	const D3DXCOLOR col, const bool bHoming, CObject* HomingObj, const float fSpeedHoming)
 {
 #ifndef LIST
 	if (CObject::GetNumAll() >= MAX_OBJECT)
@@ -83,7 +83,7 @@ CEffect3D* CEffect3D::Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 move, cons
 	{// NULLチェック
 		// 初期化処理
 		if (FAILED(pEffect3D->Init(pos, move, fSpeed, bSpeedInertia, nLife, fRadius, fAddRadius, fMinusAlpha, type,
-			col, bHoming, HomingPos, fSpeedHoming)))
+			col, bHoming, HomingObj, fSpeedHoming)))
 		{// もし失敗した場合
 			OutputDebugStringA("! ! ! 3Dエフェクトの初期化に失敗しました ! ! !\n");
 
@@ -122,7 +122,7 @@ CEffect3D::CEffect3D(const int nPriority) :CObjectBillboard(nPriority)
 	m_fMinusAlpha = 0.0f;
 	m_type = TYPE_NORMAL;
 	m_bHoming = false;
-	m_HomingPos = DEFAULT_VECTER3;
+	m_HomingObj = NULL;
 	m_fSpeedHoming = 0.0f;
 }
 
@@ -138,7 +138,7 @@ CEffect3D::~CEffect3D()
 //========================================================================
 HRESULT CEffect3D::Init(const D3DXVECTOR3 pos, const D3DXVECTOR3 move, const float fSpeed, const bool bSpeedInertia,
 	const int nLife, const float fRadius, const float fAddRadius, const float fMinusAlpha, CEffect3D::TYPE type,
-	const D3DXCOLOR col, const bool bHoming, const D3DXVECTOR3 HomingPos, const float fSpeedHoming)
+	const D3DXCOLOR col, const bool bHoming, CObject* HomingObj, const float fSpeedHoming)
 {
 	if (FAILED(CObjectBillboard::Init(pos, fRadius, fRadius)))
 	{// 3Dエフェクトの初期化に失敗した場合
@@ -160,7 +160,7 @@ HRESULT CEffect3D::Init(const D3DXVECTOR3 pos, const D3DXVECTOR3 move, const flo
 	m_fMinusAlpha = fMinusAlpha;
 	m_type = type;
 	m_bHoming = bHoming;
-	m_HomingPos = HomingPos;
+	m_HomingObj = HomingObj;
 	m_fSpeedHoming = fSpeedHoming;
 
 	return S_OK;
@@ -190,9 +190,14 @@ void CEffect3D::Update(void)
 
 	if (m_bHoming == true)
 	{// ホーミングする場合
-		pos += (m_HomingPos - pos) * m_fSpeedHoming;
+		D3DXVECTOR3 HomingPos = m_HomingObj->GetPosition();
+		D3DXVECTOR3 dist;
 
-		if (pos == m_HomingPos)
+		pos += (HomingPos - pos) * m_fSpeedHoming;
+
+		dist = pos - HomingPos;
+
+		if (D3DXVec3Length(&dist) < 1.0f)
 		{// 着いたら消す
 			// 終了処理
 			Uninit();
