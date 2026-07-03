@@ -474,6 +474,13 @@ void CPlayer::Update(void)
 
 		// モーションを設定
 		m_pMotion->Set(MOTIONTYPE_DEATH, true, 20);
+
+#ifndef _DEBUG		// デバッグビルドじゃなかったらリザルト画面へ
+		// 画面遷移
+		CManager::SetMode(CScene::MODE_RESULT);
+
+		return;
+#endif
 	}
 
 	// 位置/向きを適用

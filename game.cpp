@@ -197,6 +197,14 @@ void CGame::Update(void)
 	{// NULLチェック
 		// マップオブジェクトの更新
 		m_pMapObject->Update();
+
+		if (m_pMapObject->GetCollectObj() <= 0)
+		{// 収集アイテムを全て集めた
+			// 画面遷移
+			CManager::SetMode(MODE_RESULT);
+
+			return;
+		}
 	}
 
 	CInputKeyboard* pInputKeyboard = CManager::GetInputKeyboard();		// キーボード入力の取得

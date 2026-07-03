@@ -53,6 +53,8 @@ public:
 
 	bool CollectCollision(const D3DXVECTOR3 pos, const int nIdx);
 
+	int GetCollectObj(void) { return m_nNumCollectObj; }
+
 	void ResetData(void);
 	HRESULT WriteData(const char* pFilename);
 	HRESULT ReadData(const char* pFilename);
