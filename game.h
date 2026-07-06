@@ -15,6 +15,7 @@
 //************************************************************************
 class CPause;
 class CPlayer;
+class CShip;
 class CMeshField;
 class CMapObject;
 
@@ -34,12 +35,14 @@ public:
 
 	static CPause* GetPause(void) { return m_pPause; }
 	static CPlayer* GetPlayer(void) { return m_pPlayer; }
+	static CShip* GetShip(void) { return m_pShip; }
 	static CMeshField* GetMeshField(void) { return m_pMeshField; }
 	static CMapObject* GetMapObject(void) { return m_pMapObject; }
 
 private:
 	static CPause* m_pPause;						// ポーズのインスタンス
 	static CPlayer* m_pPlayer;						// プレイヤーのインスタンス
+	static CShip* m_pShip;							// 船のインスタンス
 	static CMeshField* m_pMeshField;				// メッシュフィールドのインスタンス
 	static CMapObject* m_pMapObject;				// マップオブジェクトのインスタンス
 };

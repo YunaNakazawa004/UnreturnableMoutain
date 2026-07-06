@@ -1,0 +1,150 @@
+#==============================================================================
+#
+# 『モーションビューワ』スクリプトファイル [motion00.txt]
+# Author : AKIRA TANAKA
+#
+#==============================================================================
+SCRIPT			# この行は絶対消さないこと！
+
+#------------------------------------------------------------------------------
+# モデル数
+#------------------------------------------------------------------------------
+NUM_MODEL = 8
+
+#------------------------------------------------------------------------------
+# モデルファイル名
+#------------------------------------------------------------------------------
+MODEL_FILENAME = data/MODEL/SHIP/00_floor.x			# [0]床
+MODEL_FILENAME = data/MODEL/SHIP/01_wall_L.x		# [1]壁左
+MODEL_FILENAME = data/MODEL/SHIP/02_wall_R.x		# [2]壁右
+MODEL_FILENAME = data/MODEL/SHIP/03_wall_Front.x	# [3]壁前
+MODEL_FILENAME = data/MODEL/SHIP/04_roof.x			# [4]屋根
+MODEL_FILENAME = data/MODEL/SHIP/05_door.x			# [5]扉
+MODEL_FILENAME = data/MODEL/SHIP/06_button_box.x	# [6]ボタン台
+MODEL_FILENAME = data/MODEL/SHIP/07_button.x		# [7]ボタン
+
+#------------------------------------------------------------------------------
+# キャラクター情報
+#------------------------------------------------------------------------------
+CHARACTERSET
+	NUM_PARTS = 8					# パーツ数
+
+	PARTSSET						
+		INDEX = 0					# [0]床
+		PARENT = -1					# (親)NULL
+		POS = 0.0 2.0 0.0
+		ROT = 0.0 0.0 0.0
+	END_PARTSSET
+	
+	PARTSSET	
+		INDEX = 1					# [1]壁左
+		PARENT = 0					# (親)床
+		POS = -15.0 -2.0 0.0
+		ROT = 0.0 0.0 0.0
+	END_PARTSSET
+	
+	PARTSSET	
+		INDEX = 2					# [2]壁右
+		PARENT = 0					# (親)床
+		POS = 15.0 -2.0 0.0
+		ROT = 0.0 0.0 0.0
+	END_PARTSSET
+	
+	PARTSSET	
+		INDEX = 3					# [3]壁前
+		PARENT = 0					# (親)床
+		POS = 0.0 0.0 13.0
+		ROT = 0.0 0.0 0.0
+	END_PARTSSET
+	
+	PARTSSET		
+		INDEX = 4					# [4]屋根
+		PARENT = 0					# (親)床
+		POS = 0.0 19.5 0.0
+		ROT = 0.0 0.0 0.0
+	END_PARTSSET
+	
+	PARTSSET		
+		INDEX = 5					# [5]扉
+		PARENT = 0					# (親)床
+		POS = 0.0 -0.5 -12.0
+		ROT = -1.6 0.0 0.0
+	END_PARTSSET
+	
+	PARTSSET			
+		INDEX = 6					# [6]ボタン台
+		PARENT = 0					# (親)床
+		POS = 0.0 0.0 10.0
+		ROT = 0.0 0.0 0.0
+	END_PARTSSET
+	
+	PARTSSET	
+		INDEX = 7					# [7]ボタン
+		PARENT = 6					# (親)ボタン台
+		POS = 0.0 4.0 0.0
+		ROT = 0.0 0.0 0.0
+	END_PARTSSET
+
+END_CHARACTERSET
+
+#========================================
+#  モーション[0] 
+#========================================
+MOTIONSET
+	LOOP = 1		# ループするかどうか[0:ループしない / 1:ループする]
+	NUM_KEY = 4		# キー数
+
+	KEYSET			# --- << KEY : 0 / 4 >> ---
+		FRAME = 120
+		KEY	# ----- [ 0 ] -----
+			POS = 0.00 0.00 0.00
+			ROT = 0.00 0.00 0.00
+		END_KEY
+
+		KEY	# ----- [ 1 ] -----
+			POS = 0.00 0.00 0.00
+			ROT = 0.00 0.00 -0.03
+		END_KEY
+	END_KEYSET
+
+	KEYSET			# --- << KEY : 1 / 4 >> ---
+		FRAME = 120
+		KEY	# ----- [ 0 ] -----
+			POS = 0.00 0.00 0.00
+			ROT = 0.00 0.00 0.00
+		END_KEY
+
+		KEY	# ----- [ 1 ] -----
+			POS = 0.00 0.00 0.00
+			ROT = 0.03 0.00 -0.03
+		END_KEY
+	END_KEYSET
+
+	KEYSET			# --- << KEY : 2 / 4 >> ---
+		FRAME = 120
+		KEY	# ----- [ 0 ] -----
+			POS = 0.00 0.00 0.00
+			ROT = 0.00 0.00 0.00
+		END_KEY
+
+		KEY	# ----- [ 1 ] -----
+			POS = 0.00 0.00 0.00
+			ROT = -0.03 0.00 0.03
+		END_KEY
+	END_KEYSET
+
+	KEYSET			# --- << KEY : 3 / 4 >> ---
+		FRAME = 120
+		KEY	# ----- [ 0 ] -----
+			POS = 0.00 0.00 0.00
+			ROT = 0.00 0.00 0.00
+		END_KEY
+
+		KEY	# ----- [ 1 ] -----
+			POS = 0.00 0.00 0.00
+			ROT = 0.03 0.00 0.03
+		END_KEY
+	END_KEYSET
+END_MOTIONSET
+
+END_SCRIPT		# この行は絶対消さないこと！

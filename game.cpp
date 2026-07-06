@@ -16,6 +16,7 @@
 #include "meshfield.h"
 #include "map_object.h"
 #include "player.h"
+#include "ship.h"
 #include "energyrock.h"
 
 //************************************************************************
@@ -23,6 +24,7 @@
 //************************************************************************
 CPause* CGame::m_pPause = NULL;						// ポーズのインスタンス
 CPlayer* CGame::m_pPlayer = NULL;					// プレイヤーのインスタンス
+CShip* CGame::m_pShip = NULL;						// 船のインスタンス
 CMeshField* CGame::m_pMeshField = NULL;				// メッシュフィールドのインスタンス
 CMapObject* CGame::m_pMapObject = NULL;				// マップオブジェクトのインスタンス
 
@@ -34,6 +36,7 @@ CGame::CGame() : CScene(CScene::MODE_GAME)
 	// 値をクリア
 	m_pPause = NULL;
 	m_pPlayer = NULL;
+	m_pShip = NULL;
 	m_pMeshField = NULL;
 	m_pMapObject = NULL;
 }
@@ -118,6 +121,19 @@ HRESULT CGame::Init(void)
 		}
 	}
 
+	// 船を生成
+	if (m_pShip == NULL)
+	{// NULLチェック
+		m_pShip = CShip::Create(D3DXVECTOR3(1500.0f, 0.0f, -1500.0f), DEFAULT_VECTER3);
+
+		if (m_pShip == NULL)
+		{// NULLチェック
+			OutputDebugStringA("! ! ! 船の生成に失敗しました ! ! !\n");
+
+			return E_FAIL;
+		}
+	}
+
 	// エネルギー鉱物を生成
 	CEnergyRock::Create(D3DXVECTOR3(-50.0f, 0.0f, 50.0f), DEFAULT_VECTER3);
 
@@ -129,6 +145,12 @@ HRESULT CGame::Init(void)
 //========================================================================
 void CGame::Uninit(void)
 {
+	// 船の破棄
+	if (m_pShip != NULL)
+	{// NULLチェック
+		m_pShip = NULL;
+	}
+
 	// プレイヤーの破棄
 	if (m_pPlayer != NULL)
 	{// NULLチェック

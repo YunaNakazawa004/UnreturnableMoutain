@@ -69,6 +69,7 @@ public:
 		TYPE_OBJECTBILLBOARD,	// オブジェクトビルボード
 		TYPE_MESHFIELD,			// メッシュフィールド
 		TYPE_PLAYER,			// プレイヤー
+		TYPE_SHIP,				// 船
 		TYPE_ENERGYROCK,		// エネルギー鉱物
 		TYPE_GRASS,				// 草
 		TYPE_TREE,				// 木

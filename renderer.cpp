@@ -191,6 +191,27 @@ void CRenderer::Uninit(void)
 		m_pD3D->Release();
 		m_pD3D = NULL;
 	}
+
+	// テクスチャの破棄
+	if (m_pTextureMT != NULL)
+	{
+		m_pTextureMT->Release();
+		m_pTextureMT = NULL;
+	}
+
+	// インターフェースの破棄
+	if (m_pRenderMT != NULL)
+	{
+		m_pRenderMT->Release();
+		m_pRenderMT = NULL;
+	}
+
+	// Zバッファの破棄
+	if (m_pZBuffMT != NULL)
+	{
+		m_pZBuffMT->Release();
+		m_pZBuffMT = NULL;
+	}
 }
 
 //========================================================================
