@@ -39,8 +39,21 @@ public:
 		MOTIONTYPE_JUMP,			// ジャンプ
 		MOTIONTYPE_LANDING,			// 着地
 		MOTIONTYPE_DEATH,			// 死亡
+		MOTIONTYPE_FALL,			// 転ぶ
 		MOTIONTYPE_MAX
 	};
+
+	// 状態
+	typedef enum
+	{
+		STATE_NONE = 0,		// 状態無し
+		STATE_WAIT,			// 待機状態
+		STATE_APPEAR,		// 出現状態
+		STATE_NORMAL,		// 通常状態
+		STATE_FALL,			// 転び状態
+		STATE_DEATH,		// 死亡状態
+		STATE_MAX
+	}STATE;
 
 	CPlayer(const int nPriority = PLAYER_PRIORITY);
 	virtual ~CPlayer();
@@ -87,6 +100,9 @@ private:
 
 	float m_fEnergy;				// エネルギー
 	int m_nEnergyCounter;			// エネルギー減少カウンター
+
+	STATE m_state;					// 状態
+	int m_nCounterState;			// 状態カウンター
 
 	bool m_bJump;					// ジャンプしているか
 	bool m_bMove;					// 移動しているか

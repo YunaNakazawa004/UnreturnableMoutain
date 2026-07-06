@@ -25,11 +25,19 @@ public:
 
 	LPDIRECT3DDEVICE9 GetDevice(void) { return m_pD3DDevice; }
 
+	void ChangeTarget(D3DXVECTOR3 posV, D3DXVECTOR3 posR, D3DXVECTOR3 vecU);
+	LPDIRECT3DTEXTURE9 GetTextureMT(void) { return m_pTextureMT; }
+
 	void SwapWireFrame(void);
 
 private:
 	LPDIRECT3D9 m_pD3D;							// Direct3Dオブジェクトへのポインタ
 	LPDIRECT3DDEVICE9 m_pD3DDevice;				// Direct3Dデバイスへのポインタ
+
+	LPDIRECT3DTEXTURE9 m_pTextureMT;			// レンダリングターゲット用テクスチャ
+	LPDIRECT3DSURFACE9 m_pRenderMT;				// テクスチャレンダリング用インターフェース
+	LPDIRECT3DSURFACE9 m_pZBuffMT;				// テクスチャレンダリング用Zバッファ
+	D3DVIEWPORT9 m_viewportMT;					// テクスチャレンダリング用ビューポート
 };
 
 #endif

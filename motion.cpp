@@ -154,8 +154,8 @@ void CMotion::Set(const int nType, bool bBlend, int nFrameBlend)
 		if (bBlend == true)
 		{// ƒuƒŒƒ“ƒh‚ ‚è
 			m_nTypeBlend = nType;
-			m_bLoopBlend = m_aInfo[m_nType].bLoop;
-			m_nNumKeyBlend = m_aInfo[m_nType].nNumKey;
+			m_bLoopBlend = m_aInfo[m_nTypeBlend].bLoop;
+			m_nNumKeyBlend = m_aInfo[m_nTypeBlend].nNumKey;
 			m_nKeyBlend = 0;
 			m_nCounterBlend = 0;
 			m_bFinish = false;

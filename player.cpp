@@ -37,9 +37,11 @@
 #define AIR_MOVEMENT	(D3DXVECTOR3(0.1f, 0.1f, 0.1f))			// 移動量(空中)
 #define MOVE_INERTIA	(0.05f)									// 移動量の慣性
 #define ROT				(D3DXVECTOR3(0.05f, 0.05f, 0.05f))		// 向き移動量
-#define ONE_LINE		(100)									// ファイルの一行として読み取る文字数
 #define MODEL_ROT		(D3DX_PI * 0.05f)						// モデルの傾き具合
-#define MAX_ROTADD		(8.0f)									// 最大追加角度
+#define MODEL_ROT_X		(0.04f)									// モデルの傾きカウントX方向
+#define MODEL_ROT_Z		(0.005f)								// モデルの傾きカウントZ方向
+#define MAX_ROTADD		(1.0f)									// 最大追加角度
+#define MIN_ROTADD		(-1.0f)									// 最小追加角度
 #define TIRE_ROT		(0.15f)									// タイヤの回り具合
 #define JUMP_HEIGHT		(4.0f)									// ジャンプの高さ
 #define JUMP_ADD		(0.02f)									// ジャンプの変化量
@@ -116,6 +118,8 @@ CPlayer::CPlayer(const int nPriority) :CObject(nPriority)
 	m_fJumpHigh = 0.0f;
 	m_fEnergy = 0.0f;
 	m_nEnergyCounter = 0;
+	m_state = STATE_NONE;
+	m_nCounterState = 0;
 	m_bJump = false;
 	m_bMove = false;
 	m_bLand = false;
@@ -142,6 +146,7 @@ HRESULT CPlayer::Init(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot)
 	m_scale = D3DXVECTOR3(0.5f, 0.5f, 0.5f);
 	m_col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 	m_fEnergy = FIRST_ENERGY;
+	m_state = STATE_APPEAR;
 
 	// モーションを生成/初期化
 	if (m_pMotion == NULL)
@@ -243,9 +248,51 @@ void CPlayer::Update(void)
 	// 前回の位置を保存
 	m_posOld = m_pos;
 
+	// 状態管理
+	switch (m_state)
+	{
+	case STATE_NONE:		// 状態なし
+		pDebugProc->Print("状態 : 状態なし\n");
+
+		break;
+
+	case STATE_WAIT:		// 待機状態
+		pDebugProc->Print("状態 : 待機状態\n");
+
+		break;			
+
+	case STATE_APPEAR:		// 出現状態
+		pDebugProc->Print("状態 : 出現状態\n");
+
+		m_nCounterState++;
+
+		if (m_nCounterState > 10)
+		{// 一定時間経った
+			m_nCounterState = 0;
+			m_state = STATE_NORMAL;
+		}
+
+		break;
+
+	case STATE_NORMAL:		// 通常状態
+		pDebugProc->Print("状態 : 通常状態\n");
+
+		break;
+
+	case STATE_FALL:		// 転び状態
+		pDebugProc->Print("状態 : 転び状態\n");
+
+		break;
+
+	case STATE_DEATH:		// 死亡状態
+		pDebugProc->Print("状態 : 死亡状態\n");
+
+		break;
+	}
+
 	// 移動処理
-	if (m_pMotion->GetType() != MOTIONTYPE_DEATH)
-	{// 死亡状態じゃないとき
+	if (m_state == STATE_NORMAL)
+	{// 通常状態のとき
 		if (Movement(rot) == true)
 		{// 移動している
 			if (m_bJump == false)
@@ -264,7 +311,7 @@ void CPlayer::Update(void)
 		}
 	}
 
-	if (m_bJump == false && m_pMotion->GetType() != MOTIONTYPE_DEATH)
+	if (m_bJump == false && m_state == STATE_NORMAL)
 	{// ジャンプしていないとき
 		static float fMinusEnergy = 0.0f;
 
@@ -315,6 +362,8 @@ void CPlayer::Update(void)
 
 		m_nEnergyCounter = 0;
 		m_fEnergy = FIRST_ENERGY;
+
+		m_state = STATE_NORMAL;
 
 		// モーションを設定
 		m_pMotion->Set(MOTIONTYPE_NEUTRAL, true, 20);
@@ -382,12 +431,9 @@ void CPlayer::Update(void)
 	CTree::Collision(&pos, &m_posOld, &m_move, m_fRadius, m_fHeight);
 	CRock::Collision(&pos, &m_posOld, &m_move, m_fRadius, m_fHeight, &bLand, &bHead);
 
-	pDebugProc->Print("オブジェクトへの着地 : %d\n", bLand);
-	pDebugProc->Print("オブジェクトへの頭 : %d\n", bHead);
-
 	if (pos.y <= fHeight || bLand == true)
 	{// 地面との当たり判定
-		if (m_bJump == true && m_pMotion->GetType() != MOTIONTYPE_DEATH)
+		if (m_bJump == true && m_state == STATE_NORMAL)
 		{// 着地
 			// モーションを設定
 			m_pMotion->Set(MOTIONTYPE_LANDING, true, 20);
@@ -406,14 +452,43 @@ void CPlayer::Update(void)
 		{// 着地モーションが終わった
 			m_bLand = false;
 			m_bAct = false;
+
+			m_state = STATE_NORMAL;
 		}
 	}
-	else if (pos.y > fHeight + 5.0f && bLand == false)
+	else if (pos.y > fHeight + 5.0f && bLand == false && m_state == STATE_NORMAL)
 	{// オブジェクトの上でもない空中
 		m_bJump = true;
 
 		// モーションを設定
 		m_pMotion->Set(MOTIONTYPE_JUMP, true, 20);
+	}
+
+	// 転ぶ
+	if (m_bJump == true)
+	{// 空中にいるとき
+		float headLine = m_apModel[3]->GetMtxWorld()._42 - 5.0f;
+
+		if (headLine < fHeight)
+		{// 上半身が先に地面についた
+			m_state = STATE_FALL;
+
+			// モーションを設定
+			m_pMotion->Set(MOTIONTYPE_FALL, true, 20);
+
+			m_bLand = true;
+
+			m_move.y = 0.0f;
+			m_bJump = false;
+		}
+	}
+
+	if (m_bLand == true && m_pMotion->GetType() == MOTIONTYPE_FALL && m_pMotion->IsFinish() == true)
+	{// 転びモーションが終わった
+		m_bLand = false;
+		m_bAct = false;
+
+		m_state = STATE_NORMAL;
 	}
 
 	if (pos.y <= fHeight || bLand == true)
@@ -425,7 +500,7 @@ void CPlayer::Update(void)
 	}
 
 	if (pEnergyRock != NULL &&
-		m_bJump == false && m_pMotion->GetType() != MOTIONTYPE_DEATH)
+		m_bJump == false && m_state == STATE_NORMAL)
 	{// エネルギー鉱物と当たっているとき/空中ではないとき
 		if (pInputKeyboard->GetTrigger(DIK_RETURN) == true || pInputJoypad->GetTrigger(0, CInputJoypad::JOYKEY_X) == true)
 		{// 回収するキーを押した
@@ -450,7 +525,7 @@ void CPlayer::Update(void)
 
 	if (pInputKeyboard->GetTrigger(DIK_H) == true)
 	{// エネルギー鉱石生成
-		CEnergyRock::Create(D3DXVECTOR3(-50.0f, 0.0f, 50.0f), DEFAULT_VECTER3);
+		CEnergyRock::Create(pos, DEFAULT_VECTER3);
 	}
 
 	// エネルギー減少
@@ -475,6 +550,8 @@ void CPlayer::Update(void)
 	else if (m_fEnergy < 0.0f)
 	{// 最小値に調整
 		m_fEnergy = 0.0f;
+
+		m_state = STATE_DEATH;
 
 		// モーションを設定
 		m_pMotion->Set(MOTIONTYPE_DEATH, true, 20);
@@ -513,6 +590,32 @@ void CPlayer::Draw(void)
 	LPDIRECT3DDEVICE9 pDevice = pRenderer->GetDevice();		// デバイスへのポインタ
 	CTexture* pTexture = CManager::GetTexture();			// テクスチャへのポインタ
 	D3DXMATRIX mtxRot, mtxTrans, mtxScale;					// 計算用マトリックス
+	LPDIRECT3DSURFACE9 pRenderDef, pZBuffDef;				// 現在のレンダリング保存用
+	D3DVIEWPORT9 viewportDef;								// 現在のビューポート保存用
+	D3DXMATRIX mtxViewDef, mtxProjectionDef;				// 現在のマトリックス保存用
+
+	// 現在のレンダリングターゲットを取得（保存）
+	pDevice->GetRenderTarget(0, &pRenderDef);
+
+	// 現在のZバッファを取得（保存）
+	pDevice->GetDepthStencilSurface(&pZBuffDef);
+
+	// 現在のビューポートを取得（保存）
+	pDevice->GetViewport(&viewportDef);
+
+	// 現在のビューマトリックスを取得（保存）
+	pDevice->GetTransform(D3DTS_VIEW, &mtxViewDef);
+	
+	// 現在のプロジェクションマトリックスを取得（保存）
+	pDevice->GetTransform(D3DTS_PROJECTION, &mtxProjectionDef);
+	
+#if 0
+	// レンダリングターゲットを変更
+	CManager::GetRenderer()->ChangeTarget(D3DXVECTOR3(m_pos.x, m_pos.y + 10.0f, m_pos.z - 15.0f), m_pos, D3DXVECTOR3(0.0f, 1.0f, 0.0f));
+
+	// レンダリングターゲット用テクスチャのクリア
+	pDevice->Clear(0, NULL, (D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER), D3DCOLOR_RGBA(0, 0, 0, 0), 1.0f, 0);
+#endif
 
 	// ワールドマトリックスの初期化
 	D3DXMatrixIdentity(&m_mtxWorld);
@@ -541,6 +644,21 @@ void CPlayer::Draw(void)
 			m_apModel[nCntModel]->Draw();
 		}
 	}
+
+	// レンダリングターゲットをもとに戻す
+	pDevice->SetRenderTarget(0, pRenderDef);
+
+	// Zバッファを元に戻す
+	pDevice->SetDepthStencilSurface(pZBuffDef);
+
+	// ビューポートを元に戻す
+	pDevice->SetViewport(&viewportDef);
+
+	// ビューマトリックスを元に戻す
+	pDevice->SetTransform(D3DTS_VIEW, &mtxViewDef);
+
+	// プロジェクションマトリックスを元に戻す
+	pDevice->SetTransform(D3DTS_PROJECTION, &mtxProjectionDef);
 }
 
 //========================================================================
@@ -622,11 +740,11 @@ bool CPlayer::Movement(const D3DXVECTOR3 rot)
 
 	bool bMove = false;
 	int nValueH, nValueV;
-	static float fRotCounterX = 1.0f;		// 傾きの追加角度X
-	static float fRotCounterZ = 1.0f;		// 傾きの追加角度Z
+	static float fRotCounterX = 0.0f;		// 傾きの追加角度X
+	static float fRotCounterZ = 0.0f;		// 傾きの追加角度Z
 
 	// 8方向移動時のスピード
-	float fCustomSpeed = (1.5f - (m_fEnergy * 0.01f)) * ((fRotCounterZ >= MAX_ROTADD) ? 0.1f : 1.0f) * 0.5f;
+	float fCustomSpeed = (1.5f - (m_fEnergy * 0.01f)) * ((fRotCounterZ >= MAX_ROTADD || fRotCounterZ <= MIN_ROTADD) ? 0.1f : 1.0f) * 0.5f;
 	float fSpeedX = (m_bJump ? AIR_MOVEMENT.x : LAND_MOVEMENT.x) * fCustomSpeed;
 	float fSpeedZ = (m_bJump ? AIR_MOVEMENT.z : LAND_MOVEMENT.z) * fCustomSpeed;
 
@@ -638,8 +756,8 @@ bool CPlayer::Movement(const D3DXVECTOR3 rot)
 		m_move.z += cosf(rot.y) * fSpeed;
 
 		// 進んだ方向にモデルを傾ける
-		UnderRotDest.x = MODEL_ROT * ((nValueV < 0) ? 1 : -1) * fRotCounterX;
-		UnderRotDest.z = MODEL_ROT * ((nValueH < 0) ? -1 : 1) * fRotCounterZ;
+		UnderRotDest.x = (MODEL_ROT + fRotCounterX) * ((nValueV < 0) ? 1 : -1);
+		UnderRotDest.z = (MODEL_ROT + fRotCounterZ) * ((nValueH < 0) ? -1 : 1);
 		UpperRotDest.x = MODEL_ROT * ((nValueV < 0) ? 1 : -1);
 		UpperRotDest.z = MODEL_ROT * ((nValueH < 0) ? -1 : 1);
 		TireRot.x += TIRE_ROT * ((nValueV < 0) ? 1 : -1);
@@ -647,22 +765,18 @@ bool CPlayer::Movement(const D3DXVECTOR3 rot)
 		// 進んだ方向に角度を向ける
 		m_rotDest.y = rot.y + ((float)nValueH * 0.00001f * ((nValueV < 0) ? -1 : 1));
 
-		if (nValueV == 0)
-		{// 前後に動いてない
-			fRotCounterX = 1.0f;	// リセット
-		}
-		else if (m_bJump == true)
+		if (nValueV != 0 && m_bJump == true)
 		{// 前後にも動いている/空中
-			fRotCounterX += 0.02f;		// カウンター加算
+			fRotCounterX += MODEL_ROT_X;		// カウンター加算
 		}
 
 		if (nValueH == 0)
 		{// 左右に動いてない
-			fRotCounterZ = 1.0f;	// リセット
+			fRotCounterZ = 0.0f;	// リセット
 		}
 		else
 		{// 左右にも動いている
-			fRotCounterZ += 0.02f;		// カウンター加算
+			fRotCounterZ += MODEL_ROT_Z;		// カウンター加算
 		}
 
 		bMove = true;
@@ -675,13 +789,13 @@ bool CPlayer::Movement(const D3DXVECTOR3 rot)
 			m_move.z += cosf(D3DX_PI * 0.75f + rot.y) * fSpeedZ;
 
 			// 進んだ方向にモデルを傾ける
-			UnderRotDest.z = -MODEL_ROT * fRotCounterZ;
+			UnderRotDest.z = -MODEL_ROT + fRotCounterZ;
 			UpperRotDest.z = -MODEL_ROT;
 
 			// 進んだ方向に角度を向ける
 			m_rotDest.y = rot.y + (-D3DX_PI * 0.15f);
 
-			fRotCounterZ += 0.02f;		// カウンター加算
+			fRotCounterZ += -MODEL_ROT_Z;		// カウンター加算
 		}
 		else if (pInputKeyboard->GetPress(DIK_D) == true || pInputJoypad->GetPress(0, CInputJoypad::JOYKEY_RIGHT) == true)
 		{// 右奥に移動
@@ -689,30 +803,30 @@ bool CPlayer::Movement(const D3DXVECTOR3 rot)
 			m_move.z += cosf(-D3DX_PI * 0.75f + rot.y) * fSpeedZ;
 
 			// 進んだ方向にモデルを傾ける
-			UnderRotDest.z = MODEL_ROT * fRotCounterZ;
+			UnderRotDest.z = MODEL_ROT + fRotCounterZ;
 			UpperRotDest.z = MODEL_ROT;
 
 			// 進んだ方向に角度を向ける
 			m_rotDest.y = rot.y + (D3DX_PI * 0.15f);
 
-			fRotCounterZ += 0.02f;		// カウンター加算
+			fRotCounterZ += MODEL_ROT_Z;		// カウンター加算
 		}
 		else if (pInputKeyboard->GetPress(DIK_W) == true || pInputJoypad->GetPress(0, CInputJoypad::JOYKEY_UP) == true)
 		{// 奥に移動
 			m_move.x += sinf(D3DX_PI * 1.0f + rot.y) * fSpeedX;
 			m_move.z += cosf(D3DX_PI * 1.0f + rot.y) * fSpeedZ;
 
-			fRotCounterZ = 1.0f;	// リセット
+			fRotCounterZ = 0.0f;	// リセット
 		}
 
 		// 進んだ方向にモデルを傾ける
-		UnderRotDest.x = -MODEL_ROT * fRotCounterX;
+		UnderRotDest.x = -MODEL_ROT + fRotCounterX;
 		UpperRotDest.x = -MODEL_ROT;
 		TireRot.x += -TIRE_ROT;
 
 		if (m_bJump == true)
 		{// 空中
-			fRotCounterX += 0.02f;		// カウンター加算
+			fRotCounterX += -MODEL_ROT_X;		// カウンター加算
 		}
 
 		bMove = true;
@@ -725,13 +839,13 @@ bool CPlayer::Movement(const D3DXVECTOR3 rot)
 			m_move.z += cosf(D3DX_PI * 0.25f + rot.y) * fSpeedZ;
 
 			// 進んだ方向にモデルを傾ける
-			UnderRotDest.z = -MODEL_ROT * fRotCounterZ;
+			UnderRotDest.z = -MODEL_ROT + fRotCounterZ;
 			UpperRotDest.z = -MODEL_ROT;
 
 			// 進んだ方向に角度を向ける
 			m_rotDest.y = rot.y + (D3DX_PI * 0.15f);
 
-			fRotCounterZ += 0.02f;		// カウンター加算
+			fRotCounterZ += -MODEL_ROT_Z;		// カウンター加算
 		}
 		else if (pInputKeyboard->GetPress(DIK_D) == true || pInputJoypad->GetPress(0, CInputJoypad::JOYKEY_RIGHT) == true)
 		{// 右手前に移動
@@ -739,30 +853,30 @@ bool CPlayer::Movement(const D3DXVECTOR3 rot)
 			m_move.z += cosf(-D3DX_PI * 0.25f + rot.y) * fSpeedZ;
 
 			// 進んだ方向にモデルを傾ける
-			UnderRotDest.z = MODEL_ROT * fRotCounterZ;
+			UnderRotDest.z = MODEL_ROT + fRotCounterZ;
 			UpperRotDest.z = MODEL_ROT;
 
 			// 進んだ方向に角度を向ける
 			m_rotDest.y = rot.y + (-D3DX_PI * 0.15f);
 
-			fRotCounterZ += 0.02f;		// カウンター加算
+			fRotCounterZ += MODEL_ROT_Z;		// カウンター加算
 		}
 		else if (pInputKeyboard->GetPress(DIK_S) == true || pInputJoypad->GetPress(0, CInputJoypad::JOYKEY_DOWN) == true)
 		{// 手前に移動
 			m_move.x += sinf(D3DX_PI * 0.0f + rot.y) * fSpeedX;
 			m_move.z += cosf(D3DX_PI * 0.0f + rot.y) * fSpeedZ;
 
-			fRotCounterZ = 1.0f;	// リセット
+			fRotCounterZ = 0.0f;	// リセット
 		}
 
 		// 進んだ方向にモデルを傾ける
-		UnderRotDest.x = MODEL_ROT * fRotCounterX;
+		UnderRotDest.x = MODEL_ROT + fRotCounterX;
 		UpperRotDest.x = MODEL_ROT;
 		TireRot.x += TIRE_ROT;
 
 		if (m_bJump == true)
 		{// 空中
-			fRotCounterX += 0.02f;		// カウンター加算
+			fRotCounterX += MODEL_ROT_X;		// カウンター加算
 		}
 
 		bMove = true;
@@ -770,22 +884,20 @@ bool CPlayer::Movement(const D3DXVECTOR3 rot)
 	else if (pInputKeyboard->GetPress(DIK_A) == true || pInputJoypad->GetPress(0, CInputJoypad::JOYKEY_LEFT) == true)
 	{// 左に移動
 		// 進んだ方向にモデルを傾ける
-		UnderRotDest.z = -MODEL_ROT * fRotCounterZ;
+		UnderRotDest.z = -MODEL_ROT + fRotCounterZ;
 		UpperRotDest.z = -MODEL_ROT;
 
-		fRotCounterX = 1.0f;	// リセット
-		fRotCounterZ += 0.02f;		// カウンター加算
+		fRotCounterZ += -MODEL_ROT_Z;		// カウンター加算
 
 		bMove = true;
 	}
 	else if (pInputKeyboard->GetPress(DIK_D) == true || pInputJoypad->GetPress(0, CInputJoypad::JOYKEY_RIGHT) == true)
 	{// 右に移動
 		// 進んだ方向にモデルを傾ける
-		UnderRotDest.z = MODEL_ROT * fRotCounterZ;
+		UnderRotDest.z = MODEL_ROT + fRotCounterZ;
 		UpperRotDest.z = MODEL_ROT;
 
-		fRotCounterX = 1.0f;	// リセット
-		fRotCounterZ += 0.02f;		// カウンター加算
+		fRotCounterZ += MODEL_ROT_Z;		// カウンター加算
 
 		bMove = true;
 	}
@@ -793,12 +905,17 @@ bool CPlayer::Movement(const D3DXVECTOR3 rot)
 	{// 動いてない
 		// オフセットに戻す
 		UpperRotDest = UpperRotOff;
-		UnderRotDest = UnderRotOff;
+		UnderRotDest.x = MODEL_ROT + fRotCounterX;
+		UnderRotDest.z = UnderRotOff.z;
 
-		fRotCounterX = 1.0f;	// リセット
-		fRotCounterZ = 1.0f;	// リセット
+		fRotCounterZ = 0.0f;	// リセット
 
 		bMove = false;
+	}
+
+	if (m_bJump == false)
+	{// 着地している
+		fRotCounterX = 0.0f;	// リセット
 	}
 
 	if (fRotCounterZ > MAX_ROTADD)
@@ -806,11 +923,16 @@ bool CPlayer::Movement(const D3DXVECTOR3 rot)
 		fRotCounterZ = MAX_ROTADD;
 	}
 
+	if (fRotCounterZ < MIN_ROTADD)
+	{// 追加角度の最小値
+		fRotCounterZ = MIN_ROTADD;
+	}
+
 	// 向きを調整
-	CorrectAngle(&UpperRotDest.x, UpperRotDest.x);
-	CorrectAngle(&UpperRotDest.z, UpperRotDest.z);
-	CorrectAngle(&UnderRotDest.x, UnderRotDest.x);
-	CorrectAngle(&UnderRotDest.z, UnderRotDest.z);
+	CorrectAngle(&UpperRotDest.x, UpperRotDest.x - UpperRot.x);
+	CorrectAngle(&UpperRotDest.z, UpperRotDest.z - UpperRot.z);
+	CorrectAngle(&UnderRotDest.x, UnderRotDest.x - UnderRot.x);
+	CorrectAngle(&UnderRotDest.z, UnderRotDest.z - UnderRot.z);
 
 	// モデルの傾きを加算
 	UnderRot += (UnderRotDest - UnderRot) * 0.1f;

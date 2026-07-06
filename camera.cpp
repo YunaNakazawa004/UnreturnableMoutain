@@ -17,6 +17,9 @@
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
+#define ENABLE_PERSPECTIVFOV				// 透視投影で描画
+//#undef ENABLE_PERSPECTIVFOV
+
 #define CAMERA_POS				(D3DXVECTOR3(0.0f, 100.0f, -200.0f))	// 初期座標
 #define FIRST_ROT_X				(200.0f)								// 視点と注視点間の距離
 #define HEIGHT					(0.0f)									// 視点の高さ
@@ -600,7 +603,7 @@ void CCamera::SetCamera(void)
 	// プロジェクションマトリックスの初期化
 	D3DXMatrixIdentity(&m_mtxProjection);
 
-#if 1		// 透視投影
+#ifdef ENABLE_PERSPECTIVFOV		// 透視投影
 	// プロジェクションマトリックスを作成
 	D3DXMatrixPerspectiveFovLH(&m_mtxProjection,
 		D3DXToRadian(m_fViewAngle),								// 視野角
