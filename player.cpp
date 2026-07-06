@@ -480,6 +480,8 @@ void CPlayer::Update(void)
 
 			m_move.y = 0.0f;
 			m_bJump = false;
+
+			m_fEnergy -= 5.0f;
 		}
 	}
 
