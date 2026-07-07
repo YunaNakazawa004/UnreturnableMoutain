@@ -204,6 +204,10 @@ void CObjectBillboard::Draw(void)
 	// ワールドマトリックスの初期化
 	D3DXMatrixIdentity(&m_mtxWorld);
 
+	// スケールを反映
+	D3DXMatrixScaling(&mtxScale, m_scale.x, m_scale.y, m_scale.z);
+	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxScale);
+
 	// ビューマトリックスを取得
 	pDevice->GetTransform(D3DTS_VIEW, &mtxView);
 
@@ -212,10 +216,6 @@ void CObjectBillboard::Draw(void)
 	m_mtxWorld._41 = 0.0f;
 	m_mtxWorld._42 = 0.0f;
 	m_mtxWorld._43 = 0.0f;
-
-	// スケールを反映
-	D3DXMatrixScaling(&mtxScale, m_scale.x, m_scale.y, m_scale.z);
-	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxScale);
 
 	// 位置を反映
 	D3DXMatrixTranslation(&mtxTrans, m_pos.x, m_pos.y, m_pos.z);

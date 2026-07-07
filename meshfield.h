@@ -13,7 +13,11 @@
 //************************************************************************
 // マクロ定義
 //************************************************************************
+#define MALTITARGET_RENDERING			// マルチターゲットレンダリング
+#undef MALTITARGET_RENDERING
+
 #define ERROR_HEIGHT			(-99999.0f)					// 高さを算出できなかった場合の数値
+#define FIELD_TEXTURE_NUM		(2)							// 地面のテクスチャの数
 
 //************************************************************************
 // メッシュフィールドクラス
@@ -34,8 +38,6 @@ public:
 	void Uninit(void);
 	void Update(void);
 	void Draw(void);
-
-	void BindTexture(const int nIdxTexture) { m_nIdxTexture = nIdxTexture; }
 
 	void SetPosition(const D3DXVECTOR3 pos);
 	D3DXVECTOR3 GetPosition(void) { return m_pos; }
@@ -58,9 +60,9 @@ public:
 	HRESULT ReadData(const char* pFilename);
 
 private:
-	LPDIRECT3DVERTEXBUFFER9 m_pVtxBuff;			// 頂点バッファへのポインタ
-	LPDIRECT3DINDEXBUFFER9 m_pIdxBuff;			// インデックスバッファへのポインタ
-	static int m_nIdxTexture;					// テクスチャのインデックス
+	LPDIRECT3DVERTEXBUFFER9 m_pVtxBuff;				// 頂点バッファへのポインタ
+	LPDIRECT3DINDEXBUFFER9 m_pIdxBuff;				// インデックスバッファへのポインタ
+	static int m_aIdxTexture[FIELD_TEXTURE_NUM];	// テクスチャのインデックス
 	D3DXMATRIX m_mtxWorld;		// ワールドマトリックス
 	D3DXVECTOR3 m_pos;			// 位置
 	D3DXVECTOR3 m_rot;			// 向き

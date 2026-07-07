@@ -344,13 +344,13 @@ void CObjectX::Draw(void)
 	// ワールドマトリックスの初期化
 	D3DXMatrixIdentity(&m_mtxWorld);
 
-	// 向きを反映
-	D3DXMatrixRotationYawPitchRoll(&mtxRot, m_rot.y, m_rot.x, m_rot.z);
-	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxRot);
-
 	// スケールを反映
 	D3DXMatrixScaling(&mtxScale, m_scale.x, m_scale.y, m_scale.z);
 	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxScale);
+
+	// 向きを反映
+	D3DXMatrixRotationYawPitchRoll(&mtxRot, m_rot.y, m_rot.x, m_rot.z);
+	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxRot);
 
 	// 位置を反映
 	D3DXMatrixTranslation(&mtxTrans, m_pos.x, m_pos.y, m_pos.z);

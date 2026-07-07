@@ -24,7 +24,7 @@
 //************************************************************************
 // 静的メンバ変数宣言
 //************************************************************************
-int CMeshField::m_nIdxTexture = -1;				// テクスチャのインデックス
+int CMeshField::m_aIdxTexture[FIELD_TEXTURE_NUM] = {};				// テクスチャのインデックス
 
 //========================================================================
 // テクスチャの生成
@@ -35,9 +35,10 @@ HRESULT CMeshField::Load(void)
 	CTexture* pTexture = CManager::GetTexture();			// テクスチャへのポインタ
 
 	// テクスチャの設定
-	m_nIdxTexture = pTexture->Register("data\\TEXTURE\\field002.jpg");
+	m_aIdxTexture[0] = pTexture->Register("data\\TEXTURE\\field002.jpg");
+	m_aIdxTexture[1] = pTexture->Register("data\\TEXTURE\\rock.jpg");
 
-	if (m_nIdxTexture == -1)
+	if (m_aIdxTexture[0] == -1 || m_aIdxTexture[1] == -1)
 	{// テクスチャが設定できていない
 		OutputDebugStringA("! ! ! テクスチャの設定に失敗しました ! ! !\n");
 
@@ -53,7 +54,7 @@ HRESULT CMeshField::Load(void)
 void CMeshField::Unload(void)
 {
 	// テクスチャのインデックスを削除
-	m_nIdxTexture = -1;
+	memset(&m_aIdxTexture[0], -1, sizeof m_aIdxTexture);
 }
 
 //========================================================================
@@ -91,9 +92,6 @@ CMeshField* CMeshField::Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot, con
 
 		// 種類を設定
 		pMeshFIeld->SetType(type);
-
-		// テクスチャの割り当て
-		pMeshFIeld->BindTexture(m_nIdxTexture);
 
 		return pMeshFIeld;
 	}
@@ -138,7 +136,7 @@ HRESULT CMeshField::Init(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot,
 	// ローカル変数宣言
 	CRenderer* pRenderer = CManager::GetRenderer();			// レンダラーへのポインタ
 	LPDIRECT3DDEVICE9 pDevice = pRenderer->GetDevice();		// デバイスへのポインタ
-	VERTEX_3D* pVtx;					// 頂点情報へのポインタ
+	VERTEX_3D_MALTI* pVtx;					// 頂点情報へのポインタ
 	DWORD* pIdx;							// インデックス情報へのポインタ
 
 	// クラスの値を初期化
@@ -151,9 +149,9 @@ HRESULT CMeshField::Init(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot,
 	m_nNumIdx = (((int)m_block.x) * ((int)m_block.y) * 2) + (((int)m_block.y - 1) * 4) + 2;
 
 	// 頂点バッファの生成
-	pDevice->CreateVertexBuffer(sizeof(VERTEX_3D) * m_nNumVtx,
+	pDevice->CreateVertexBuffer(sizeof(VERTEX_3D_MALTI) * m_nNumVtx,
 		D3DUSAGE_WRITEONLY,
-		FVF_VERTEX_3D,
+		FVF_VERTEX_3D_MALTI,
 		D3DPOOL_MANAGED,
 		&m_pVtxBuff,
 		NULL);
@@ -175,10 +173,11 @@ HRESULT CMeshField::Init(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot,
 			pVtx[nVtx].pos.z = -((float)nCntMeshField1 * m_size.y * 2.0f) + ((m_block.y * m_size.y * 2.0f) * 0.5f);
 
 			// 頂点カラーの設定
-			pVtx[nVtx].col = COLOR_WHITE;
+			pVtx[nVtx].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.0f);
 
 			// テクスチャ座標の設定
 			pVtx[nVtx].tex = D3DXVECTOR2((float)nCntMeshField2, (float)nCntMeshField1);
+			pVtx[nVtx].texM = D3DXVECTOR2((float)nCntMeshField2, (float)nCntMeshField1);
 		}
 	}
 
@@ -266,12 +265,24 @@ void CMeshField::Draw(void)
 		return;
 	}
 
-
 	// ローカル変数宣言
 	CRenderer* pRenderer = CManager::GetRenderer();			// レンダラーへのポインタ
 	LPDIRECT3DDEVICE9 pDevice = pRenderer->GetDevice();		// デバイスへのポインタ
 	CTexture* pTexture = CManager::GetTexture();			// テクスチャへのポインタ
 	D3DXMATRIX mtxRot, mtxTrans, mtxScale;		// 計算用マトリックス
+
+	// テクスチャステージステート0の設定
+	//pDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
+	pDevice->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+	pDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
+	pDevice->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_DIFFUSE);
+
+	// テクスチャステージステート1の設定
+	pDevice->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_BLENDCURRENTALPHA);
+	pDevice->SetTextureStageState(1, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+	pDevice->SetTextureStageState(1, D3DTSS_COLORARG2, D3DTA_CURRENT);
+	pDevice->SetTextureStageState(1, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
+	pDevice->SetTextureStageState(1, D3DTSS_ALPHAARG1, D3DTA_TFACTOR);
 
 	// ワールドマトリックスの初期化
 	D3DXMatrixIdentity(&m_mtxWorld);
@@ -292,20 +303,37 @@ void CMeshField::Draw(void)
 	pDevice->SetTransform(D3DTS_WORLD, &m_mtxWorld);
 
 	// 頂点バッファをデータストリームに設定
-	pDevice->SetStreamSource(0, m_pVtxBuff, 0, sizeof(VERTEX_3D));
+	pDevice->SetStreamSource(0, m_pVtxBuff, 0, sizeof(VERTEX_3D_MALTI));
 
 	// インデックスバッファをデータストリームに設定
 	pDevice->SetIndices(m_pIdxBuff);
 
 	// 頂点フォーマットの設定
-	pDevice->SetFVF(FVF_VERTEX_3D);
+	pDevice->SetFVF(FVF_VERTEX_3D_MALTI);
 
+#ifdef MALTITARGET_RENDERING
 	// テクスチャの設定
-	pDevice->SetTexture(0, pTexture->GetAddress(m_nIdxTexture));
+	pDevice->SetTexture(0, CManager::GetRenderer()->GetTextureMT());
+	pDevice->SetTexture(1, CManager::GetRenderer()->GetTextureMT());
+
+#else
+	// テクスチャの設定
+	pDevice->SetTexture(0, pTexture->GetAddress(m_aIdxTexture[0]));
+	pDevice->SetTexture(1, pTexture->GetAddress(m_aIdxTexture[1]));
+
+#endif
 
 	// ポリゴンの描画
 	pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLESTRIP, 0, 0, ((int)m_block.x + 1) * ((int)m_block.y + 1), 0,
 		(((int)m_block.x) * ((int)m_block.y) * 2) + (((int)m_block.y - 1) * 4));
+
+	// テクスチャステージステートの設定
+	pDevice->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
+
+	// テクスチャステージステートの設定
+	pDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
+	pDevice->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
+	pDevice->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_CURRENT);
 }
 
 //========================================================================
@@ -351,7 +379,7 @@ void CMeshField::SetColor(const D3DXCOLOR col)
 {
 	m_col = col;
 
-	VERTEX_3D* pVtx;
+	VERTEX_3D_MALTI* pVtx;
 
 	// 頂点バッファをロックし、頂点情報へのポインタを取得
 	m_pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
@@ -373,7 +401,7 @@ void CMeshField::SetColor(const int nCntVtx, const D3DXCOLOR col)
 {
 	m_col = col;
 
-	VERTEX_3D* pVtx;
+	VERTEX_3D_MALTI* pVtx;
 
 	// 頂点バッファをロックし、頂点情報へのポインタを取得
 	m_pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
@@ -391,7 +419,7 @@ void CMeshField::SetColor(const int nCntVtx, const D3DXCOLOR col)
 //========================================================================
 void CMeshField::SetTexUV(const int nCntVtx, const float ftexU, const float ftexV)
 {
-	VERTEX_3D* pVtx;
+	VERTEX_3D_MALTI* pVtx;
 
 	// 頂点バッファをロックし、頂点情報へのポインタを取得
 	m_pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
@@ -408,7 +436,7 @@ void CMeshField::SetTexUV(const int nCntVtx, const float ftexU, const float ftex
 //========================================================================
 void CMeshField::SetNor(void)
 {
-	VERTEX_3D* pVtx;					// 頂点情報へのポインタ
+	VERTEX_3D_MALTI* pVtx;					// 頂点情報へのポインタ
 	D3DXVECTOR3 nor, nor1, nor2, nor3, nor4, nor5, nor6, vec1, vec2;
 
 	// 頂点バッファをロックし、頂点情報へのポインタを取得
@@ -732,6 +760,7 @@ void CMeshField::SetNor(void)
 			}
 
 			pVtx[nVtx].nor = nor;
+			pVtx[nVtx].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, (1.0f - nor.y) - 0.4f);
 		}
 	}
 
@@ -783,7 +812,7 @@ float CMeshField::GetHeight(const D3DXVECTOR3 pos, const D3DXVECTOR2 polygonIdx)
 	int nCntLine = 0;		// 内側にいた回数
 	int nVtx = (int)polygonIdx.x + ((int)polygonIdx.y * ((int)m_block.x + 1));		// 現在位置の頂点
 	int nMainVtx = -1;		// 主となる頂点
-	VERTEX_3D* pVtx;
+	VERTEX_3D_MALTI* pVtx;
 
 	// 頂点バッファをロックし、頂点情報へのポインタを取得
 	m_pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
@@ -932,7 +961,7 @@ float CMeshField::GetSlope(const D3DXVECTOR3 pos, const D3DXVECTOR2 polygonIdx)
 	int nCntLine = 0;		// 内側にいた回数
 	int nVtx = (int)polygonIdx.x + ((int)polygonIdx.y * ((int)m_block.x + 1));		// 現在位置の頂点
 	int nMainVtx = -1;		// 主となる頂点
-	VERTEX_3D* pVtx;
+	VERTEX_3D_MALTI* pVtx;
 
 	// 頂点バッファをロックし、頂点情報へのポインタを取得
 	m_pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
@@ -1057,7 +1086,7 @@ HRESULT CMeshField::ReadData(const char* pFilename)
 
 	if (file.is_open() == true)
 	{// ファイルが開けた
-		VERTEX_3D* pVtx;
+		VERTEX_3D_MALTI* pVtx;
 		DWORD* pIdx;
 		D3DXVECTOR2 block, size;
 		int nNumVtx, nNumIdx;
@@ -1094,9 +1123,9 @@ HRESULT CMeshField::ReadData(const char* pFilename)
 			}
 
 			// 頂点バッファの生成
-			pDevice->CreateVertexBuffer(sizeof(VERTEX_3D) * nNumVtx,
+			pDevice->CreateVertexBuffer(sizeof(VERTEX_3D_MALTI) * nNumVtx,
 				D3DUSAGE_WRITEONLY,
-				FVF_VERTEX_3D,
+				FVF_VERTEX_3D_MALTI,
 				D3DPOOL_MANAGED,
 				&m_pVtxBuff,
 				NULL);
