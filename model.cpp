@@ -11,6 +11,8 @@
 #include "input.h"
 #include "texture.h"
 #include "debugproc.h"
+
+#include "line.h"
 #include "object.h"
 
 //************************************************************************
@@ -390,24 +392,25 @@ void CModel::SetColor(const D3DXCOLOR col)
 //========================================================================
 // 当たり判定
 //========================================================================
-bool CModel::Collision(const D3DXVECTOR3 posMe, D3DXVECTOR3* pPos, D3DXVECTOR3* pPosOld, D3DXVECTOR3* pMove,
+bool CModel::Collision(const D3DXVECTOR3 posMe, const D3DXVECTOR3 scaleMe, D3DXVECTOR3* pPos, D3DXVECTOR3* pPosOld, D3DXVECTOR3* pMove,
 	const float fRadius, const float fHeight)
 {
 	bool bLand = false;		// 着地しているか
 	int nCntLand = 0;	// 辺の内側に入った数(4回入っていれば、オブジェクトの内側にいる)
-	D3DXVECTOR3 pos = posMe + m_posOffC;		// 現在位置
+	D3DXVECTOR3 pos = posMe;		// 現在位置
 
 	for (int nCnt = 0; nCnt < 4; nCnt++)
 	{
 		D3DXVECTOR3 start, end;			// 始点/終点
 		float fXS, fZS, fXE, fZE;		// 始点のXZ座標/終点のXZ座標
+		float fMinY, fMaxY;				// Y座標の最低値と最大値
 
 		D3DXVECTOR3 vecLine, vecMove, vecToPos, vecToPosOld, vecNor, vecMoveRef, vecMoveDest;		// 各ベクトル
 		D3DXVECTOR3 vecLineW, posDest;
 
 		float fRate, fDot;		// 交点の割合/内積
-		float fXLength = m_VtxMax.x - m_VtxMin.x;		// X方向の長さ
-		float fZLength = m_VtxMax.z - m_VtxMin.z;		// Z方向の長さ
+		float fXLength = (m_VtxMax.x - m_VtxMin.x) * scaleMe.x;		// X方向の長さ
+		float fZLength = (m_VtxMax.z - m_VtxMin.z) * scaleMe.z;		// Z方向の長さ
 
 		float fOffXS = (nCnt == 0 || nCnt == 3) ? +(fXLength * 0.5f + fRadius) : -(fXLength * 0.5f + fRadius);		// 向き0のときの座標
 		float fOffZS = (nCnt == 0 || nCnt == 1) ? +(fZLength * 0.5f + fRadius) : -(fZLength * 0.5f + fRadius);		// 向き0のときの座標
@@ -428,6 +431,10 @@ bool CModel::Collision(const D3DXVECTOR3 posMe, D3DXVECTOR3* pPos, D3DXVECTOR3* 
 		fXE = fOffXE * fCos - fOffZE * fSin;
 		fZE = fOffXE * fSin + fOffZE * fCos;
 
+		// Y座標の最低値/最大値
+		fMinY = pos.y + (m_VtxMin.y * scaleMe.y) - fHeight;
+		fMaxY = pos.y + (m_VtxMax.y * scaleMe.y);
+
 		// 始点
 		start.x = pos.x + fXS;
 		start.y = 0.0f;
@@ -437,6 +444,11 @@ bool CModel::Collision(const D3DXVECTOR3 posMe, D3DXVECTOR3* pPos, D3DXVECTOR3* 
 		end.x = pos.x + fXE;
 		end.y = 0.0f;
 		end.z = pos.z + fZE;
+
+#ifdef _DEBUG
+		CLine::Create(D3DXVECTOR3(start.x, fMinY, start.z), D3DXVECTOR3(end.x, fMinY, end.z));
+		CLine::Create(D3DXVECTOR3(start.x, fMaxY, start.z), D3DXVECTOR3(end.x, fMaxY, end.z));
+#endif
 
 		// 境界線ベクトル
 		vecLine.x = (end.x) - (start.x);
@@ -486,8 +498,8 @@ bool CModel::Collision(const D3DXVECTOR3 posMe, D3DXVECTOR3* pPos, D3DXVECTOR3* 
 		{// 交点の割合が範囲内
 			if (fPosLine >= 0.0f && (fPosOldLine <= 0.0f))
 			{// 交差した
-				if ((pos.y + m_VtxMin.y - fHeight <= pPos->y) &&
-					(pos.y + m_VtxMax.y >= pPos->y))
+				if ((fMinY <= pPos->y) &&
+					(fMaxY >= pPos->y))
 				{// 高さが合っている
 					// 現在の移動ベクトル
 					D3DXVECTOR3 move = vecMove;
@@ -513,24 +525,25 @@ bool CModel::Collision(const D3DXVECTOR3 posMe, D3DXVECTOR3* pPos, D3DXVECTOR3* 
 
 			if (nCntLand == 4)
 			{// 全ての内側に入っていたら
-				if ((pos.y + m_VtxMin.y - fHeight <= pPos->y) &&
-					(pos.y + m_VtxMax.y >= pPos->y))
+				if ((fMinY <= pPos->y) &&
+					(fMaxY >= pPos->y))
 				{// 範囲内
-					bLand = true;		// 着地フラグ
 				}
 
 				// 位置調整
-				if ((pos.y + m_VtxMin.y - fHeight >= pPosOld->y) &&
-					(pos.y + m_VtxMin.y - fHeight <= pPos->y))
+				if ((fMinY >= pPosOld->y) &&
+					(fMinY <= pPos->y))
 				{// 下からの当たり判定
-					pPos->y = pos.y + m_VtxMin.y - fHeight;
+					pPos->y = fMinY;
 					pMove->y = -0.5f;							// 移動量を0にする
 				}
-				else if ((pos.y + m_VtxMax.y <= pPosOld->y) &&
-					(pos.y + m_VtxMax.y >= pPos->y))
+				else if ((fMaxY <= pPosOld->y) &&
+					(fMaxY >= pPos->y))
 				{// 上からの当たり判定
-					pPos->y = pos.y + m_VtxMax.y;
+					pPos->y = fMaxY;
 					pMove->y = 0.0f;							// 移動量を0にする
+
+					bLand = true;		// 着地フラグ
 				}
 			}
 		}

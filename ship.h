@@ -58,6 +58,9 @@ public:
 	void SetDisp(const bool bDisp) { m_bDisp = bDisp; }
 	void SwapDisp(void) { m_bDisp = m_bDisp ? false : true; }
 
+	bool Collision(D3DXVECTOR3* pos, D3DXVECTOR3* posOld, D3DXVECTOR3* move,
+		const float fRadius, const float fHeight, bool* pLand);
+
 private:
 	HRESULT SetModel(const char* pFilename);
 

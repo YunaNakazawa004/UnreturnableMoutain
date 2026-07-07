@@ -22,6 +22,7 @@
 #include "energyrock.h"
 #include "tree.h"
 #include "rock.h"
+#include "ship.h"
 
 #include "object3D.h"
 #include "meshfield.h"
@@ -211,7 +212,8 @@ void CPlayer::Update(void)
 	CInputKeyboard* pInputKeyboard = CManager::GetInputKeyboard();		// キーボード入力の取得
 	CInputJoypad* pInputJoypad = CManager::GetInputJoypad();			// ジョイパッド入力の取得
 	CDebugProc* pDebugProc = CManager::GetDebugProc();					// デバッグ表示の取得
-	CMeshField* pMeshField = CGame::GetMeshField();					// メッシュフィールドの取得
+	CMeshField* pMeshField = CGame::GetMeshField();						// メッシュフィールドの取得
+	CShip* pShip = CGame::GetShip();						// 船の取得
 	D3DXVECTOR3 pos = CPlayer::GetPosition();				// プレイヤーの位置	
 	D3DXVECTOR3 rot = CPlayer::GetRotation();				// プレイヤーの向き
 	D3DXVECTOR2 move = { 0.0f,0.0f };						// XZ方向に動いているかどうかの判断用
@@ -226,6 +228,7 @@ void CPlayer::Update(void)
 	bool bHead = false;			// オブジェクトへの頭ぶつかり判定
 
 	pDebugProc->Print("\n*** プレイヤー ***\n");
+	pDebugProc->Print("位置 : %f %f %f\n", pos.x, pos.y, pos.z);
 	pDebugProc->Print("エネルギー残量:%f\n", m_fEnergy);
 
 	// 操作
@@ -259,7 +262,7 @@ void CPlayer::Update(void)
 	case STATE_WAIT:		// 待機状態
 		pDebugProc->Print("状態 : 待機状態\n");
 
-		break;			
+		break;
 
 	case STATE_APPEAR:		// 出現状態
 		pDebugProc->Print("状態 : 出現状態\n");
@@ -430,6 +433,7 @@ void CPlayer::Update(void)
 	CEnergyRock* pEnergyRock = CEnergyRock::Collision(&pos, &m_posOld, &m_move, m_fRadius, m_fHeight);
 	CTree::Collision(&pos, &m_posOld, &m_move, m_fRadius, m_fHeight);
 	CRock::Collision(&pos, &m_posOld, &m_move, m_fRadius, m_fHeight, &bLand, &bHead);
+	pShip->Collision(&pos, &m_posOld, &m_move, m_fRadius, m_fHeight, &bLand);
 
 	if (pos.y <= fHeight || bLand == true)
 	{// 地面との当たり判定
@@ -504,7 +508,7 @@ void CPlayer::Update(void)
 	if (pEnergyRock != NULL &&
 		m_bJump == false && m_state == STATE_NORMAL)
 	{// エネルギー鉱物と当たっているとき/空中ではないとき
-		if (pInputKeyboard->GetTrigger(DIK_RETURN) == true || pInputJoypad->GetTrigger(0, CInputJoypad::JOYKEY_X) == true)
+		if (pInputKeyboard->GetTrigger(DIK_E) == true || pInputJoypad->GetTrigger(0, CInputJoypad::JOYKEY_B) == true)
 		{// 回収するキーを押した
 			// モーションを設定
 			m_pMotion->Set(MOTIONTYPE_ACTION, true, 20);
@@ -607,10 +611,10 @@ void CPlayer::Draw(void)
 
 	// 現在のビューマトリックスを取得（保存）
 	pDevice->GetTransform(D3DTS_VIEW, &mtxViewDef);
-	
+
 	// 現在のプロジェクションマトリックスを取得（保存）
 	pDevice->GetTransform(D3DTS_PROJECTION, &mtxProjectionDef);
-	
+
 #if 0
 	// レンダリングターゲットを変更
 	CManager::GetRenderer()->ChangeTarget(D3DXVECTOR3(m_pos.x, m_pos.y + 10.0f, m_pos.z - 15.0f), m_pos, D3DXVECTOR3(0.0f, 1.0f, 0.0f));
@@ -716,6 +720,23 @@ void CPlayer::SetColor(const D3DXCOLOR col)
 			m_apModel[nCntModel]->SetColor(col);
 		}
 	}
+}
+
+//========================================================================
+// プレイヤーの近くにいるかを判定
+//========================================================================
+bool CPlayer::IsNear(const D3DXVECTOR3 pos, const float fRadius)
+{
+	// ローカル変数
+	D3DXVECTOR3 dist;
+	dist = pos - m_pos;
+
+	if (D3DXVec3Length(&dist) <= fRadius)
+	{// 近い
+		return true;
+	}
+
+	return false;
 }
 
 //========================================================================

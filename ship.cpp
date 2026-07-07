@@ -16,6 +16,9 @@
 #include "camera.h"
 #include "model.h"
 
+#include "map_object.h"
+#include "player.h"
+
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -23,6 +26,7 @@
 //************************************************************************
 // マクロ定義
 //************************************************************************
+#define NEAR_BUTTON			(20.0f)				// ボタンの近く
 
 //========================================================================
 // 船クラスの生成処理
@@ -104,7 +108,7 @@ HRESULT CShip::Init(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot)
 	// 船の情報の初期化
 	m_pos = pos;
 	m_rot = rot;
-	m_scale = D3DXVECTOR3(1.0f, 1.0f, 1.0f);
+	m_scale = D3DXVECTOR3(3.0f, 3.0f, 3.0f);
 	m_col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 	m_state = STATE_APPEAR;
 
@@ -146,7 +150,11 @@ void CShip::Uninit(void)
 void CShip::Update(void)
 {
 	// ローカル変数
-	CDebugProc* pDebugProc = CManager::GetDebugProc();					// デバッグ表示の取得
+	CInputKeyboard* pInputKeyboard = CManager::GetInputKeyboard();		// キーボード入力の取得
+	CInputJoypad* pInputJoypad = CManager::GetInputJoypad();			// ジョイパッド入力の取得
+	CDebugProc* pDebugProc = CManager::GetDebugProc();		// デバッグ表示の取得
+	CMapObject* pMapObj = CGame::GetMapObject();			// マップオブジェクトの取得
+	CPlayer* pPlayer = CGame::GetPlayer();					// プレイヤーの取得
 
 	pDebugProc->Print("\n*** 船 ***\n");
 
@@ -179,10 +187,26 @@ void CShip::Update(void)
 	case STATE_NORMAL:		// 通常状態
 		pDebugProc->Print("状態 : 通常状態\n");
 
+		if (pMapObj->GetCollectObj() <= 0)
+		{// マップ上の収集アイテムがなくなったら
+			m_state = STATE_READY;
+		}
+
 		break;
 
 	case STATE_READY:		// 準備完了状態
 		pDebugProc->Print("状態 : 準備完了状態\n");
+
+		if (pPlayer->IsNear(m_pos, NEAR_BUTTON) == true)
+		{// 近くにいるとき
+			if (pInputKeyboard->GetTrigger(DIK_E) == true || pInputJoypad->GetTrigger(0, CInputJoypad::JOYKEY_B) == true)
+			{// ボタンを押した
+				// 遷移フラグをON
+				CGame::SetFadeEnable();
+
+				return;
+			}
+		}
 
 		break;
 	}
@@ -286,6 +310,39 @@ void CShip::SetColor(const D3DXCOLOR col)
 			m_apModel[nCntModel]->SetColor(col);
 		}
 	}
+}
+
+//========================================================================
+// 当たり判定
+//========================================================================
+bool CShip::Collision(D3DXVECTOR3* pos, D3DXVECTOR3* posOld, D3DXVECTOR3* move,
+	const float fRadius, const float fHeight, bool* pLand)
+{
+	D3DXVECTOR3 dist;
+
+	dist = *pos - m_pos;
+
+	if (D3DXVec3Length(&dist) <= m_fRadius)
+	{// 距離が近い
+		// 各パーツの当たり判定
+		for (int nCntPart = 0; nCntPart < m_nNumModel; nCntPart++)
+		{
+			if (nCntPart != 5)
+			{// 当たり判定するものだけ
+				D3DXVECTOR3 posPart =
+					D3DXVECTOR3(m_apModel[nCntPart]->GetMtxWorld()._41, m_apModel[nCntPart]->GetMtxWorld()._42, m_apModel[nCntPart]->GetMtxWorld()._43);
+
+				if (m_apModel[nCntPart]->Collision(posPart, m_scale, pos, posOld, move, fRadius, fHeight) == true)
+				{// 当たっている
+					*pLand = true;
+				}
+			}
+		}
+
+		return true;
+	}
+
+	return false;
 }
 
 //========================================================================

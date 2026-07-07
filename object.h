@@ -65,6 +65,7 @@ public:
 		TYPE_PARTICLE3D,		// パーティクル3D
 		TYPE_PAUSE,				// ポーズ
 		TYPE_BG,				// 背景
+		TYPE_LINE,				// 線
 		TYPE_OBJECTX,			// オブジェクトX
 		TYPE_OBJECTBILLBOARD,	// オブジェクトビルボード
 		TYPE_MESHFIELD,			// メッシュフィールド

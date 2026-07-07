@@ -27,6 +27,7 @@ CPlayer* CGame::m_pPlayer = NULL;					// プレイヤーのインスタンス
 CShip* CGame::m_pShip = NULL;						// 船のインスタンス
 CMeshField* CGame::m_pMeshField = NULL;				// メッシュフィールドのインスタンス
 CMapObject* CGame::m_pMapObject = NULL;				// マップオブジェクトのインスタンス
+bool CGame::m_bFade = false;						// 遷移フラグ
 
 //========================================================================
 // ゲーム画面クラスのコンストラクタ
@@ -39,6 +40,7 @@ CGame::CGame() : CScene(CScene::MODE_GAME)
 	m_pShip = NULL;
 	m_pMeshField = NULL;
 	m_pMapObject = NULL;
+	m_bFade = false;
 }
 
 //========================================================================
@@ -219,20 +221,12 @@ void CGame::Update(void)
 	{// NULLチェック
 		// マップオブジェクトの更新
 		m_pMapObject->Update();
-
-		if (m_pMapObject->GetCollectObj() <= 0)
-		{// 収集アイテムを全て集めた
-			// 画面遷移
-			CManager::SetMode(MODE_RESULT);
-
-			return;
-		}
 	}
 
 	CInputKeyboard* pInputKeyboard = CManager::GetInputKeyboard();		// キーボード入力の取得
 
 	// 画面遷移
-	if (pInputKeyboard->GetTrigger(DIK_RETURN) == true)
+	if (pInputKeyboard->GetTrigger(DIK_RETURN) == true || m_bFade == true)
 	{// ENTERが押された
 		CManager::SetMode(MODE_RESULT);
 

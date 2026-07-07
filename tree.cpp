@@ -308,11 +308,11 @@ bool CTree::Collision(D3DXVECTOR3* pPos, D3DXVECTOR3* posOld, D3DXVECTOR3* move,
 				// サイズを代入
 				D3DXVECTOR3 Radius = dynamic_cast<CTree*>(pObj)->m_apModel[0]->GetVtxMax();
 
-				if ((D3DXVec3Length(&dist) < Radius.x + fRadius) &&
+				if ((D3DXVec3Length(&dist) < (Radius.x + fRadius) * 2.0f) &&
 					pPos->y < posObj.y + Radius.y && pPos->y + fHeight > posObj.y)
 				{// 木と重なった
 					// 当たり判定
-					bColl = dynamic_cast<CTree*>(pObj)->m_apModel[0]->Collision(posObj, pPos, posOld, move, fRadius, fHeight);
+					bColl = dynamic_cast<CTree*>(pObj)->m_apModel[0]->Collision(posObj, dynamic_cast<CTree*>(pObj)->GetScale(), pPos, posOld, move, fRadius, fHeight);
 
 					if (dynamic_cast<CTree*>(pObj)->GetShake() == true && bColl == true)
 					{// 一度揺らす

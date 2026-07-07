@@ -28,6 +28,7 @@ MODEL_FILENAME = data/MODEL/SHIP/07_button.x		# [7]ボタン
 #------------------------------------------------------------------------------
 CHARACTERSET
 	NUM_PARTS = 8					# パーツ数
+	RADIUS = 100
 
 	PARTSSET						
 		INDEX = 0					# [0]床
@@ -86,65 +87,5 @@ CHARACTERSET
 	END_PARTSSET
 
 END_CHARACTERSET
-
-#========================================
-#  モーション[0] 
-#========================================
-MOTIONSET
-	LOOP = 1		# ループするかどうか[0:ループしない / 1:ループする]
-	NUM_KEY = 4		# キー数
-
-	KEYSET			# --- << KEY : 0 / 4 >> ---
-		FRAME = 120
-		KEY	# ----- [ 0 ] -----
-			POS = 0.00 0.00 0.00
-			ROT = 0.00 0.00 0.00
-		END_KEY
-
-		KEY	# ----- [ 1 ] -----
-			POS = 0.00 0.00 0.00
-			ROT = 0.00 0.00 -0.03
-		END_KEY
-	END_KEYSET
-
-	KEYSET			# --- << KEY : 1 / 4 >> ---
-		FRAME = 120
-		KEY	# ----- [ 0 ] -----
-			POS = 0.00 0.00 0.00
-			ROT = 0.00 0.00 0.00
-		END_KEY
-
-		KEY	# ----- [ 1 ] -----
-			POS = 0.00 0.00 0.00
-			ROT = 0.03 0.00 -0.03
-		END_KEY
-	END_KEYSET
-
-	KEYSET			# --- << KEY : 2 / 4 >> ---
-		FRAME = 120
-		KEY	# ----- [ 0 ] -----
-			POS = 0.00 0.00 0.00
-			ROT = 0.00 0.00 0.00
-		END_KEY
-
-		KEY	# ----- [ 1 ] -----
-			POS = 0.00 0.00 0.00
-			ROT = -0.03 0.00 0.03
-		END_KEY
-	END_KEYSET
-
-	KEYSET			# --- << KEY : 3 / 4 >> ---
-		FRAME = 120
-		KEY	# ----- [ 0 ] -----
-			POS = 0.00 0.00 0.00
-			ROT = 0.00 0.00 0.00
-		END_KEY
-
-		KEY	# ----- [ 1 ] -----
-			POS = 0.00 0.00 0.00
-			ROT = 0.03 0.00 0.03
-		END_KEY
-	END_KEYSET
-END_MOTIONSET
 
 END_SCRIPT		# この行は絶対消さないこと！

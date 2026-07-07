@@ -155,6 +155,7 @@
     <ClCompile Include="grass.cpp" />
     <ClCompile Include="input.cpp" />
     <ClCompile Include="light.cpp" />
+    <ClCompile Include="line.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="manager.cpp" />
     <ClCompile Include="map_object.cpp" />
@@ -192,6 +193,7 @@
     <ClInclude Include="grass.h" />
     <ClInclude Include="input.h" />
     <ClInclude Include="light.h" />
+    <ClInclude Include="line.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="manager.h" />
     <ClInclude Include="map_object.h" />

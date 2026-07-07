@@ -39,12 +39,16 @@ public:
 	static CMeshField* GetMeshField(void) { return m_pMeshField; }
 	static CMapObject* GetMapObject(void) { return m_pMapObject; }
 
+	static void SetFadeEnable(void) { m_bFade = true; }
+
 private:
 	static CPause* m_pPause;						// ポーズのインスタンス
 	static CPlayer* m_pPlayer;						// プレイヤーのインスタンス
 	static CShip* m_pShip;							// 船のインスタンス
 	static CMeshField* m_pMeshField;				// メッシュフィールドのインスタンス
 	static CMapObject* m_pMapObject;				// マップオブジェクトのインスタンス
+
+	static bool m_bFade;		// 遷移フラグ
 };
 
 #endif
