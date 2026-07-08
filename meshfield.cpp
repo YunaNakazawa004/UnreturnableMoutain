@@ -177,7 +177,7 @@ HRESULT CMeshField::Init(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot,
 
 			// テクスチャ座標の設定
 			pVtx[nVtx].tex = D3DXVECTOR2((float)nCntMeshField2, (float)nCntMeshField1);
-			pVtx[nVtx].texM = D3DXVECTOR2((float)nCntMeshField2, (float)nCntMeshField1);
+			pVtx[nVtx].texM = D3DXVECTOR2((float)nCntMeshField2 / 2.0f, (float)nCntMeshField1 / 2.0f);
 		}
 	}
 

@@ -136,9 +136,6 @@ HRESULT CGame::Init(void)
 		}
 	}
 
-	// ƒGƒlƒ‹ƒM[z•¨‚ğ¶¬
-	CEnergyRock::Create(D3DXVECTOR3(-50.0f, 0.0f, 50.0f), DEFAULT_VECTER3);
-
 	return S_OK;
 }
 

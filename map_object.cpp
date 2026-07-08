@@ -17,6 +17,7 @@
 #include "tree.h"
 #include "rock.h"
 #include "flower.h"
+#include "energyrock.h"
 
 #include "player.h"
 
@@ -67,6 +68,13 @@ void CMapObject::Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot, const int 
 
 		case MAP_OBJ_FLOWER:		// â‘Çê∂ê¨
 			m_aMapObject[m_nNumObject].m_apObject = CFlower::Create(pos, rot);
+			m_aMapObject[m_nNumObject].m_aObjType = mapObj;
+			m_aMapObject[m_nNumObject].m_bCollect = bCollect;
+
+			break;
+
+		case MAP_OBJ_ENERGYROCK:	// ÉGÉlÉãÉMÅ[çzêŒÇê∂ê¨
+			m_aMapObject[m_nNumObject].m_apObject = CEnergyRock::Create(pos, rot);
 			m_aMapObject[m_nNumObject].m_aObjType = mapObj;
 			m_aMapObject[m_nNumObject].m_bCollect = bCollect;
 

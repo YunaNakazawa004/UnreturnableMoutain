@@ -32,6 +32,7 @@ public:
 		MAP_OBJ_TREE,			// ñÿ
 		MAP_OBJ_ROCK,			// ä‚
 		MAP_OBJ_FLOWER,			// â‘
+		MAP_OBJ_ENERGYROCK,		// ÉGÉlÉãÉMÅ[çzêŒ
 		MAP_OBJ_MAX
 	};
 
