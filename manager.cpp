@@ -25,6 +25,8 @@
 #include "game.h"
 #include "result.h"
 
+#include "fade.h"
+
 #include "effect2D.h"
 #include "effect3D.h"
 #include "meshfield.h"
@@ -43,6 +45,7 @@ CCamera* CManager::m_pCamera = NULL;					// カメラのインスタンス
 CLight* CManager::m_pLight = NULL;						// ライトのインスタンス
 CTexture* CManager::m_pTexture = NULL;					// テクスチャのインスタンス
 CScene* CManager::m_pScene = NULL;						// シーンのインスタンス
+CFade* CManager::m_pFade = NULL;						// フェードのインスタンス
 int CManager::m_nCountFPS = 0;							// FPSカウンター
 bool CManager::m_bPause = false;						// ポーズするかしないか
 
@@ -62,6 +65,7 @@ CManager::CManager()
 	m_pLight = NULL;
 	m_pTexture = NULL;
 	m_pScene = NULL;
+	m_pFade = NULL;
 	m_nCountFPS = 0;
 	m_bPause = false;
 }
@@ -195,18 +199,35 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	CMeshField::Load();
 	CGrass::Load();
 
-	// シーンの生成
-	if (m_pScene == NULL)
+//	// シーンの生成
+//	if (m_pScene == NULL)
+//	{// NULLチェック
+//#ifdef _DEBUG
+//		m_pScene = CScene::Create(CScene::MODE_GAME);
+//#else
+//		m_pScene = CScene::Create(CScene::MODE_TITLE);
+//#endif
+//
+//		if (m_pScene == NULL)
+//		{// NULLチェック
+//			OutputDebugStringA("! ! ! シーンの生成に失敗しました ! ! !\n");
+//
+//			return E_FAIL;
+//		}
+//	}
+	
+	// フェードの生成
+	if (m_pFade == NULL)
 	{// NULLチェック
 #ifdef _DEBUG
-		m_pScene = CScene::Create(CScene::MODE_GAME);
+		m_pFade = CFade::Create(CScene::MODE_GAME);
 #else
-		m_pScene = CScene::Create(CScene::MODE_TITLE);
+		m_pFade = CFade::Create(CScene::MODE_TITLE);
 #endif
 
-		if (m_pScene == NULL)
+		if (m_pFade == NULL)
 		{// NULLチェック
-			OutputDebugStringA("! ! ! シーンの生成に失敗しました ! ! !\n");
+			OutputDebugStringA("! ! ! フェードの生成に失敗しました ! ! !\n");
 
 			return E_FAIL;
 		}
@@ -232,6 +253,16 @@ void CManager::Uninit(void)
 	CNumber::Unload();
 	CEffect3D::Unload();
 	CEffect2D::Unload();
+
+	// フェードの破棄
+	if (m_pFade != NULL)
+	{// NULLチェック
+		// 終了処理
+		m_pFade->Uninit();
+
+		delete m_pFade;
+		m_pFade = NULL;
+	}
 
 	// シーンの破棄
 	if (m_pScene != NULL)
@@ -355,6 +386,12 @@ void CManager::Update(void)
 
 		// オブジェクトの総数を表示
 		m_pDebugProc->Print("オブジェクトの総数 : %d\n", CObject::GetNumAll());
+	}
+
+	if (m_pFade != NULL)
+	{// NULLチェック
+		// フェードの更新
+		m_pFade->Update();
 	}
 
 #ifndef ENABLE_INHERITANCE_COBJECT

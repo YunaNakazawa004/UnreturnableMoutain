@@ -11,6 +11,7 @@
 #include "input.h"
 #include "debugproc.h"
 #include "camera.h"
+#include "fade.h"
 
 #include "object2D.h"
 
@@ -83,11 +84,15 @@ void CTitle::Uninit(void)
 void CTitle::Update(void)
 {
 	CInputKeyboard* pInputKeyboard = CManager::GetInputKeyboard();		// キーボード入力の取得
+	CFade* pFade = CManager::GetFade();									// フェードの取得
 
 	// 画面遷移
 	if (pInputKeyboard->GetTrigger(DIK_RETURN) == true)
 	{// ENTERが押された
-		CManager::SetMode(MODE_GAME);
+		if (pFade != NULL)
+		{// NULLチェック
+			pFade->SetFade(MODE_GAME);
+		}
 	}
 }
 

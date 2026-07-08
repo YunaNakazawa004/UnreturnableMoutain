@@ -12,6 +12,7 @@
 #include "debugproc.h"
 #include "camera.h"
 #include "pause.h"
+#include "fade.h"
 
 #include "meshfield.h"
 #include "map_object.h"
@@ -190,6 +191,8 @@ void CGame::Uninit(void)
 //========================================================================
 void CGame::Update(void)
 {
+	CFade* pFade = CManager::GetFade();			// フェードの取得
+
 	if (m_pPause != NULL)
 	{// NULLチェック
 		// ポーズ画面表示/非表示
@@ -225,7 +228,10 @@ void CGame::Update(void)
 	// 画面遷移
 	if (pInputKeyboard->GetTrigger(DIK_RETURN) == true || m_bFade == true)
 	{// ENTERが押された
-		CManager::SetMode(MODE_RESULT);
+		if (pFade != NULL)
+		{// NULLチェック
+			pFade->SetFade(MODE_RESULT);
+		}
 
 		return;
 	}

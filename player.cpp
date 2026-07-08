@@ -564,7 +564,7 @@ void CPlayer::Update(void)
 
 #ifndef _DEBUG		// リリースビルドならリザルト画面へ
 		// 画面遷移
-		CManager::SetMode(CScene::MODE_RESULT);
+		CGame::SetFadeEnable();
 
 		return;
 #endif

@@ -9,6 +9,7 @@
 #include "manager.h"
 #include "debugproc.h"
 #include "object.h"
+#include "fade.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -236,6 +237,15 @@ void CRenderer::Draw(void)
 	{// 描画開始が成功した場合
 		// 全てのオブジェクトの描画
 		CObject::DrawAll();
+
+		// フェード
+		CFade* pFade = CManager::GetFade();
+
+		if (pFade != NULL)
+		{// NULLチェック
+			// フェードの描画
+			pFade->Draw();
+		}
 
 		// デバッグ表示
 		CDebugProc* pDebugProc = CManager::GetDebugProc();
