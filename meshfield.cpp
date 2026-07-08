@@ -760,7 +760,7 @@ void CMeshField::SetNor(void)
 			}
 
 			pVtx[nVtx].nor = nor;
-			pVtx[nVtx].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, (1.0f - nor.y) - 0.4f);
+			pVtx[nVtx].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, (1.0f - nor.y) - 0.2f);
 		}
 	}
 
