@@ -83,7 +83,7 @@ HRESULT CFade::Init(CScene::MODE modenext)
 	// 初期化
 	m_fade = FADE_IN;				// フェードイン状態に
 	m_modeNext = modenext;			// 次の画面(モード)を設定
-	m_col = BLK_INVISIBLE_VTX;
+	m_col = BLK_VISIBLE_VTX;
 
 	// 頂点バッファの生成
 	pDevice->CreateVertexBuffer(sizeof(VERTEX_2D) * 4,
