@@ -191,7 +191,8 @@ void CGame::Uninit(void)
 //========================================================================
 void CGame::Update(void)
 {
-	CFade* pFade = CManager::GetFade();			// フェードの取得
+	CInputKeyboard* pInputKeyboard = CManager::GetInputKeyboard();		// キーボード入力の取得
+	CFade* pFade = CManager::GetFade();									// フェードの取得
 
 	if (m_pPause != NULL)
 	{// NULLチェック
@@ -222,8 +223,6 @@ void CGame::Update(void)
 		// マップオブジェクトの更新
 		m_pMapObject->Update();
 	}
-
-	CInputKeyboard* pInputKeyboard = CManager::GetInputKeyboard();		// キーボード入力の取得
 
 	// 画面遷移
 	if (pInputKeyboard->GetTrigger(DIK_RETURN) == true || m_bFade == true)

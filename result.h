@@ -14,6 +14,7 @@
 // 前方宣言
 //************************************************************************
 class CObject2D;
+class CResultUI;
 
 //************************************************************************
 // リザルト画面クラス
@@ -30,9 +31,15 @@ public:
 	void Draw(void);
 
 	static CObject2D* GetObject2D(void) { return m_pObject2D; }
+	static CResultUI* GetResultUI(void) { return m_pResultUI; }
+	
+	static void SetClear(const bool bClear) { m_bClear = bClear; }
 
 private:
 	static CObject2D* m_pObject2D;						// 背景のインスタンス
+	static CResultUI* m_pResultUI;						// リザルトUIのインスタンス
+
+	static bool m_bClear;			// クリアフラグ
 };
 
 #endif

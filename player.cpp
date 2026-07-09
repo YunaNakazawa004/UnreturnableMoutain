@@ -13,6 +13,7 @@
 #include "texture.h"
 
 #include "game.h"
+#include "result.h"
 #include "camera.h"
 #include "model.h"
 #include "motion.h"
@@ -565,6 +566,9 @@ void CPlayer::Update(void)
 #ifndef _DEBUG		// リリースビルドならリザルト画面へ
 		// 画面遷移
 		CGame::SetFadeEnable();
+
+		// クリアフラグを消す
+		CResult::SetClear(false);
 
 		return;
 #endif

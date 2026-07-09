@@ -13,6 +13,7 @@
 #include "texture.h"
 
 #include "game.h"
+#include "result.h"
 #include "camera.h"
 #include "model.h"
 
@@ -203,6 +204,9 @@ void CShip::Update(void)
 			{// ボタンを押した
 				// 遷移フラグをON
 				CGame::SetFadeEnable();
+
+				// クリアフラグを立てる
+				CResult::SetClear(true);
 
 				return;
 			}
