@@ -41,14 +41,14 @@ CHARACTERSET
 	PARTSSET
 		INDEX = 0					# 下半身
 		PARENT = -1					# (親)NULL
-		POS = 0.0 4.0 0.0
+		POS = 0.0 2.0 0.0
 		ROT = 0.0 0.0 0.0
 	END_PARTSSET
 
 	PARTSSET
 		INDEX = 1					# 上半身
 		PARENT = 0					# (親)下半身
-		POS = 0.0 12.0 0.0
+		POS = 0.0 6.0 0.0
 		ROT = 0.0 0.0 0.0
 	END_PARTSSET
 	
@@ -62,84 +62,84 @@ CHARACTERSET
 		PARTSSET
 		INDEX = 3					# 目
 		PARENT = 1					# (親)上半身
-		POS = 0.0 9.5 -4.0
+		POS = 0.0 4.75 -2.0
 		ROT = 0.0 0.0 0.0
 	END_PARTSSET
 	
 		PARTSSET
 		INDEX = 4					# フタ
 		PARENT = 1					# (親)上半身
-		POS = -7.75 17.0 2.25
+		POS = -3.8 8.7 1.1
 		ROT = 0.05 0.0 0.0
 	END_PARTSSET
 	
 		PARTSSET
 		INDEX = 5					# 右腕上部
 		PARENT = 1					# (親)上半身
-		POS = -9.75 10.0 0.0
+		POS = -4.7 5.0 0.0
 		ROT = 0.0 0.0 0.0
 	END_PARTSSET
 	
 		PARTSSET
 		INDEX = 6					# 右腕下部
 		PARENT = 5					# (親)右腕上部
-		POS = -12.0 0.0 0.0
+		POS = -6.0 0.0 0.0
 		ROT = 0.0 0.0 0.0
 	END_PARTSSET
 	
 		PARTSSET
 		INDEX = 7					# 右手
 		PARENT = 6					# (親)右腕下部
-		POS = -10.0 0.2 0.2
+		POS = -5.0 0.1 0.1
 		ROT = 0.0 0.0 0.0
 	END_PARTSSET
 	
 		PARTSSET
 		INDEX = 8					# 右手
 		PARENT = 6					# (親)右腕下部
-		POS = -10.0 0.2 -0.2
+		POS = -5.0 0.1 -0.1
 		ROT = 0.0 0.0 0.0
 	END_PARTSSET
 	
 		PARTSSET
 		INDEX = 9					# 右手
 		PARENT = 6					# (親)右腕下部
-		POS = -10.0 -0.2 0.0
+		POS = -5.0 -0.1 0.0
 		ROT = 0.0 0.0 0.0
 	END_PARTSSET
 	
 		PARTSSET
 		INDEX = 10					# 左腕上部
 		PARENT = 1					# (親)上半身
-		POS = 9.75 10.0 0.0
+		POS = 4.7 5.0 0.0
 		ROT = 0.0 0.0 0.0
 	END_PARTSSET
 	
 		PARTSSET
 		INDEX = 11					# 左腕下部
 		PARENT = 10					# (親)左腕上部
-		POS = 12.0 0.0 0.0
+		POS = 6.0 0.0 0.0
 		ROT = 0.0 0.0 0.0
 	END_PARTSSET
 	
 		PARTSSET
 		INDEX = 12					# 左手
 		PARENT = 11					# (親)左腕下部
-		POS = 10.0 0.2 0.2
+		POS = 5.0 0.1 0.1
 		ROT = 0.0 0.0 0.0
 	END_PARTSSET
 	
 		PARTSSET
 		INDEX = 13					# 左手
 		PARENT = 11					# (親)左腕下部
-		POS = 10.0 0.2 -0.2
+		POS = 5.0 0.1 -0.1
 		ROT = 0.0 0.0 0.0
 	END_PARTSSET
 	
 		PARTSSET
 		INDEX = 14					# 左手
 		PARENT = 11					# (親)左腕下部
-		POS = 10.0 -0.2 0.0
+		POS = 5.0 -0.1 0.0
 		ROT = 0.0 0.0 0.0
 	END_PARTSSET
 END_CHARACTERSET

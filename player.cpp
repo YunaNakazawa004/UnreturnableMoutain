@@ -144,7 +144,7 @@ HRESULT CPlayer::Init(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot)
 	m_pos = pos;
 	m_posOld = pos;
 	m_rot = rot;
-	m_scale = D3DXVECTOR3(0.5f, 0.5f, 0.5f);
+	m_scale = D3DXVECTOR3(1.0f, 1.0f, 1.0f);
 	m_col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 	m_fEnergy = FIRST_ENERGY;
 	m_state = STATE_APPEAR;
@@ -237,13 +237,13 @@ void CPlayer::Update(void)
 	pDebugProc->Print("\n[キーボード]\n");
 	pDebugProc->Print("WASD:移動\n");
 	pDebugProc->Print("Space:ジャンプ(長押しで高さ変化)\n");
-	pDebugProc->Print("Enter:エネルギー回収(鉱石の近くで)\n");
-	pDebugProc->Print("IJKL/マウス右クリック:カメラ操作\n");
+	pDebugProc->Print("E:エネルギー回収(鉱石の近くで)\n");
+	pDebugProc->Print("IJKL/マウス左クリック:カメラ操作\n");
 	pDebugProc->Print("BackSpace:リセット\n");
 	pDebugProc->Print("\n[コントローラー]\n");
 	pDebugProc->Print("左スティック/十字キー:移動\n");
 	pDebugProc->Print("A:ジャンプ(長押しで高さ変化)\n");
-	pDebugProc->Print("X:エネルギー回収(鉱石の近くで)\n");
+	pDebugProc->Print("B:エネルギー回収(鉱石の近くで)\n");
 	pDebugProc->Print("右スティック:カメラ操作\n");
 	pDebugProc->Print("START:リセット\n");
 #endif
@@ -751,8 +751,6 @@ bool CPlayer::Movement(const D3DXVECTOR3 rot)
 
 	D3DXVECTOR3 UnderRotOff = m_apModel[0]->GetRotOffC();	// 下半身の傾き(オフセット保存)
 	D3DXVECTOR3 UnderRot = m_apModel[0]->GetRotOff();		// 下半身の傾き(オフセットをいじる)
-	D3DXVECTOR3 UpperPosOff = m_apModel[1]->GetPosOffC();	// 上半身の位置(オフセット保存)
-	D3DXVECTOR3 UpperPos = m_apModel[1]->GetPosOff();		// 上半身の位置(オフセットをいじる)
 	D3DXVECTOR3 UpperRotOff = m_apModel[1]->GetRotOffC();	// 上半身の傾き(オフセット保存)
 	D3DXVECTOR3 UpperRot = m_apModel[1]->GetRotOff();		// 上半身の傾き(オフセットをいじる)
 	D3DXVECTOR3 TireRotOff = m_apModel[2]->GetRotOffC();	// タイヤの傾き(オフセット保存)
