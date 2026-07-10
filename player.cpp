@@ -215,7 +215,7 @@ void CPlayer::Update(void)
 	CInputKeyboard* pInputKeyboard = CManager::GetInputKeyboard();		// キーボード入力の取得
 	CInputJoypad* pInputJoypad = CManager::GetInputJoypad();			// ジョイパッド入力の取得
 	CDebugProc* pDebugProc = CManager::GetDebugProc();					// デバッグ表示の取得
-	CMeshField* pMeshField = CGame::GetMeshField();						// メッシュフィールドの取得
+	CMeshField* pMeshField = CGame::GetMountain();						// メッシュフィールドの取得
 	CEnergyUI* pEnergyUI = CGame::GetEnergyUI();			// エネルギーUIの取得
 	CShip* pShip = CGame::GetShip();						// 船の取得
 	D3DXVECTOR3 pos = CPlayer::GetPosition();				// プレイヤーの位置	

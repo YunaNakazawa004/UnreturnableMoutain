@@ -141,7 +141,7 @@ void CTree::Uninit(void)
 //========================================================================
 void CTree::Update(void)
 {
-	CMeshField* pMeshField = CGame::GetMeshField();					// メッシュフィールドの取得
+	CMeshField* pMeshField = CGame::GetMountain();					// メッシュフィールドの取得
 	D3DXVECTOR3 pos = GetPosition();
 	D3DXVECTOR3 posM = m_apModel[0]->GetPosition();
 

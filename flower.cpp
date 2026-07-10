@@ -115,7 +115,7 @@ void CFlower::Uninit(void)
 //========================================================================
 void CFlower::Update(void)
 {
-	CMeshField* pMeshField = CGame::GetMeshField();					// メッシュフィールドの取得
+	CMeshField* pMeshField = CGame::GetMountain();					// メッシュフィールドの取得
 	D3DXVECTOR3 pos = GetPosition();
 
 	float fHeight = 0.0f;		// 地面の高さ

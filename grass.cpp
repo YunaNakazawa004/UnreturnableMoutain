@@ -152,7 +152,7 @@ void CGrass::Uninit(void)
 void CGrass::Update(void)
 {
 	// ローカル変数
-	CMeshField* pMeshField = CGame::GetMeshField();					// メッシュフィールドの取得
+	CMeshField* pMeshField = CGame::GetMountain();					// メッシュフィールドの取得
 	D3DXVECTOR3 pos = CObject3D::GetPosition();
 	D3DXVECTOR3 rot = CObject3D::GetRotation();
 

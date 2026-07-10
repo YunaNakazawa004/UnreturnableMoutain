@@ -27,7 +27,7 @@
 CPause* CGame::m_pPause = NULL;						// ポーズのインスタンス
 CPlayer* CGame::m_pPlayer = NULL;					// プレイヤーのインスタンス
 CShip* CGame::m_pShip = NULL;						// 船のインスタンス
-CMeshField* CGame::m_pMeshField = NULL;				// メッシュフィールドのインスタンス
+CMeshField* CGame::m_pMountain = NULL;				// メッシュフィールドのインスタンス
 CMapObject* CGame::m_pMapObject = NULL;				// マップオブジェクトのインスタンス
 CEnergyUI* CGame::m_pEnergyUI = NULL;				// エネルギーUIのインスタンス
 bool CGame::m_bFade = false;						// 遷移フラグ
@@ -41,7 +41,7 @@ CGame::CGame() : CScene(CScene::MODE_GAME)
 	m_pPause = NULL;
 	m_pPlayer = NULL;
 	m_pShip = NULL;
-	m_pMeshField = NULL;
+	m_pMountain = NULL;
 	m_pMapObject = NULL;
 	m_pEnergyUI = NULL;
 	m_bFade = false;
@@ -98,12 +98,12 @@ HRESULT CGame::Init(void)
 	}
 
 	// メッシュフィールドを生成
-	if (m_pMeshField == NULL)
+	if (m_pMountain == NULL)
 	{// NULLチェック
-		m_pMeshField = CMeshField::Create(DEFAULT_VECTER3, DEFAULT_VECTER3, D3DXVECTOR2(32.0f, 32.0f),
+		m_pMountain = CMeshField::Create(DEFAULT_VECTER3, DEFAULT_VECTER3, D3DXVECTOR2(32.0f, 32.0f),
 			D3DXVECTOR2(10.0f, 10.0f), CObject::TYPE_MESHFIELD, OBJECT_PRIORITY);
 
-		if (m_pMeshField == NULL)
+		if (m_pMountain == NULL)
 		{// NULLチェック
 			OutputDebugStringA("! ! ! メッシュフィールドの生成に失敗しました ! ! !\n");
 
@@ -111,7 +111,7 @@ HRESULT CGame::Init(void)
 		}
 
 		// ステージのデータを読み込む
-		if (FAILED(m_pMeshField->ReadData("data\\stage.bin")))
+		if (FAILED(m_pMountain->ReadData("data\\stage.bin")))
 		{// もし失敗したら
 			return E_FAIL;
 		}
@@ -186,9 +186,9 @@ void CGame::Uninit(void)
 	}
 
 	// メッシュフィールドの破棄
-	if (m_pMeshField != NULL)
+	if (m_pMountain != NULL)
 	{// NULLチェック
-		m_pMeshField = NULL;
+		m_pMountain = NULL;
 	}
 
 	// マップオブジェクトの破棄

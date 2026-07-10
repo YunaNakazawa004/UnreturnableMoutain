@@ -37,7 +37,7 @@ public:
 	static CPause* GetPause(void) { return m_pPause; }
 	static CPlayer* GetPlayer(void) { return m_pPlayer; }
 	static CShip* GetShip(void) { return m_pShip; }
-	static CMeshField* GetMeshField(void) { return m_pMeshField; }
+	static CMeshField* GetMountain(void) { return m_pMountain; }
 	static CMapObject* GetMapObject(void) { return m_pMapObject; }
 	static CEnergyUI* GetEnergyUI(void) { return m_pEnergyUI; }
 
@@ -47,7 +47,7 @@ private:
 	static CPause* m_pPause;						// ポーズのインスタンス
 	static CPlayer* m_pPlayer;						// プレイヤーのインスタンス
 	static CShip* m_pShip;							// 船のインスタンス
-	static CMeshField* m_pMeshField;				// メッシュフィールドのインスタンス
+	static CMeshField* m_pMountain;					// 山のインスタンス
 	static CMapObject* m_pMapObject;				// マップオブジェクトのインスタンス
 	static CEnergyUI* m_pEnergyUI;					// エネルギーUIのインスタンス
 
