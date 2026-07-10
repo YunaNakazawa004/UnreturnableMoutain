@@ -545,6 +545,10 @@ bool CObjectX::Collision(D3DXVECTOR3* pPos, D3DXVECTOR3* pPosOld, D3DXVECTOR3* p
 					{// •Ç‚ÉŒü‚©‚Á‚Ä‚¢‚é‚Æ‚«‚¾‚¯–@ü¬•ª‚ðÁ‚·
 						vecMoveDest = move - (vecNor * fDotN);
 					}
+					else
+					{// ‰Šú’l
+						vecMoveDest = DEFAULT_VECTER3;
+					}
 
 					// ˆÊ’u‚ð‚¸‚ç‚·
 					pPos->x = start.x + (vecLine.x * fRate) + vecMoveDest.x;

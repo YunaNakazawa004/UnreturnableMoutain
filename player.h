@@ -102,6 +102,7 @@ private:
 
 	float m_fEnergy;				// エネルギー
 	int m_nEnergyCounter;			// エネルギー減少カウンター
+	float m_fUsedEnergy;			// ゴールまでに使ったエネルギー量
 
 	STATE m_state;					// 状態
 	int m_nCounterState;			// 状態カウンター

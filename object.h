@@ -50,7 +50,7 @@
 #define LIST				// リスト構造にするかどうか
 //#undef LIST
 
-#define MALTITARGET_RENDERING			// マルチターゲットレンダリング
+#define MALTITARGET_RENDERING			// マルチターゲットレンダリングで描画する
 //#undef MALTITARGET_RENDERING
 
 //************************************************************************

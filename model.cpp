@@ -511,6 +511,10 @@ bool CModel::Collision(const D3DXVECTOR3 posMe, const D3DXVECTOR3 scaleMe, D3DXV
 					{// •Ç‚ÉŒü‚©‚Á‚Ä‚¢‚é‚Æ‚«‚¾‚¯–@ü¬•ª‚ðÁ‚·
 						vecMoveDest = move - (vecNor * fDotN);
 					}
+					else
+					{// ‰Šú’l
+						vecMoveDest = DEFAULT_VECTER3;
+					}
 
 					// ˆÊ’u‚ð‚¸‚ç‚·
 					pPos->x = start.x + (vecLine.x * fRate) + vecMoveDest.x;

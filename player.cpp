@@ -121,6 +121,7 @@ CPlayer::CPlayer(const int nPriority) :CObject(nPriority)
 	m_fJumpHigh = 0.0f;
 	m_fEnergy = 0.0f;
 	m_nEnergyCounter = 0;
+	m_fUsedEnergy = 0.0f;
 	m_state = STATE_NONE;
 	m_nCounterState = 0;
 	m_bJump = false;
@@ -354,6 +355,7 @@ void CPlayer::Update(void)
 
 			// エネルギーを消費する
 			m_fEnergy -= fMinusEnergy;
+			m_fUsedEnergy += fMinusEnergy;
 			fMinusEnergy = 0.0f;		// リセット
 		}
 	}
@@ -489,6 +491,7 @@ void CPlayer::Update(void)
 			m_bJump = false;
 
 			m_fEnergy -= ONE_ENERGY;
+			m_fUsedEnergy += ONE_ENERGY;
 		}
 	}
 
@@ -543,10 +546,12 @@ void CPlayer::Update(void)
 		if (m_bJump == false)
 		{// 地上
 			m_fEnergy -= 2.0f - pMeshField->GetSlope(pos, polygonIdx);		// 減らす
+			m_fUsedEnergy += 2.0f - pMeshField->GetSlope(pos, polygonIdx);
 		}
 		else
 		{// 空中
 			m_fEnergy -= 1.0f;
+			m_fUsedEnergy += 1.0f;
 		}
 
 		m_nEnergyCounter = 0;	// リセット
@@ -575,6 +580,8 @@ void CPlayer::Update(void)
 		return;
 #endif
 	}
+
+	pDebugProc->Print("使用したエネルギー量 : %f\n", m_fUsedEnergy);
 
 	// エネルギー量をUIに設定
 	pEnergyUI->SetEnergy(m_fEnergy);
