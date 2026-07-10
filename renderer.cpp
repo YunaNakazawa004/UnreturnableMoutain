@@ -10,6 +10,7 @@
 #include "debugproc.h"
 #include "object.h"
 #include "fade.h"
+#include "screen.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -237,6 +238,17 @@ void CRenderer::Draw(void)
 	{// 描画開始が成功した場合
 		// 全てのオブジェクトの描画
 		CObject::DrawAll();
+
+#ifdef MALTITARGET_RENDERING
+		// 画面
+		CScreen* pScreen = CManager::GetScreen();
+
+		if (pScreen != NULL)
+		{// NULLチェック
+			// 画面の描画
+			pScreen->Draw();
+		}
+#endif
 
 		// フェード
 		CFade* pFade = CManager::GetFade();

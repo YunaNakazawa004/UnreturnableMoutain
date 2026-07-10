@@ -8,6 +8,7 @@
 
 #include "manager.h"
 #include "debugproc.h"
+#include "input.h"
 
 #include "object.h"
 #include "particle3D.h"
@@ -149,6 +150,7 @@ void CMapObject::Uninit(void)
 void CMapObject::Update(void)
 {
 	CDebugProc* pDebugProc = CManager::GetDebugProc();					// デバッグ表示の取得
+	CInputKeyboard* pInputKeyboard = CManager::GetInputKeyboard();		// キーボード入力の取得
 
 	for (int nCnt = 0; nCnt < MAX_MAP_OBJECT; nCnt++)
 	{
@@ -163,6 +165,13 @@ void CMapObject::Update(void)
 			}
 		}
 	}
+
+#ifdef _DEBUG
+	if (pInputKeyboard->GetTrigger(DIK_DELETE) == true)
+	{// 収集スキップ
+		SkipCollectObj();
+	}
+#endif
 
 	pDebugProc->Print("収集アイテムの総数 : %d\n", m_nNumCollectObj);
 }

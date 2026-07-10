@@ -177,6 +177,7 @@
     <ClCompile Include="result.cpp" />
     <ClCompile Include="rock.cpp" />
     <ClCompile Include="scene.cpp" />
+    <ClCompile Include="screen.cpp" />
     <ClCompile Include="ship.cpp" />
     <ClCompile Include="sound.cpp" />
     <ClCompile Include="texture.cpp" />
@@ -217,6 +218,7 @@
     <ClInclude Include="result.h" />
     <ClInclude Include="rock.h" />
     <ClInclude Include="scene.h" />
+    <ClInclude Include="screen.h" />
     <ClInclude Include="ship.h" />
     <ClInclude Include="sound.h" />
     <ClInclude Include="texture.h" />

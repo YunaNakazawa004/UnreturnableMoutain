@@ -600,32 +600,6 @@ void CPlayer::Draw(void)
 	LPDIRECT3DDEVICE9 pDevice = pRenderer->GetDevice();		// デバイスへのポインタ
 	CTexture* pTexture = CManager::GetTexture();			// テクスチャへのポインタ
 	D3DXMATRIX mtxRot, mtxTrans, mtxScale;					// 計算用マトリックス
-	LPDIRECT3DSURFACE9 pRenderDef, pZBuffDef;				// 現在のレンダリング保存用
-	D3DVIEWPORT9 viewportDef;								// 現在のビューポート保存用
-	D3DXMATRIX mtxViewDef, mtxProjectionDef;				// 現在のマトリックス保存用
-
-	// 現在のレンダリングターゲットを取得（保存）
-	pDevice->GetRenderTarget(0, &pRenderDef);
-
-	// 現在のZバッファを取得（保存）
-	pDevice->GetDepthStencilSurface(&pZBuffDef);
-
-	// 現在のビューポートを取得（保存）
-	pDevice->GetViewport(&viewportDef);
-
-	// 現在のビューマトリックスを取得（保存）
-	pDevice->GetTransform(D3DTS_VIEW, &mtxViewDef);
-
-	// 現在のプロジェクションマトリックスを取得（保存）
-	pDevice->GetTransform(D3DTS_PROJECTION, &mtxProjectionDef);
-
-#ifdef MALTITARGET_RENDERING
-	// レンダリングターゲットを変更
-	CManager::GetRenderer()->ChangeTarget(D3DXVECTOR3(m_pos.x, m_pos.y + 10.0f, m_pos.z - 15.0f), m_pos, D3DXVECTOR3(0.0f, 1.0f, 0.0f));
-
-	// レンダリングターゲット用テクスチャのクリア
-	pDevice->Clear(0, NULL, (D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER), D3DCOLOR_RGBA(0, 0, 0, 0), 1.0f, 0);
-#endif
 
 	// ワールドマトリックスの初期化
 	D3DXMatrixIdentity(&m_mtxWorld);
@@ -654,21 +628,6 @@ void CPlayer::Draw(void)
 			m_apModel[nCntModel]->Draw();
 		}
 	}
-
-	// レンダリングターゲットをもとに戻す
-	pDevice->SetRenderTarget(0, pRenderDef);
-
-	// Zバッファを元に戻す
-	pDevice->SetDepthStencilSurface(pZBuffDef);
-
-	// ビューポートを元に戻す
-	pDevice->SetViewport(&viewportDef);
-
-	// ビューマトリックスを元に戻す
-	pDevice->SetTransform(D3DTS_VIEW, &mtxViewDef);
-
-	// プロジェクションマトリックスを元に戻す
-	pDevice->SetTransform(D3DTS_PROJECTION, &mtxProjectionDef);
 }
 
 //========================================================================

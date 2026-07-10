@@ -311,17 +311,9 @@ void CMeshField::Draw(void)
 	// 頂点フォーマットの設定
 	pDevice->SetFVF(FVF_VERTEX_3D_MALTI);
 
-#ifdef MALTITARGET_RENDERING
-	// テクスチャの設定
-	pDevice->SetTexture(0, CManager::GetRenderer()->GetTextureMT());
-	pDevice->SetTexture(1, CManager::GetRenderer()->GetTextureMT());
-
-#else
 	// テクスチャの設定
 	pDevice->SetTexture(0, pTexture->GetAddress(m_aIdxTexture[0]));
 	pDevice->SetTexture(1, pTexture->GetAddress(m_aIdxTexture[1]));
-
-#endif
 
 	// ポリゴンの描画
 	pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLESTRIP, 0, 0, ((int)m_block.x + 1) * ((int)m_block.y + 1), 0,

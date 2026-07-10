@@ -37,6 +37,8 @@ public:
 	void SetViewAngle(float fViewAngle);
 	void SetType(const TYPE type) { m_type = type; }
 
+	D3DXVECTOR3 GetPositionV(void) { return m_posV; }
+	D3DXVECTOR3 GetPositionR(void) { return m_posR; }
 	D3DXVECTOR3 GetRotation(void) { return m_rot; }
 
 	void CorrectAngle(float* pAngle, float fAngle);

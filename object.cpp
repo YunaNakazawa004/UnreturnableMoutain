@@ -6,6 +6,7 @@
 //========================================================================
 #include "object.h"
 
+#include "renderer.h"
 #include "manager.h"
 #include "camera.h"
 
@@ -351,6 +352,36 @@ void CObject::DrawAll(void)
 	// カメラを設定
 	pCamera->SetCamera();
 
+#ifdef MALTITARGET_RENDERING
+	CRenderer* pRenderer = CManager::GetRenderer();			// レンダラーへのポインタ
+	LPDIRECT3DDEVICE9 pDevice = pRenderer->GetDevice();		// デバイスへのポインタ
+	LPDIRECT3DSURFACE9 pRenderDef, pZBuffDef;				// 現在のレンダリング保存用
+	D3DVIEWPORT9 viewportDef;								// 現在のビューポート保存用
+	D3DXMATRIX mtxViewDef, mtxProjectionDef;				// 現在のマトリックス保存用
+
+	// 現在のレンダリングターゲットを取得（保存）
+	pDevice->GetRenderTarget(0, &pRenderDef);
+
+	// 現在のZバッファを取得（保存）
+	pDevice->GetDepthStencilSurface(&pZBuffDef);
+
+	// 現在のビューポートを取得（保存）
+	pDevice->GetViewport(&viewportDef);
+
+	// 現在のビューマトリックスを取得（保存）
+	pDevice->GetTransform(D3DTS_VIEW, &mtxViewDef);
+
+	// 現在のプロジェクションマトリックスを取得（保存）
+	pDevice->GetTransform(D3DTS_PROJECTION, &mtxProjectionDef);
+
+	// レンダリングターゲットを変更
+	CManager::GetRenderer()->ChangeTarget(pCamera->GetPositionV(), pCamera->GetPositionR(), D3DXVECTOR3(0.0f, 1.0f, 0.0f));
+
+	// レンダリングターゲット用テクスチャのクリア
+	pDevice->Clear(0, NULL, (D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER), D3DCOLOR_RGBA(0, 0, 0, 0), 1.0f, 0);
+
+#endif
+
 	for (int nCntPri = 0; nCntPri < MAX_PRIORITY_NUM; nCntPri++)
 	{
 #ifdef LIST
@@ -378,6 +409,23 @@ void CObject::DrawAll(void)
 
 #endif
 	}
+
+#ifdef MALTITARGET_RENDERING
+	// レンダリングターゲットをもとに戻す
+	pDevice->SetRenderTarget(0, pRenderDef);
+
+	// Zバッファを元に戻す
+	pDevice->SetDepthStencilSurface(pZBuffDef);
+
+	// ビューポートを元に戻す
+	pDevice->SetViewport(&viewportDef);
+
+	// ビューマトリックスを元に戻す
+	pDevice->SetTransform(D3DTS_VIEW, &mtxViewDef);
+
+	// プロジェクションマトリックスを元に戻す
+	pDevice->SetTransform(D3DTS_PROJECTION, &mtxProjectionDef);
+#endif
 }
 
 //=============================================================================

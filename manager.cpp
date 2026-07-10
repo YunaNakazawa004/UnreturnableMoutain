@@ -25,6 +25,7 @@
 #include "game.h"
 #include "result.h"
 
+#include "screen.h"
 #include "fade.h"
 
 #include "effect2D.h"
@@ -46,6 +47,7 @@ CLight* CManager::m_pLight = NULL;						// ライトのインスタンス
 CTexture* CManager::m_pTexture = NULL;					// テクスチャのインスタンス
 CScene* CManager::m_pScene = NULL;						// シーンのインスタンス
 CFade* CManager::m_pFade = NULL;						// フェードのインスタンス
+CScreen* CManager::m_pScreen = NULL;					// 画面のインスタンス
 int CManager::m_nCountFPS = 0;							// FPSカウンター
 bool CManager::m_bPause = false;						// ポーズするかしないか
 
@@ -66,6 +68,7 @@ CManager::CManager()
 	m_pTexture = NULL;
 	m_pScene = NULL;
 	m_pFade = NULL;
+	m_pScreen = NULL;
 	m_nCountFPS = 0;
 	m_bPause = false;
 }
@@ -198,24 +201,22 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	CNumber::Load();
 	CMeshField::Load();
 	CGrass::Load();
-
-//	// シーンの生成
-//	if (m_pScene == NULL)
-//	{// NULLチェック
-//#ifdef _DEBUG
-//		m_pScene = CScene::Create(CScene::MODE_GAME);
-//#else
-//		m_pScene = CScene::Create(CScene::MODE_TITLE);
-//#endif
-//
-//		if (m_pScene == NULL)
-//		{// NULLチェック
-//			OutputDebugStringA("! ! ! シーンの生成に失敗しました ! ! !\n");
-//
-//			return E_FAIL;
-//		}
-//	}
 	
+#ifdef MALTITARGET_RENDERING
+	// 画面の生成
+	if (m_pScreen == NULL)
+	{// NULLチェック
+		m_pScreen = CScreen::Create(D3DXVECTOR3(640.0f, 360.0f, 0.0f), SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f);
+
+		if (m_pScreen == NULL)
+		{// NULLチェック
+			OutputDebugStringA("! ! ! フェードの生成に失敗しました ! ! !\n");
+
+			return E_FAIL;
+		}
+	}
+#endif
+		
 	// フェードの生成
 	if (m_pFade == NULL)
 	{// NULLチェック
@@ -262,6 +263,16 @@ void CManager::Uninit(void)
 
 		delete m_pFade;
 		m_pFade = NULL;
+	}
+	
+	// 画面の破棄
+	if (m_pScreen != NULL)
+	{// NULLチェック
+		// 終了処理
+		m_pScreen->Uninit();
+
+		delete m_pScreen;
+		m_pScreen = NULL;
 	}
 
 	// シーンの破棄
@@ -392,6 +403,12 @@ void CManager::Update(void)
 	{// NULLチェック
 		// フェードの更新
 		m_pFade->Update();
+	}
+	
+	if (m_pScreen != NULL)
+	{// NULLチェック
+		// 画面の更新
+		m_pScreen->Update();
 	}
 
 #ifndef ENABLE_INHERITANCE_COBJECT

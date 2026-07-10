@@ -24,6 +24,7 @@ class CLight;
 class CTexture;
 class CScene;
 class CFade;
+class CScreen;
 
 //************************************************************************
 // マネージャークラス
@@ -49,6 +50,7 @@ public:
 	static CLight* GetLight(void) { return m_pLight; }
 	static CTexture* GetTexture(void) { return m_pTexture; }
 	static CFade* GetFade(void) { return m_pFade; }
+	static CScreen* GetScreen(void) { return m_pScreen; }
 
 	static void SetMode(const CScene::MODE mode);
 	static CScene::MODE GetMode(void) { return m_pScene->GetMode(); }
@@ -72,6 +74,7 @@ private:
 	static CTexture* m_pTexture;					// テクスチャのインスタンス
 	static CScene* m_pScene;						// シーンのインスタンス
 	static CFade* m_pFade;							// フェードのインスタンス
+	static CScreen* m_pScreen;						// 画面のインスタンス
 		
 	static int m_nCountFPS;							// FPSカウンター
 	static bool m_bPause;							// ポーズするかしないか
