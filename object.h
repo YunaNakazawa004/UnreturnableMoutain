@@ -42,6 +42,7 @@
 #define COLOR_LIMEGREEN		(D3DXCOLOR(0.0f,1.0f,0.0f,1.0f))				// ライムグリーン
 #define COLOR_SKYBLUE		(D3DXCOLOR(0.529f,0.807f,0.921f,1.0f))			// 空色
 #define COLOR_HISUI			(D3DXCOLOR(0.219f,0.705f,0.545f,1.0f))			// 翡翠色
+#define COLOR_BROWN			(D3DXCOLOR(0.3f, 0.1f, 0.0f, 1.0f))				// 茶色
 #define COLOR_RETROFILTER	(D3DXCOLOR(1.000f,	1.000f,	1.000f,	0.080f))	// レトロ風
 #define COLOR_DISALPHA		(D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.35f))			// ほぼ透明
 #define COLOR_WHITE_ALPHA	(D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f))				// 半透明（白）

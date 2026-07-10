@@ -27,6 +27,7 @@
 
 #include "object3D.h"
 #include "meshfield.h"
+#include "UI_energy.h"
 
 #include <iostream>
 #include <fstream>
@@ -214,6 +215,7 @@ void CPlayer::Update(void)
 	CInputJoypad* pInputJoypad = CManager::GetInputJoypad();			// ジョイパッド入力の取得
 	CDebugProc* pDebugProc = CManager::GetDebugProc();					// デバッグ表示の取得
 	CMeshField* pMeshField = CGame::GetMeshField();						// メッシュフィールドの取得
+	CEnergyUI* pEnergyUI = CGame::GetEnergyUI();			// エネルギーUIの取得
 	CShip* pShip = CGame::GetShip();						// 船の取得
 	D3DXVECTOR3 pos = CPlayer::GetPosition();				// プレイヤーの位置	
 	D3DXVECTOR3 rot = CPlayer::GetRotation();				// プレイヤーの向き
@@ -502,7 +504,7 @@ void CPlayer::Update(void)
 	{// 地上
 		if (D3DXVec2Length(&move) >= 0.4f)
 		{// 移動している
-			CParticle3D::Create(pos, 1, 3, 1.0f, -0.2f, 0.1f, CEffect3D::TYPE_NORMAL_NULL, CParticle3D::TYPE_NORMAL, 2, 2.0f, true);
+			CParticle3D::Create(pos, 1, 3, 1.0f, -0.2f, 0.1f, CEffect3D::TYPE_NORMAL_NULL, CParticle3D::TYPE_NORMAL, 2, 2.0f, true, COLOR_BROWN);
 		}
 	}
 
@@ -573,6 +575,9 @@ void CPlayer::Update(void)
 		return;
 #endif
 	}
+
+	// エネルギー量をUIに設定
+	pEnergyUI->SetEnergy(m_fEnergy);
 
 	// 位置/向きを適用
 	SetPosition(pos);

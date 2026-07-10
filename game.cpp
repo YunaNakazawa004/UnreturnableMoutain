@@ -19,6 +19,7 @@
 #include "player.h"
 #include "ship.h"
 #include "energyrock.h"
+#include "UI_energy.h"
 
 //************************************************************************
 // 静的メンバ変数宣言
@@ -28,6 +29,7 @@ CPlayer* CGame::m_pPlayer = NULL;					// プレイヤーのインスタンス
 CShip* CGame::m_pShip = NULL;						// 船のインスタンス
 CMeshField* CGame::m_pMeshField = NULL;				// メッシュフィールドのインスタンス
 CMapObject* CGame::m_pMapObject = NULL;				// マップオブジェクトのインスタンス
+CEnergyUI* CGame::m_pEnergyUI = NULL;				// エネルギーUIのインスタンス
 bool CGame::m_bFade = false;						// 遷移フラグ
 
 //========================================================================
@@ -41,6 +43,7 @@ CGame::CGame() : CScene(CScene::MODE_GAME)
 	m_pShip = NULL;
 	m_pMeshField = NULL;
 	m_pMapObject = NULL;
+	m_pEnergyUI = NULL;
 	m_bFade = false;
 }
 
@@ -59,6 +62,9 @@ HRESULT CGame::Init(void)
 	// カメラの設定
 	CCamera* pCamera = CManager::GetCamera();
 	pCamera->SetType(CCamera::TYPE_PLAYER);
+
+	// テクスチャを読み込み
+	CEnergyUI::Load();
 
 	// ポーズを生成
 	if (m_pPause == NULL)
@@ -137,6 +143,19 @@ HRESULT CGame::Init(void)
 		}
 	}
 	
+	// エネルギーUIを生成
+	if (m_pEnergyUI == NULL)
+	{// NULLチェック
+		m_pEnergyUI = CEnergyUI::Create(D3DXVECTOR3(1150.0f, 600.0f, 0.0f), 100.0f,100.0f);
+
+		if (m_pEnergyUI == NULL)
+		{// NULLチェック
+			OutputDebugStringA("! ! ! エネルギーUIの生成に失敗しました ! ! !\n");
+
+			return E_FAIL;
+		}
+	}
+	
 	return S_OK;
 }
 
@@ -145,6 +164,15 @@ HRESULT CGame::Init(void)
 //========================================================================
 void CGame::Uninit(void)
 {
+	// テクスチャを破棄
+	CEnergyUI::Unload();
+
+	// エネルギーUIの破棄
+	if (m_pEnergyUI != NULL)
+	{// NULLチェック
+		m_pEnergyUI = NULL;
+	}
+	
 	// 船の破棄
 	if (m_pShip != NULL)
 	{// NULLチェック

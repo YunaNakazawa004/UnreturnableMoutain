@@ -210,7 +210,7 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 
 		if (m_pScreen == NULL)
 		{// NULLチェック
-			OutputDebugStringA("! ! ! フェードの生成に失敗しました ! ! !\n");
+			OutputDebugStringA("! ! ! 画面の生成に失敗しました ! ! !\n");
 
 			return E_FAIL;
 		}

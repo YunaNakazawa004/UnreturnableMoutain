@@ -18,6 +18,7 @@ class CPlayer;
 class CShip;
 class CMeshField;
 class CMapObject;
+class CEnergyUI;
 
 //************************************************************************
 // ゲーム画面クラス
@@ -38,6 +39,7 @@ public:
 	static CShip* GetShip(void) { return m_pShip; }
 	static CMeshField* GetMeshField(void) { return m_pMeshField; }
 	static CMapObject* GetMapObject(void) { return m_pMapObject; }
+	static CEnergyUI* GetEnergyUI(void) { return m_pEnergyUI; }
 
 	static void SetFadeEnable(void) { m_bFade = true; }
 
@@ -47,6 +49,7 @@ private:
 	static CShip* m_pShip;							// 船のインスタンス
 	static CMeshField* m_pMeshField;				// メッシュフィールドのインスタンス
 	static CMapObject* m_pMapObject;				// マップオブジェクトのインスタンス
+	static CEnergyUI* m_pEnergyUI;					// エネルギーUIのインスタンス
 
 	static bool m_bFade;		// 遷移フラグ
 };
