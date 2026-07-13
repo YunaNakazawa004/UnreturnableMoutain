@@ -26,7 +26,7 @@
 #include "ship.h"
 
 #include "object3D.h"
-#include "meshfield.h"
+#include "mountain.h"
 #include "UI_energy.h"
 #include "UI_jump_meter.h"
 
@@ -216,7 +216,7 @@ void CPlayer::Update(void)
 	CInputKeyboard* pInputKeyboard = CManager::GetInputKeyboard();		// キーボード入力の取得
 	CInputJoypad* pInputJoypad = CManager::GetInputJoypad();			// ジョイパッド入力の取得
 	CDebugProc* pDebugProc = CManager::GetDebugProc();					// デバッグ表示の取得
-	CMeshField* pMeshField = CGame::GetMountain();						// メッシュフィールドの取得
+	CMountain* pMountain = CGame::GetMountain();						// 山の取得
 	CEnergyUI* pEnergyUI = CGame::GetEnergyUI();			// エネルギーUIの取得
 	CJumpMeterUI* pJumpMeterUI = CGame::GetJumpMeterUI();	// ジャンプメーターUIの取得
 	CShip* pShip = CGame::GetShip();						// 船の取得
@@ -405,21 +405,21 @@ void CPlayer::Update(void)
 	rot.y += (m_rotDest.y - rot.y) * 0.1f;
 
 	// ポリゴン番号を取得
-	polygonIdx = pMeshField->GetPolygonIdx(pos);
+	polygonIdx = pMountain->GetPolygonIdx(pos);
 
-	pDebugProc->Print("傾斜 : %f\n", pMeshField->GetSlope(pos, polygonIdx));
+	pDebugProc->Print("傾斜 : %f\n", pMountain->GetSlope(pos, polygonIdx));
 
 	if (m_bJump == false)
 	{// 地上にいるときだけ
 		// 傾斜によって進む距離を調整
-		pos = m_posOld + ((pos - m_posOld) * pMeshField->GetSlope(pos, polygonIdx));
+		pos = m_posOld + ((pos - m_posOld) * pMountain->GetSlope(pos, polygonIdx));
 	}
 
 	// 乗っているポリゴン番号を再計算
-	polygonIdx = pMeshField->GetPolygonIdx(pos);
+	polygonIdx = pMountain->GetPolygonIdx(pos);
 
 	// 地面の高さを取得
-	fHeight = pMeshField->GetHeight(pos, polygonIdx);
+	fHeight = pMountain->GetHeight(pos, polygonIdx);
 
 	if (fHeight == ERROR_HEIGHT)
 	{// 無効な高さだったら
@@ -430,7 +430,7 @@ void CPlayer::Update(void)
 	{// 地面にめり込んだときだけ
 		pos.y = fHeight;
 
-		if (pMeshField->GetSlope(pos, polygonIdx) <= UNCLIMB_SLOPE && m_bJump == false)
+		if (pMountain->GetSlope(pos, polygonIdx) <= UNCLIMB_SLOPE && m_bJump == false)
 		{// 傾斜の角度的に登れない/地面にいる
 			pos = m_posOld;
 		}
@@ -473,6 +473,10 @@ void CPlayer::Update(void)
 
 		// モーションを設定
 		m_pMotion->Set(MOTIONTYPE_JUMP, true, 20);
+
+		// ジャンプ量リセット
+		m_fJumpHigh = 0.0f;
+		UpperPos.y = UpperPosOff.y;
 	}
 
 	// 転ぶ
@@ -510,6 +514,8 @@ void CPlayer::Update(void)
 		if (D3DXVec2Length(&move) >= 0.4f)
 		{// 移動している
 			CParticle3D::Create(pos, 1, 3, 1.0f, -0.2f, 0.1f, CEffect3D::TYPE_NORMAL_NULL, CParticle3D::TYPE_NORMAL, 2, 2.0f, true, COLOR_BROWN);
+		
+			pInputJoypad->SetVibration(0, 256, 256, 1);
 		}
 	}
 
@@ -537,18 +543,20 @@ void CPlayer::Update(void)
 		m_fEnergy += ONE_ENERGY;
 	}
 
+#ifdef _DEBUG
 	if (pInputKeyboard->GetTrigger(DIK_H) == true)
 	{// エネルギー鉱石生成
 		CEnergyRock::Create(pos, DEFAULT_VECTER3);
 	}
+#endif
 
 	// エネルギー減少
 	if (m_nEnergyCounter > MINUS_ENERGY)
 	{// 一定時間移動し続けると減少
 		if (m_bJump == false)
 		{// 地上
-			m_fEnergy -= 2.0f - pMeshField->GetSlope(pos, polygonIdx);		// 減らす
-			m_fUsedEnergy += 2.0f - pMeshField->GetSlope(pos, polygonIdx);
+			m_fEnergy -= 2.0f - pMountain->GetSlope(pos, polygonIdx);		// 減らす
+			m_fUsedEnergy += 2.0f - pMountain->GetSlope(pos, polygonIdx);
 		}
 		else
 		{// 空中

@@ -51,7 +51,7 @@
 //#undef LIST
 
 #define MALTITARGET_RENDERING			// マルチターゲットレンダリングで描画する
-//#undef MALTITARGET_RENDERING
+#undef MALTITARGET_RENDERING
 
 //************************************************************************
 // オブジェクトクラス
@@ -74,7 +74,7 @@ public:
 		TYPE_LINE,				// 線
 		TYPE_OBJECTX,			// オブジェクトX
 		TYPE_OBJECTBILLBOARD,	// オブジェクトビルボード
-		TYPE_MESHFIELD,			// メッシュフィールド
+		TYPE_MOUNTAIN,			// 山
 		TYPE_PLAYER,			// プレイヤー
 		TYPE_SHIP,				// 船
 		TYPE_ENERGYROCK,		// エネルギー鉱物

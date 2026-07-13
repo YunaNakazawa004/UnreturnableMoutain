@@ -14,7 +14,7 @@
 #include "pause.h"
 #include "fade.h"
 
-#include "meshfield.h"
+#include "mountain.h"
 #include "map_object.h"
 #include "player.h"
 #include "ship.h"
@@ -28,7 +28,7 @@
 CPause* CGame::m_pPause = NULL;						// ポーズのインスタンス
 CPlayer* CGame::m_pPlayer = NULL;					// プレイヤーのインスタンス
 CShip* CGame::m_pShip = NULL;						// 船のインスタンス
-CMeshField* CGame::m_pMountain = NULL;				// メッシュフィールドのインスタンス
+CMountain* CGame::m_pMountain = NULL;				// メッシュフィールドのインスタンス
 CMapObject* CGame::m_pMapObject = NULL;				// マップオブジェクトのインスタンス
 CEnergyUI* CGame::m_pEnergyUI = NULL;				// エネルギーUIのインスタンス
 CJumpMeterUI* CGame::m_pJumpMeterUI = NULL;			// ジャンプメーターUIのインスタンス
@@ -101,15 +101,15 @@ HRESULT CGame::Init(void)
 		}
 	}
 
-	// メッシュフィールドを生成
+	// 山を生成
 	if (m_pMountain == NULL)
 	{// NULLチェック
-		m_pMountain = CMeshField::Create(DEFAULT_VECTER3, DEFAULT_VECTER3, D3DXVECTOR2(32.0f, 32.0f),
-			D3DXVECTOR2(10.0f, 10.0f), CObject::TYPE_MESHFIELD, OBJECT_PRIORITY);
+		m_pMountain = CMountain::Create(DEFAULT_VECTER3, DEFAULT_VECTER3, D3DXVECTOR2(32.0f, 32.0f),
+			D3DXVECTOR2(10.0f, 10.0f));
 
 		if (m_pMountain == NULL)
 		{// NULLチェック
-			OutputDebugStringA("! ! ! メッシュフィールドの生成に失敗しました ! ! !\n");
+			OutputDebugStringA("! ! ! 山の生成に失敗しました ! ! !\n");
 
 			return E_FAIL;
 		}
@@ -209,7 +209,7 @@ void CGame::Uninit(void)
 		m_pPlayer = NULL;
 	}
 
-	// メッシュフィールドの破棄
+	// 山の破棄
 	if (m_pMountain != NULL)
 	{// NULLチェック
 		m_pMountain = NULL;

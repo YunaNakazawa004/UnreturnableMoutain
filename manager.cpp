@@ -30,7 +30,7 @@
 
 #include "effect2D.h"
 #include "effect3D.h"
-#include "meshfield.h"
+#include "mountain.h"
 #include "grass.h"
 
 //************************************************************************
@@ -199,7 +199,7 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	CEffect2D::Load();
 	CEffect3D::Load();
 	CNumber::Load();
-	CMeshField::Load();
+	CMountain::Load();
 	CGrass::Load();
 	
 #ifdef MALTITARGET_RENDERING
@@ -250,7 +250,7 @@ void CManager::Uninit(void)
 
 	// オブジェクトのテクスチャを破棄
 	CGrass::Unload();
-	CMeshField::Unload();
+	CMountain::Unload();
 	CNumber::Unload();
 	CEffect3D::Unload();
 	CEffect2D::Unload();

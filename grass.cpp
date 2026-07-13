@@ -11,7 +11,7 @@
 #include "texture.h"
 
 #include "game.h"
-#include "meshfield.h"
+#include "mountain.h"
 #include "player.h"
 
 //************************************************************************
@@ -152,7 +152,7 @@ void CGrass::Uninit(void)
 void CGrass::Update(void)
 {
 	// ローカル変数
-	CMeshField* pMeshField = CGame::GetMountain();					// メッシュフィールドの取得
+	CMountain* pMountain = CGame::GetMountain();					// 山の取得
 	D3DXVECTOR3 pos = CObject3D::GetPosition();
 	D3DXVECTOR3 rot = CObject3D::GetRotation();
 
@@ -170,10 +170,10 @@ void CGrass::Update(void)
 	CollisionPlayer();
 
 	// ポリゴン番号を取得
-	polygonIdx = pMeshField->GetPolygonIdx(pos);
+	polygonIdx = pMountain->GetPolygonIdx(pos);
 
 	// 地面の高さを取得
-	fHeight = pMeshField->GetHeight(pos, polygonIdx);
+	fHeight = pMountain->GetHeight(pos, polygonIdx);
 
 	if (fHeight == ERROR_HEIGHT)
 	{// 無効な高さだったら

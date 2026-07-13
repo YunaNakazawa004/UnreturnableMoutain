@@ -22,19 +22,19 @@
 class CMeshField : public CObject
 {
 public:
-	CMeshField(const int nPriority);
+	CMeshField(const int nPriority = OBJECT_PRIORITY);
 	virtual ~CMeshField();
 
-	static HRESULT Load(void);
-	static void Unload(void);
 	static CMeshField* Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot, const D3DXVECTOR2 block,
-		const D3DXVECTOR2 size, const CObject::TYPE type, const int nPriority = BG_PRIORITY);
+		const D3DXVECTOR2 size, const CObject::TYPE type, const int nPriority = OBJECT_PRIORITY);
 	HRESULT Init(void) { return S_OK; }
 	HRESULT Init(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot,
 		const D3DXVECTOR2 block, const D3DXVECTOR2 size);
 	void Uninit(void);
 	void Update(void);
 	void Draw(void);
+
+	void BindTexture(const int* pTexture);
 
 	void SetPosition(const D3DXVECTOR3 pos);
 	D3DXVECTOR3 GetPosition(void) { return m_pos; }
@@ -59,7 +59,7 @@ public:
 private:
 	LPDIRECT3DVERTEXBUFFER9 m_pVtxBuff;				// 頂点バッファへのポインタ
 	LPDIRECT3DINDEXBUFFER9 m_pIdxBuff;				// インデックスバッファへのポインタ
-	static int m_aIdxTexture[FIELD_TEXTURE_NUM];	// テクスチャのインデックス
+	int m_aIdxTexture[FIELD_TEXTURE_NUM];			// テクスチャのインデックス
 	D3DXMATRIX m_mtxWorld;		// ワールドマトリックス
 	D3DXVECTOR3 m_pos;			// 位置
 	D3DXVECTOR3 m_rot;			// 向き

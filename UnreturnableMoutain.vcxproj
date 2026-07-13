@@ -163,6 +163,7 @@
     <ClCompile Include="meshfield.cpp" />
     <ClCompile Include="model.cpp" />
     <ClCompile Include="motion.cpp" />
+    <ClCompile Include="mountain.cpp" />
     <ClCompile Include="number.cpp" />
     <ClCompile Include="object.cpp" />
     <ClCompile Include="object2D.cpp" />
@@ -206,6 +207,7 @@
     <ClInclude Include="meshfield.h" />
     <ClInclude Include="model.h" />
     <ClInclude Include="motion.h" />
+    <ClInclude Include="mountain.h" />
     <ClInclude Include="number.h" />
     <ClInclude Include="object.h" />
     <ClInclude Include="object2D.h" />

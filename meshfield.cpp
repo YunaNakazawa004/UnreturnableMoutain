@@ -21,42 +21,6 @@
 // マクロ定義
 //************************************************************************
 
-//************************************************************************
-// 静的メンバ変数宣言
-//************************************************************************
-int CMeshField::m_aIdxTexture[FIELD_TEXTURE_NUM] = {};				// テクスチャのインデックス
-
-//========================================================================
-// テクスチャの生成
-//========================================================================
-HRESULT CMeshField::Load(void)
-{
-	// ローカル変数宣言
-	CTexture* pTexture = CManager::GetTexture();			// テクスチャへのポインタ
-
-	// テクスチャの設定
-	m_aIdxTexture[0] = pTexture->Register("data\\TEXTURE\\field002.jpg");
-	m_aIdxTexture[1] = pTexture->Register("data\\TEXTURE\\rock.jpg");
-
-	if (m_aIdxTexture[0] == -1 || m_aIdxTexture[1] == -1)
-	{// テクスチャが設定できていない
-		OutputDebugStringA("! ! ! テクスチャの設定に失敗しました ! ! !\n");
-
-		return E_FAIL;
-	}
-
-	return S_OK;
-}
-
-//========================================================================
-// テクスチャの破棄
-//========================================================================
-void CMeshField::Unload(void)
-{
-	// テクスチャのインデックスを削除
-	memset(&m_aIdxTexture[0], -1, sizeof m_aIdxTexture);
-}
-
 //========================================================================
 // メッシュフィールドクラスの生成処理
 //========================================================================
@@ -72,18 +36,18 @@ CMeshField* CMeshField::Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot, con
 	}
 #endif
 
-	CMeshField* pMeshFIeld = NULL;
+	CMeshField* pMeshField = NULL;
 
-	if (pMeshFIeld == NULL)
+	if (pMeshField == NULL)
 	{// NULLチェック
 		// メッシュフィールドの生成
-		pMeshFIeld = new CMeshField(nPriority);
+		pMeshField = new CMeshField(nPriority);
 	}
 
-	if (pMeshFIeld != NULL)
+	if (pMeshField != NULL)
 	{// NULLチェック
 		// 初期化処理
-		if (FAILED(pMeshFIeld->Init(pos, rot, block, size)))
+		if (FAILED(pMeshField->Init(pos, rot, block, size)))
 		{// もし失敗した場合
 			OutputDebugStringA("! ! ! メッシュフィールドの初期化に失敗しました ! ! !\n");
 
@@ -91,9 +55,9 @@ CMeshField* CMeshField::Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot, con
 		}
 
 		// 種類を設定
-		pMeshFIeld->SetType(type);
+		pMeshField->SetType(type);
 
-		return pMeshFIeld;
+		return pMeshField;
 	}
 
 	OutputDebugStringA("! ! ! メッシュフィールドの生成に失敗しました ! ! !\n");
@@ -271,19 +235,6 @@ void CMeshField::Draw(void)
 	CTexture* pTexture = CManager::GetTexture();			// テクスチャへのポインタ
 	D3DXMATRIX mtxRot, mtxTrans, mtxScale;		// 計算用マトリックス
 
-	// テクスチャステージステート0の設定
-	//pDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
-	pDevice->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
-	pDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
-	pDevice->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_DIFFUSE);
-
-	// テクスチャステージステート1の設定
-	pDevice->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_BLENDCURRENTALPHA);
-	pDevice->SetTextureStageState(1, D3DTSS_COLORARG1, D3DTA_TEXTURE);
-	pDevice->SetTextureStageState(1, D3DTSS_COLORARG2, D3DTA_CURRENT);
-	pDevice->SetTextureStageState(1, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
-	pDevice->SetTextureStageState(1, D3DTSS_ALPHAARG1, D3DTA_TFACTOR);
-
 	// ワールドマトリックスの初期化
 	D3DXMatrixIdentity(&m_mtxWorld);
 
@@ -318,14 +269,18 @@ void CMeshField::Draw(void)
 	// ポリゴンの描画
 	pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLESTRIP, 0, 0, ((int)m_block.x + 1) * ((int)m_block.y + 1), 0,
 		(((int)m_block.x) * ((int)m_block.y) * 2) + (((int)m_block.y - 1) * 4));
+}
 
-	// テクスチャステージステートの設定
-	pDevice->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
-
-	// テクスチャステージステートの設定
-	pDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
-	pDevice->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
-	pDevice->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_CURRENT);
+//========================================================================
+// テクスチャを結びつけ
+//========================================================================
+void CMeshField::BindTexture(const int* pTexture)
+{
+	if (pTexture != NULL)
+	{// NULLチェック
+		m_aIdxTexture[0] = pTexture[0];
+		m_aIdxTexture[1] = pTexture[1];
+	}
 }
 
 //========================================================================

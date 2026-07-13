@@ -16,7 +16,7 @@
 #include "model.h"
 #include "game.h"
 
-#include "meshfield.h"
+#include "mountain.h"
 
 //************************************************************************
 // マクロ定義
@@ -141,7 +141,7 @@ void CTree::Uninit(void)
 //========================================================================
 void CTree::Update(void)
 {
-	CMeshField* pMeshField = CGame::GetMountain();					// メッシュフィールドの取得
+	CMountain* pMountain = CGame::GetMountain();					// 山の取得
 	D3DXVECTOR3 pos = GetPosition();
 	D3DXVECTOR3 posM = m_apModel[0]->GetPosition();
 
@@ -149,10 +149,10 @@ void CTree::Update(void)
 	D3DXVECTOR2 polygonIdx = { -1.0f,-1.0f };		// ポリゴン番号
 
 	// ポリゴン番号を取得
-	polygonIdx = pMeshField->GetPolygonIdx(pos);
+	polygonIdx = pMountain->GetPolygonIdx(pos);
 
 	// 地面の高さを取得
-	fHeight = pMeshField->GetHeight(pos, polygonIdx);
+	fHeight = pMountain->GetHeight(pos, polygonIdx);
 
 	if (fHeight == ERROR_HEIGHT)
 	{// 無効な高さだったら
