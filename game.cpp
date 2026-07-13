@@ -15,6 +15,8 @@
 #include "fade.h"
 
 #include "mountain.h"
+#include "beach.h"
+#include "grass.h"
 #include "map_object.h"
 #include "player.h"
 #include "ship.h"
@@ -28,7 +30,8 @@
 CPause* CGame::m_pPause = NULL;						// ポーズのインスタンス
 CPlayer* CGame::m_pPlayer = NULL;					// プレイヤーのインスタンス
 CShip* CGame::m_pShip = NULL;						// 船のインスタンス
-CMountain* CGame::m_pMountain = NULL;				// メッシュフィールドのインスタンス
+CMountain* CGame::m_pMountain = NULL;				// 山のインスタンス
+CBeach* CGame::m_pBeach = NULL;						// 砂浜のインスタンス
 CMapObject* CGame::m_pMapObject = NULL;				// マップオブジェクトのインスタンス
 CEnergyUI* CGame::m_pEnergyUI = NULL;				// エネルギーUIのインスタンス
 CJumpMeterUI* CGame::m_pJumpMeterUI = NULL;			// ジャンプメーターUIのインスタンス
@@ -44,6 +47,7 @@ CGame::CGame() : CScene(CScene::MODE_GAME)
 	m_pPlayer = NULL;
 	m_pShip = NULL;
 	m_pMountain = NULL;
+	m_pBeach = NULL;
 	m_pMapObject = NULL;
 	m_pEnergyUI = NULL;
 	m_pJumpMeterUI = NULL;
@@ -69,6 +73,9 @@ HRESULT CGame::Init(void)
 	// テクスチャを読み込み
 	CEnergyUI::Load();
 	CJumpMeterUI::Load();
+	CMountain::Load();
+	CBeach::Load();
+	CGrass::Load();
 
 	// ポーズを生成
 	if (m_pPause == NULL)
@@ -116,6 +123,26 @@ HRESULT CGame::Init(void)
 
 		// ステージのデータを読み込む
 		if (FAILED(m_pMountain->ReadData("data\\stage.bin")))
+		{// もし失敗したら
+			return E_FAIL;
+		}
+	}
+	
+	// ビーチを生成
+	if (m_pBeach == NULL)
+	{// NULLチェック
+		m_pBeach = CBeach::Create(DEFAULT_VECTER3, DEFAULT_VECTER3, D3DXVECTOR2(32.0f, 32.0f),
+			D3DXVECTOR2(10.0f, 10.0f));
+
+		if (m_pBeach == NULL)
+		{// NULLチェック
+			OutputDebugStringA("! ! ! ビーチの生成に失敗しました ! ! !\n");
+
+			return E_FAIL;
+		}
+
+		// ステージのデータを読み込む
+		if (FAILED(m_pBeach->ReadData("data\\Outstage.bin")))
 		{// もし失敗したら
 			return E_FAIL;
 		}
@@ -182,6 +209,9 @@ HRESULT CGame::Init(void)
 void CGame::Uninit(void)
 {
 	// テクスチャを破棄
+	CGrass::Unload();
+	CBeach::Unload();
+	CMountain::Unload();
 	CJumpMeterUI::Unload();
 	CEnergyUI::Unload();
 
@@ -209,6 +239,12 @@ void CGame::Uninit(void)
 		m_pPlayer = NULL;
 	}
 
+	// ビーチの破棄
+	if (m_pBeach != NULL)
+	{// NULLチェック
+		m_pBeach = NULL;
+	}
+	
 	// 山の破棄
 	if (m_pMountain != NULL)
 	{// NULLチェック

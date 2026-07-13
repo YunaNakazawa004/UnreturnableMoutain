@@ -17,6 +17,7 @@ class CPause;
 class CPlayer;
 class CShip;
 class CMountain;
+class CBeach;
 class CMapObject;
 class CEnergyUI;
 class CJumpMeterUI;
@@ -39,6 +40,7 @@ public:
 	static CPlayer* GetPlayer(void) { return m_pPlayer; }
 	static CShip* GetShip(void) { return m_pShip; }
 	static CMountain* GetMountain(void) { return m_pMountain; }
+	static CBeach* GetBeach(void) { return m_pBeach; }
 	static CMapObject* GetMapObject(void) { return m_pMapObject; }
 	static CEnergyUI* GetEnergyUI(void) { return m_pEnergyUI; }
 	static CJumpMeterUI* GetJumpMeterUI(void) { return m_pJumpMeterUI; }
@@ -50,6 +52,7 @@ private:
 	static CPlayer* m_pPlayer;						// プレイヤーのインスタンス
 	static CShip* m_pShip;							// 船のインスタンス
 	static CMountain* m_pMountain;					// 山のインスタンス
+	static CBeach* m_pBeach;						// 砂浜のインスタンス
 	static CMapObject* m_pMapObject;				// マップオブジェクトのインスタンス
 	static CEnergyUI* m_pEnergyUI;					// エネルギーUIのインスタンス
 	static CJumpMeterUI* m_pJumpMeterUI;			// ジャンプメーターUIのインスタンス

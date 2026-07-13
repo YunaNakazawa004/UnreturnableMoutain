@@ -75,6 +75,7 @@ public:
 		TYPE_OBJECTX,			// オブジェクトX
 		TYPE_OBJECTBILLBOARD,	// オブジェクトビルボード
 		TYPE_MOUNTAIN,			// 山
+		TYPE_BEACH,				// 砂浜
 		TYPE_PLAYER,			// プレイヤー
 		TYPE_SHIP,				// 船
 		TYPE_ENERGYROCK,		// エネルギー鉱物

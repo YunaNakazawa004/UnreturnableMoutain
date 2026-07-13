@@ -145,6 +145,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="beach.cpp" />
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="debugproc.cpp" />
     <ClCompile Include="effect2D.cpp" />
@@ -189,6 +190,7 @@
     <ClCompile Include="UI_result.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="beach.h" />
     <ClInclude Include="camera.h" />
     <ClInclude Include="debugproc.h" />
     <ClInclude Include="effect2D.h" />

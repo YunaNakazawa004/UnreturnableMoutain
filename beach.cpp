@@ -1,10 +1,10 @@
 //========================================================================
 // 
-// 山 [ meshfield.cpp ]
+// 砂浜 [ beach.cpp ]
 // Author : Nakazawa Yuna
 // 
 //========================================================================
-#include "mountain.h"
+#include "beach.h"
 
 #include "renderer.h"
 #include "manager.h"
@@ -19,19 +19,19 @@
 //************************************************************************
 // 静的メンバ変数宣言
 //************************************************************************
-int CMountain::m_aIdxTexture[FIELD_TEXTURE_NUM] = {};				// テクスチャのインデックス
+int CBeach::m_aIdxTexture[FIELD_TEXTURE_NUM] = {};				// テクスチャのインデックス
 
 //========================================================================
 // テクスチャの生成
 //========================================================================
-HRESULT CMountain::Load(void)
+HRESULT CBeach::Load(void)
 {
 	// ローカル変数宣言
 	CTexture* pTexture = CManager::GetTexture();			// テクスチャへのポインタ
 
 	// テクスチャの設定
 	m_aIdxTexture[0] = pTexture->Register("data\\TEXTURE\\field002.jpg");
-	m_aIdxTexture[1] = pTexture->Register("data\\TEXTURE\\rock.jpg");
+	m_aIdxTexture[1] = pTexture->Register("data\\TEXTURE\\sand.jpg");
 
 	if (m_aIdxTexture[0] == -1 || m_aIdxTexture[1] == -1)
 	{// テクスチャが設定できていない
@@ -46,16 +46,16 @@ HRESULT CMountain::Load(void)
 //========================================================================
 // テクスチャの破棄
 //========================================================================
-void CMountain::Unload(void)
+void CBeach::Unload(void)
 {
 	// テクスチャのインデックスを削除
 	memset(&m_aIdxTexture[0], -1, sizeof m_aIdxTexture);
 }
 
 //========================================================================
-// 山クラスの生成処理
+// 砂浜クラスの生成処理
 //========================================================================
-CMountain* CMountain::Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot, const D3DXVECTOR2 block,
+CBeach* CBeach::Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot, const D3DXVECTOR2 block,
 	const D3DXVECTOR2 size)
 {
 #ifndef LIST
@@ -67,57 +67,57 @@ CMountain* CMountain::Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot, const
 	}
 #endif
 
-	CMountain* pMountain = NULL;
+	CBeach* pBeach = NULL;
 
-	if (pMountain == NULL)
+	if (pBeach == NULL)
 	{// NULLチェック
-		// 山の生成
-		pMountain = new CMountain;
+		// 砂浜の生成
+		pBeach = new CBeach;
 	}
 
-	if (pMountain != NULL)
+	if (pBeach != NULL)
 	{// NULLチェック
 		// 初期化処理
-		if (FAILED(pMountain->Init(pos, rot, block, size)))
+		if (FAILED(pBeach->Init(pos, rot, block, size)))
 		{// もし失敗した場合
-			OutputDebugStringA("! ! ! 山の初期化に失敗しました ! ! !\n");
+			OutputDebugStringA("! ! ! 砂浜の初期化に失敗しました ! ! !\n");
 
 			return NULL;
 		}
 
 		// 種類を設定
-		pMountain->SetType(TYPE_MOUNTAIN);
+		pBeach->SetType(TYPE_BEACH);
 
 		// テクスチャを設定
-		pMountain->BindTexture(&m_aIdxTexture[0]);
+		pBeach->BindTexture(&m_aIdxTexture[0]);
 
-		return pMountain;
+		return pBeach;
 	}
 
-	OutputDebugStringA("! ! ! 山の生成に失敗しました ! ! !\n");
+	OutputDebugStringA("! ! ! 砂浜の生成に失敗しました ! ! !\n");
 
 	return NULL;
 }
 
 //========================================================================
-// 山クラスのコンストラクタ
+// 砂浜クラスのコンストラクタ
 //========================================================================
-CMountain::CMountain(const int nPriority) :CMeshField(nPriority)
+CBeach::CBeach(const int nPriority) :CMeshField(nPriority)
 {
-	// 山クラスの値をクリア
+	// 砂浜クラスの値をクリア
 }
 
 //========================================================================
-// 山クラスのデストラクタ
+// 砂浜クラスのデストラクタ
 //========================================================================
-CMountain::~CMountain()
+CBeach::~CBeach()
 {
 }
 
 //========================================================================
-// 山クラスの初期化処理(オーバーロード)
+// 砂浜クラスの初期化処理(オーバーロード)
 //========================================================================
-HRESULT CMountain::Init(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot,
+HRESULT CBeach::Init(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot,
 	const D3DXVECTOR2 block, const D3DXVECTOR2 size)
 {
 	// 初期化処理
@@ -127,25 +127,25 @@ HRESULT CMountain::Init(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot,
 }
 
 //========================================================================
-// 山クラスの終了処理
+// 砂浜クラスの終了処理
 //========================================================================
-void CMountain::Uninit(void)
+void CBeach::Uninit(void)
 {
 	// 終了処理
 	CMeshField::Uninit();
 }
 
 //========================================================================
-// 山クラスの更新処理
+// 砂浜クラスの更新処理
 //========================================================================
-void CMountain::Update(void)
+void CBeach::Update(void)
 {
 }
 
 //========================================================================
-// 山クラスの描画処理
+// 砂浜クラスの描画処理
 //========================================================================
-void CMountain::Draw(void)
+void CBeach::Draw(void)
 {
 	// ローカル変数宣言
 	CRenderer* pRenderer = CManager::GetRenderer();			// レンダラーへのポインタ

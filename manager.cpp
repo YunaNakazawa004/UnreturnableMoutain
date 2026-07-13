@@ -30,8 +30,6 @@
 
 #include "effect2D.h"
 #include "effect3D.h"
-#include "mountain.h"
-#include "grass.h"
 
 //************************************************************************
 // 静的メンバ変数宣言
@@ -199,8 +197,6 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	CEffect2D::Load();
 	CEffect3D::Load();
 	CNumber::Load();
-	CMountain::Load();
-	CGrass::Load();
 	
 #ifdef MALTITARGET_RENDERING
 	// 画面の生成
@@ -249,8 +245,6 @@ void CManager::Uninit(void)
 	CObject::ReleaseAll();
 
 	// オブジェクトのテクスチャを破棄
-	CGrass::Unload();
-	CMountain::Unload();
 	CNumber::Unload();
 	CEffect3D::Unload();
 	CEffect2D::Unload();
