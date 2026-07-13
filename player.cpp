@@ -28,6 +28,7 @@
 #include "object3D.h"
 #include "meshfield.h"
 #include "UI_energy.h"
+#include "UI_jump_meter.h"
 
 #include <iostream>
 #include <fstream>
@@ -217,6 +218,7 @@ void CPlayer::Update(void)
 	CDebugProc* pDebugProc = CManager::GetDebugProc();					// デバッグ表示の取得
 	CMeshField* pMeshField = CGame::GetMountain();						// メッシュフィールドの取得
 	CEnergyUI* pEnergyUI = CGame::GetEnergyUI();			// エネルギーUIの取得
+	CJumpMeterUI* pJumpMeterUI = CGame::GetJumpMeterUI();	// ジャンプメーターUIの取得
 	CShip* pShip = CGame::GetShip();						// 船の取得
 	D3DXVECTOR3 pos = CPlayer::GetPosition();				// プレイヤーの位置	
 	D3DXVECTOR3 rot = CPlayer::GetRotation();				// プレイヤーの向き
@@ -585,6 +587,9 @@ void CPlayer::Update(void)
 
 	// エネルギー量をUIに設定
 	pEnergyUI->SetEnergy(m_fEnergy);
+
+	// ジャンプ量をUIに設定
+	pJumpMeterUI->SetJumpMeter(m_fJumpHigh);
 
 	// 位置/向きを適用
 	SetPosition(pos);

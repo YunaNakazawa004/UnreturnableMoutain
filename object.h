@@ -70,6 +70,7 @@ public:
 		TYPE_PAUSE,				// ポーズ
 		TYPE_BG,				// 背景
 		TYPE_RESULTUI,			// リザルトUI
+		TYPE_JUMPUI,			// ジャンプUI
 		TYPE_LINE,				// 線
 		TYPE_OBJECTX,			// オブジェクトX
 		TYPE_OBJECTBILLBOARD,	// オブジェクトビルボード

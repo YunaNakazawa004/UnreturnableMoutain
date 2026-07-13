@@ -20,6 +20,7 @@
 #include "ship.h"
 #include "energyrock.h"
 #include "UI_energy.h"
+#include "UI_jump_meter.h"
 
 //************************************************************************
 // 静的メンバ変数宣言
@@ -30,6 +31,7 @@ CShip* CGame::m_pShip = NULL;						// 船のインスタンス
 CMeshField* CGame::m_pMountain = NULL;				// メッシュフィールドのインスタンス
 CMapObject* CGame::m_pMapObject = NULL;				// マップオブジェクトのインスタンス
 CEnergyUI* CGame::m_pEnergyUI = NULL;				// エネルギーUIのインスタンス
+CJumpMeterUI* CGame::m_pJumpMeterUI = NULL;			// ジャンプメーターUIのインスタンス
 bool CGame::m_bFade = false;						// 遷移フラグ
 
 //========================================================================
@@ -44,6 +46,7 @@ CGame::CGame() : CScene(CScene::MODE_GAME)
 	m_pMountain = NULL;
 	m_pMapObject = NULL;
 	m_pEnergyUI = NULL;
+	m_pJumpMeterUI = NULL;
 	m_bFade = false;
 }
 
@@ -65,6 +68,7 @@ HRESULT CGame::Init(void)
 
 	// テクスチャを読み込み
 	CEnergyUI::Load();
+	CJumpMeterUI::Load();
 
 	// ポーズを生成
 	if (m_pPause == NULL)
@@ -142,11 +146,11 @@ HRESULT CGame::Init(void)
 			return E_FAIL;
 		}
 	}
-	
+
 	// エネルギーUIを生成
 	if (m_pEnergyUI == NULL)
 	{// NULLチェック
-		m_pEnergyUI = CEnergyUI::Create(D3DXVECTOR3(1150.0f, 600.0f, 0.0f), 100.0f,100.0f);
+		m_pEnergyUI = CEnergyUI::Create(D3DXVECTOR3(1150.0f, 600.0f, 0.0f), 100.0f, 100.0f);
 
 		if (m_pEnergyUI == NULL)
 		{// NULLチェック
@@ -155,7 +159,20 @@ HRESULT CGame::Init(void)
 			return E_FAIL;
 		}
 	}
-	
+
+	// ジャンプメーターUIを生成
+	if (m_pJumpMeterUI == NULL)
+	{// NULLチェック
+		m_pJumpMeterUI = CJumpMeterUI::Create(D3DXVECTOR3(680.0f, 340.0f, 0.0f), 5.0f, 30.0f, 100.0f);
+
+		if (m_pJumpMeterUI == NULL)
+		{// NULLチェック
+			OutputDebugStringA("! ! ! エネルギーUIの生成に失敗しました ! ! !\n");
+
+			return E_FAIL;
+		}
+	}
+
 	return S_OK;
 }
 
@@ -165,14 +182,21 @@ HRESULT CGame::Init(void)
 void CGame::Uninit(void)
 {
 	// テクスチャを破棄
+	CJumpMeterUI::Unload();
 	CEnergyUI::Unload();
+
+	// ジャンプメーターUIの破棄
+	if (m_pJumpMeterUI != NULL)
+	{// NULLチェック
+		m_pJumpMeterUI = NULL;
+	}
 
 	// エネルギーUIの破棄
 	if (m_pEnergyUI != NULL)
 	{// NULLチェック
 		m_pEnergyUI = NULL;
 	}
-	
+
 	// 船の破棄
 	if (m_pShip != NULL)
 	{// NULLチェック

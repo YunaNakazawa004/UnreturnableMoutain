@@ -19,6 +19,7 @@ class CShip;
 class CMeshField;
 class CMapObject;
 class CEnergyUI;
+class CJumpMeterUI;
 
 //************************************************************************
 // ゲーム画面クラス
@@ -40,6 +41,7 @@ public:
 	static CMeshField* GetMountain(void) { return m_pMountain; }
 	static CMapObject* GetMapObject(void) { return m_pMapObject; }
 	static CEnergyUI* GetEnergyUI(void) { return m_pEnergyUI; }
+	static CJumpMeterUI* GetJumpMeterUI(void) { return m_pJumpMeterUI; }
 
 	static void SetFadeEnable(void) { m_bFade = true; }
 
@@ -50,6 +52,7 @@ private:
 	static CMeshField* m_pMountain;					// 山のインスタンス
 	static CMapObject* m_pMapObject;				// マップオブジェクトのインスタンス
 	static CEnergyUI* m_pEnergyUI;					// エネルギーUIのインスタンス
+	static CJumpMeterUI* m_pJumpMeterUI;			// ジャンプメーターUIのインスタンス
 
 	static bool m_bFade;		// 遷移フラグ
 };
