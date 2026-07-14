@@ -27,6 +27,7 @@
 
 #include "object3D.h"
 #include "mountain.h"
+#include "beach.h"
 #include "UI_energy.h"
 #include "UI_jump_meter.h"
 
@@ -217,6 +218,7 @@ void CPlayer::Update(void)
 	CInputJoypad* pInputJoypad = CManager::GetInputJoypad();			// ジョイパッド入力の取得
 	CDebugProc* pDebugProc = CManager::GetDebugProc();					// デバッグ表示の取得
 	CMountain* pMountain = CGame::GetMountain();						// 山の取得
+	CBeach* pBeach = CGame::GetBeach();									// 砂浜の取得
 	CEnergyUI* pEnergyUI = CGame::GetEnergyUI();			// エネルギーUIの取得
 	CJumpMeterUI* pJumpMeterUI = CGame::GetJumpMeterUI();	// ジャンプメーターUIの取得
 	CShip* pShip = CGame::GetShip();						// 船の取得
@@ -227,8 +229,15 @@ void CPlayer::Update(void)
 	D3DXVECTOR3 UpperPosOff = m_apModel[1]->GetPosOffC();	// 上半身の位置(オフセット保存)
 	D3DXVECTOR3 UpperPos = m_apModel[1]->GetPosOff();		// 上半身の位置(オフセットをいじる)
 
+	float fHeightM = 0.0f;		// 山の地面の高さ
+	D3DXVECTOR2 polygonIdxM = { -1.0f,-1.0f };		// ポリゴン番号
+
+	float fHeightB = 0.0f;		// 砂浜の地面の高さ
+	D3DXVECTOR2 polygonIdxB = { -1.0f,-1.0f };		// ポリゴン番号
+
 	float fHeight = 0.0f;		// 地面の高さ
 	D3DXVECTOR2 polygonIdx = { -1.0f,-1.0f };		// ポリゴン番号
+	CMeshField* pMeshField = NULL;					// どちらに乗っているか
 
 	bool bLand = false;			// オブジェクトへの着地判定
 	bool bHead = false;			// オブジェクトへの頭ぶつかり判定
@@ -404,22 +413,65 @@ void CPlayer::Update(void)
 	// 角度を慣性ありで加算
 	rot.y += (m_rotDest.y - rot.y) * 0.1f;
 
-	// ポリゴン番号を取得
-	polygonIdx = pMountain->GetPolygonIdx(pos);
+	// 山のポリゴン番号を取得
+	polygonIdxM = pMountain->GetPolygonIdx(pos);
 
-	pDebugProc->Print("傾斜 : %f\n", pMountain->GetSlope(pos, polygonIdx));
+	// 山の地面の高さを取得
+	fHeightM = pMountain->GetHeight(pos, polygonIdxM);
+
+	// 砂浜のポリゴン番号を取得
+	polygonIdxB = pBeach->GetPolygonIdx(pos);
+
+	// 砂浜の地面の高さを取得
+	fHeightB = pBeach->GetHeight(pos, polygonIdxB);
+
+	// 最終的な高さ/ポリゴン番号
+	if (fHeightM >= fHeightB)
+	{// 山
+		fHeight = fHeightM;
+		polygonIdx = polygonIdxM;
+		pMeshField = pMountain;
+	}
+	else
+	{// 砂浜
+		fHeight = fHeightB;
+		polygonIdx = polygonIdxB;
+		pMeshField = pBeach;
+	}
+
+	pDebugProc->Print("傾斜 : %f\n", pMeshField->GetSlope(pos, polygonIdx));
 
 	if (m_bJump == false)
 	{// 地上にいるときだけ
 		// 傾斜によって進む距離を調整
-		pos = m_posOld + ((pos - m_posOld) * pMountain->GetSlope(pos, polygonIdx));
+		pos = m_posOld + ((pos - m_posOld) * pMeshField->GetSlope(pos, polygonIdx));
 	}
 
-	// 乗っているポリゴン番号を再計算
-	polygonIdx = pMountain->GetPolygonIdx(pos);
+	// 山のポリゴン番号を取得
+	polygonIdxM = pMountain->GetPolygonIdx(pos);
 
-	// 地面の高さを取得
-	fHeight = pMountain->GetHeight(pos, polygonIdx);
+	// 山の地面の高さを取得
+	fHeightM = pMountain->GetHeight(pos, polygonIdxM);
+
+	// 砂浜のポリゴン番号を取得
+	polygonIdxB = pBeach->GetPolygonIdx(pos);
+
+	// 砂浜の地面の高さを取得
+	fHeightB = pBeach->GetHeight(pos, polygonIdxB);
+
+	// 最終的な高さ/ポリゴン番号
+	if (fHeightM >= fHeightB)
+	{// 山
+		fHeight = fHeightM;
+		polygonIdx = polygonIdxM;
+		pMeshField = pMountain;
+	}
+	else
+	{// 砂浜
+		fHeight = fHeightB;
+		polygonIdx = polygonIdxB;
+		pMeshField = pBeach;
+	}
 
 	if (fHeight == ERROR_HEIGHT)
 	{// 無効な高さだったら
@@ -430,7 +482,7 @@ void CPlayer::Update(void)
 	{// 地面にめり込んだときだけ
 		pos.y = fHeight;
 
-		if (pMountain->GetSlope(pos, polygonIdx) <= UNCLIMB_SLOPE && m_bJump == false)
+		if (pMeshField->GetSlope(pos, polygonIdx) <= UNCLIMB_SLOPE && m_bJump == false)
 		{// 傾斜の角度的に登れない/地面にいる
 			pos = m_posOld;
 		}
@@ -555,8 +607,8 @@ void CPlayer::Update(void)
 	{// 一定時間移動し続けると減少
 		if (m_bJump == false)
 		{// 地上
-			m_fEnergy -= 2.0f - pMountain->GetSlope(pos, polygonIdx);		// 減らす
-			m_fUsedEnergy += 2.0f - pMountain->GetSlope(pos, polygonIdx);
+			m_fEnergy -= 2.0f - pMeshField->GetSlope(pos, polygonIdx);		// 減らす
+			m_fUsedEnergy += 2.0f - pMeshField->GetSlope(pos, polygonIdx);
 		}
 		else
 		{// 空中

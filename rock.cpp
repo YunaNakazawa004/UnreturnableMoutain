@@ -11,6 +11,7 @@
 
 #include "game.h"
 #include "mountain.h"
+#include "beach.h"
 
 //************************************************************************
 // マクロ定義
@@ -107,16 +108,31 @@ void CRock::Uninit(void)
 void CRock::Update(void)
 {
 	CMountain* pMountain = CGame::GetMountain();					// 山の取得
+	CBeach* pBeach = CGame::GetBeach();								// 砂浜の取得
 	D3DXVECTOR3 pos = GetPosition();
 
+	float fHeightM = 0.0f;		// 山の地面の高さ
+	D3DXVECTOR2 polygonIdxM = { -1.0f,-1.0f };		// ポリゴン番号
+
+	float fHeightB = 0.0f;		// 砂浜の地面の高さ
+	D3DXVECTOR2 polygonIdxB = { -1.0f,-1.0f };		// ポリゴン番号
+
 	float fHeight = 0.0f;		// 地面の高さ
-	D3DXVECTOR2 polygonIdx = { -1.0f,-1.0f };		// ポリゴン番号
 
-	// ポリゴン番号を取得
-	polygonIdx = pMountain->GetPolygonIdx(pos);
+	// 山のポリゴン番号を取得
+	polygonIdxM = pMountain->GetPolygonIdx(pos);
 
-	// 地面の高さを取得
-	fHeight = pMountain->GetHeight(pos, polygonIdx);
+	// 山の地面の高さを取得
+	fHeightM = pMountain->GetHeight(pos, polygonIdxM);
+
+	// 砂浜のポリゴン番号を取得
+	polygonIdxB = pBeach->GetPolygonIdx(pos);
+
+	// 砂浜の地面の高さを取得
+	fHeightB = pBeach->GetHeight(pos, polygonIdxB);
+
+	// 最終的な高さ
+	fHeight = (fHeightM >= fHeightB) ? fHeightM : fHeightB;
 
 	if (fHeight == ERROR_HEIGHT)
 	{// 無効な高さだったら

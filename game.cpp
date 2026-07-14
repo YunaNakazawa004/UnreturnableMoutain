@@ -128,7 +128,7 @@ HRESULT CGame::Init(void)
 		}
 	}
 	
-	// ビーチを生成
+	// 砂浜を生成
 	if (m_pBeach == NULL)
 	{// NULLチェック
 		m_pBeach = CBeach::Create(DEFAULT_VECTER3, DEFAULT_VECTER3, D3DXVECTOR2(32.0f, 32.0f),
@@ -136,7 +136,7 @@ HRESULT CGame::Init(void)
 
 		if (m_pBeach == NULL)
 		{// NULLチェック
-			OutputDebugStringA("! ! ! ビーチの生成に失敗しました ! ! !\n");
+			OutputDebugStringA("! ! ! 砂浜の生成に失敗しました ! ! !\n");
 
 			return E_FAIL;
 		}
@@ -239,7 +239,7 @@ void CGame::Uninit(void)
 		m_pPlayer = NULL;
 	}
 
-	// ビーチの破棄
+	// 砂浜の破棄
 	if (m_pBeach != NULL)
 	{// NULLチェック
 		m_pBeach = NULL;

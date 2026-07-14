@@ -18,6 +18,8 @@
 #include "model.h"
 
 #include "map_object.h"
+#include "mountain.h"
+#include "beach.h"
 #include "player.h"
 
 #include <iostream>
@@ -156,6 +158,17 @@ void CShip::Update(void)
 	CDebugProc* pDebugProc = CManager::GetDebugProc();		// デバッグ表示の取得
 	CMapObject* pMapObj = CGame::GetMapObject();			// マップオブジェクトの取得
 	CPlayer* pPlayer = CGame::GetPlayer();					// プレイヤーの取得
+	CMountain* pMountain = CGame::GetMountain();			// 山の取得
+	CBeach* pBeach = CGame::GetBeach();						// 砂浜の取得
+	D3DXVECTOR3 pos = GetPosition();
+
+	float fHeightM = 0.0f;		// 山の地面の高さ
+	D3DXVECTOR2 polygonIdxM = { -1.0f,-1.0f };		// ポリゴン番号
+
+	float fHeightB = 0.0f;		// 砂浜の地面の高さ
+	D3DXVECTOR2 polygonIdxB = { -1.0f,-1.0f };		// ポリゴン番号
+
+	float fHeight = 0.0f;		// 地面の高さ
 
 	pDebugProc->Print("\n*** 船 ***\n");
 
@@ -214,6 +227,32 @@ void CShip::Update(void)
 
 		break;
 	}
+
+	// 山のポリゴン番号を取得
+	polygonIdxM = pMountain->GetPolygonIdx(pos);
+
+	// 山の地面の高さを取得
+	fHeightM = pMountain->GetHeight(pos, polygonIdxM);
+
+	// 砂浜のポリゴン番号を取得
+	polygonIdxB = pBeach->GetPolygonIdx(pos);
+
+	// 砂浜の地面の高さを取得
+	fHeightB = pBeach->GetHeight(pos, polygonIdxB);
+
+	// 最終的な高さ
+	fHeight = (fHeightM >= fHeightB) ? fHeightM : fHeightB;
+
+	if (fHeight == ERROR_HEIGHT)
+	{// 無効な高さだったら
+		fHeight = 0.0f;
+	}
+
+	// 高さを代入
+	pos.y = fHeight;
+
+	// 位置を適用
+	SetPosition(pos);
 }
 
 //========================================================================

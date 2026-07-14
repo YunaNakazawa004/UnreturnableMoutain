@@ -707,7 +707,20 @@ void CMeshField::SetNor(void)
 			}
 
 			pVtx[nVtx].nor = nor;
-			pVtx[nVtx].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, (1.0f - nor.y) - 0.2f);
+
+			if (GetType() == CObject::TYPE_MOUNTAIN)
+			{// éR
+				pVtx[nVtx].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, (1.0f - nor.y) - 0.2f);
+			}
+			else if (GetType() == CObject::TYPE_BEACH)
+			{// çªïl
+				D3DXVECTOR3 dist = -pVtx[nVtx].pos;
+				D3DXVECTOR3 distDef = -pVtx[0].pos;
+				float fDist = D3DXVec3Length(&dist);
+				float fDistDef = D3DXVec3Length(&distDef);
+				float fAlpha = (fDist / (fDistDef * 0.45f)) * (fDist / (fDistDef * 0.45f)) * (fDist / (fDistDef * 0.45f)) * (fDist / (fDistDef * 0.45f));
+				pVtx[nVtx].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, fAlpha * fAlpha);
+			}
 		}
 	}
 

@@ -11,6 +11,7 @@
 #include "object.h"
 #include "fade.h"
 #include "screen.h"
+#include "camera.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -120,57 +121,110 @@ HRESULT CRenderer::Init(HWND hWnd, BOOL bWindow)
 	m_pD3DDevice->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
 	m_pD3DDevice->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_CURRENT);
 
-	LPDIRECT3DSURFACE9 pRenderDef, pZBuffDef;
+	for (int nCnt = 0; nCnt < 2; nCnt++)
+	{
+		LPDIRECT3DSURFACE9 pRenderDef, pZBuffDef;
 
-	// レンダリングターゲット用テクスチャの生成
-	m_pD3DDevice->CreateTexture(SCREEN_WIDTH, SCREEN_HEIGHT,
-		1,
-		D3DUSAGE_RENDERTARGET,
-		D3DFMT_A8R8G8B8,
-		D3DPOOL_DEFAULT,
-		&m_pTextureMT,
+		// レンダリングターゲット用テクスチャの生成
+		m_pD3DDevice->CreateTexture(SCREEN_WIDTH, SCREEN_HEIGHT,
+			1,
+			D3DUSAGE_RENDERTARGET,
+			D3DFMT_A8R8G8B8,
+			D3DPOOL_DEFAULT,
+			&m_apTextureMT[nCnt],
+			NULL);
+
+		// テクスチャレンダリング用インターフェースの生成
+		m_apTextureMT[nCnt]->GetSurfaceLevel(0, &m_apRenderMT[nCnt]);
+
+		// テクスチャレンダリング用Zバッファの生成
+		m_pD3DDevice->CreateDepthStencilSurface(SCREEN_WIDTH, SCREEN_HEIGHT,
+			D3DFMT_D16,
+			D3DMULTISAMPLE_NONE,
+			0,
+			TRUE,
+			&m_pZBuffMT,
+			NULL);
+
+		// 現在のレンダリングターゲットを取得（保存）
+		m_pD3DDevice->GetRenderTarget(0, &pRenderDef);
+
+		// 現在のZバッファを取得（保存）
+		m_pD3DDevice->GetDepthStencilSurface(&pZBuffDef);
+
+		// レンダリングターゲットを生成したテクスチャに設定
+		m_pD3DDevice->SetRenderTarget(0, m_apRenderMT[nCnt]);
+
+		// Zバッファを生成したZバッファに設定
+		m_pD3DDevice->SetDepthStencilSurface(m_pZBuffMT);
+
+		// レンダリングターゲット用テクスチャのクリア
+		m_pD3DDevice->Clear(0, NULL, (D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER), D3DCOLOR_RGBA(0, 0, 0, 0), 1.0f, 0);
+
+		// レンダリングターゲットをもとに戻す
+		m_pD3DDevice->SetRenderTarget(0, pRenderDef);
+
+		// Zバッファを元に戻す
+		m_pD3DDevice->SetDepthStencilSurface(pZBuffDef);
+
+		// テクスチャレンダリング用ビューポートの設定
+		m_viewportMT.X = 0;
+		m_viewportMT.Y = 0;
+		m_viewportMT.Width = SCREEN_WIDTH;
+		m_viewportMT.Height = SCREEN_HEIGHT;
+		m_viewportMT.MinZ = 0.0f;
+		m_viewportMT.MaxZ = 1.0f;
+	}
+
+	// フィードバック用ポリゴンを生成
+	VERTEX_2D* pVtx;
+
+	// 頂点バッファの生成
+	m_pD3DDevice->CreateVertexBuffer(sizeof(VERTEX_2D) * 4,
+		D3DUSAGE_WRITEONLY,
+		FVF_VERTEX_2D,
+		D3DPOOL_MANAGED,
+		&m_pVtxBuffMT,
 		NULL);
 
-	// テクスチャレンダリング用インターフェースの生成
-	m_pTextureMT->GetSurfaceLevel(0, &m_pRenderMT);
+	// 頂点バッファをロックし、頂点情報へのポインタを取得
+	m_pVtxBuffMT->Lock(0, 0, (void**)&pVtx, 0);
 
-	// テクスチャレンダリング用Zバッファの生成
-	m_pD3DDevice->CreateDepthStencilSurface(SCREEN_WIDTH, SCREEN_HEIGHT,
-		D3DFMT_D16,
-		D3DMULTISAMPLE_NONE,
-		0,
-		TRUE,
-		&m_pZBuffMT,
-		NULL);
+	// 頂点情報の設定
+	// 頂点座標の設定
+	pVtx[0].pos.x = 0.0f;
+	pVtx[0].pos.y = 0.0f;
+	pVtx[0].pos.z = 0.0f;
+	pVtx[1].pos.x = SCREEN_WIDTH;
+	pVtx[1].pos.y = 0.0f;
+	pVtx[1].pos.z = 0.0f;
+	pVtx[2].pos.x = 0.0f;
+	pVtx[2].pos.y = SCREEN_HEIGHT;
+	pVtx[2].pos.z = 0.0f;
+	pVtx[3].pos.x = SCREEN_WIDTH;
+	pVtx[3].pos.y = SCREEN_HEIGHT;
+	pVtx[3].pos.z = 0.0f;
 
-	// 現在のレンダリングターゲットを取得（保存）
-	m_pD3DDevice->GetRenderTarget(0, &pRenderDef);
+	// rhwの設定
+	pVtx[0].rhw = 1.0f;
+	pVtx[1].rhw = 1.0f;
+	pVtx[2].rhw = 1.0f;
+	pVtx[3].rhw = 1.0f;
 
-	// 現在のZバッファを取得（保存）
-	m_pD3DDevice->GetDepthStencilSurface(&pZBuffDef);
+	// 頂点カラーの設定
+	pVtx[0].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f);
+	pVtx[1].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f);
+	pVtx[2].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f);
+	pVtx[3].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f);
 
-	// レンダリングターゲットを生成したテクスチャに設定
-	m_pD3DDevice->SetRenderTarget(0, m_pRenderMT);
+	// テクスチャ座標の設定
+	pVtx[0].tex = D3DXVECTOR2(0.0f, 0.0f);
+	pVtx[1].tex = D3DXVECTOR2(1.0f, 0.0f);
+	pVtx[2].tex = D3DXVECTOR2(0.0f, 1.0f);
+	pVtx[3].tex = D3DXVECTOR2(1.0f, 1.0f);
 
-	// Zバッファを生成したZバッファに設定
-	m_pD3DDevice->SetDepthStencilSurface(m_pZBuffMT); 
-
-	// レンダリングターゲット用テクスチャのクリア
-	m_pD3DDevice->Clear(0, NULL, (D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER), D3DCOLOR_RGBA(0, 0, 0, 0), 1.0f, 0);
-
-	// レンダリングターゲットをもとに戻す
-	m_pD3DDevice->SetRenderTarget(0, pRenderDef);
-
-	// Zバッファを元に戻す
-	m_pD3DDevice->SetDepthStencilSurface(pZBuffDef);
-
-	// テクスチャレンダリング用ビューポートの設定
-	m_viewportMT.X = 0;
-	m_viewportMT.Y = 0;
-	m_viewportMT.Width = SCREEN_WIDTH;
-	m_viewportMT.Height = SCREEN_HEIGHT;
-	m_viewportMT.MinZ = 0.0f;
-	m_viewportMT.MaxZ = 1.0f;
+	// 頂点バッファをアンロックする
+	m_pVtxBuffMT->Unlock();
 
 	return S_OK;
 }
@@ -195,17 +249,23 @@ void CRenderer::Uninit(void)
 	}
 
 	// テクスチャの破棄
-	if (m_pTextureMT != NULL)
+	for (int nCnt = 0; nCnt < 2; nCnt++)
 	{
-		m_pTextureMT->Release();
-		m_pTextureMT = NULL;
+		if (m_apTextureMT[nCnt] != NULL)
+		{
+			m_apTextureMT[nCnt]->Release();
+			m_apTextureMT[nCnt] = NULL;
+		}
 	}
 
 	// インターフェースの破棄
-	if (m_pRenderMT != NULL)
+	for (int nCnt = 0; nCnt < 2; nCnt++)
 	{
-		m_pRenderMT->Release();
-		m_pRenderMT = NULL;
+		if (m_apRenderMT[nCnt] != NULL)
+		{
+			m_apRenderMT[nCnt]->Release();
+			m_apRenderMT[nCnt] = NULL;
+		}
 	}
 
 	// Zバッファの破棄
@@ -213,6 +273,13 @@ void CRenderer::Uninit(void)
 	{
 		m_pZBuffMT->Release();
 		m_pZBuffMT = NULL;
+	}
+
+	// 頂点バッファの破棄
+	if (m_pVtxBuffMT != NULL)
+	{
+		m_pVtxBuffMT->Release();
+		m_pVtxBuffMT = NULL;
 	}
 }
 
@@ -230,24 +297,151 @@ void CRenderer::Update(void)
 //========================================================================
 void CRenderer::Draw(void)
 {
+	// ローカル変数
+	LPDIRECT3DSURFACE9 pRenderWk;
+	LPDIRECT3DTEXTURE9 pTextureWk;
+
 	// 画面クリア(バックバッファとZバッファのクリア)
 	m_pD3DDevice->Clear(0, NULL, (D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER), D3DCOLOR_RGBA(0, 0, 0, 0), 1.0f, 0);
 
 	// 描画開始
 	if (SUCCEEDED(m_pD3DDevice->BeginScene()))
 	{// 描画開始が成功した場合
+
+#ifdef MALTITARGET_RENDERING
+		LPDIRECT3DSURFACE9 pRenderDef, pZBuffDef;				// 現在のレンダリング保存用
+		D3DVIEWPORT9 viewportDef;								// 現在のビューポート保存用
+		D3DXMATRIX mtxViewDef, mtxProjectionDef;				// 現在のマトリックス保存用
+		CCamera* pCamera = CManager::GetCamera();				// カメラの取得
+		VERTEX_2D* pVtx;
+
+		// 現在のレンダリングターゲットを取得（保存）
+		m_pD3DDevice->GetRenderTarget(0, &pRenderDef);
+
+		// 現在のZバッファを取得（保存）
+		m_pD3DDevice->GetDepthStencilSurface(&pZBuffDef);
+
+		// 現在のビューポートを取得（保存）
+		m_pD3DDevice->GetViewport(&viewportDef);
+
+		// 現在のビューマトリックスを取得（保存）
+		m_pD3DDevice->GetTransform(D3DTS_VIEW, &mtxViewDef);
+
+		// 現在のプロジェクションマトリックスを取得（保存）
+		m_pD3DDevice->GetTransform(D3DTS_PROJECTION, &mtxProjectionDef);
+
+		// レンダリングターゲットを変更
+		ChangeTarget(pCamera->GetPositionV(), pCamera->GetPositionR(), D3DXVECTOR3(0.0f, 1.0f, 0.0f));
+
+		// レンダリングターゲット用テクスチャのクリア
+		m_pD3DDevice->Clear(0, NULL, (D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER), D3DCOLOR_RGBA(0, 0, 0, 0), 1.0f, 0);
+
+#endif
+
 		// 全てのオブジェクトの描画
 		CObject::DrawAll();
 
 #ifdef MALTITARGET_RENDERING
-		// 画面
-		CScreen* pScreen = CManager::GetScreen();
 
-		if (pScreen != NULL)
-		{// NULLチェック
-			// 画面の描画
-			pScreen->Draw();
-		}
+		// 頂点バッファをロックし、頂点情報へのポインタを取得
+		m_pVtxBuffMT->Lock(0, 0, (void**)&pVtx, 0);
+
+		// 頂点座標の設定
+		pVtx[0].pos.x = -10.0f;
+		pVtx[0].pos.y = -10.0f;
+		pVtx[0].pos.z = 0.0f;
+		pVtx[1].pos.x = SCREEN_WIDTH + 10.0f;
+		pVtx[1].pos.y = -10.0f;
+		pVtx[1].pos.z = 0.0f;
+		pVtx[2].pos.x = -10.0f;
+		pVtx[2].pos.y = SCREEN_HEIGHT + 10.0f;
+		pVtx[2].pos.z = 0.0f;
+		pVtx[3].pos.x = SCREEN_WIDTH + 10.0f;
+		pVtx[3].pos.y = SCREEN_HEIGHT + 10.0f;
+		pVtx[3].pos.z = 0.0f;
+
+		// 頂点カラーの設定
+		pVtx[0].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f);
+		pVtx[1].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f);
+		pVtx[2].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f);
+		pVtx[3].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f);
+
+		// 頂点バッファをアンロックする
+		m_pVtxBuffMT->Unlock();
+
+		// 頂点バッファをデータストリームに設定
+		m_pD3DDevice->SetStreamSource(0, m_pVtxBuffMT, 0, sizeof(VERTEX_2D));
+
+		// 頂点フォーマットの設定
+		m_pD3DDevice->SetFVF(FVF_VERTEX_2D);
+
+		// テクスチャの設定
+		m_pD3DDevice->SetTexture(0, m_apTextureMT[1]);
+
+		// ポリゴンの描画
+		m_pD3DDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
+
+		// レンダリングターゲットをもとに戻す
+		m_pD3DDevice->SetRenderTarget(0, pRenderDef);
+
+		// Zバッファを元に戻す
+		m_pD3DDevice->SetDepthStencilSurface(pZBuffDef);
+
+		// ビューポートを元に戻す
+		m_pD3DDevice->SetViewport(&viewportDef);
+
+		// ビューマトリックスを元に戻す
+		m_pD3DDevice->SetTransform(D3DTS_VIEW, &mtxViewDef);
+
+		// プロジェクションマトリックスを元に戻す
+		m_pD3DDevice->SetTransform(D3DTS_PROJECTION, &mtxProjectionDef);
+
+		// 頂点バッファをロックし、頂点情報へのポインタを取得
+		m_pVtxBuffMT->Lock(0, 0, (void**)&pVtx, 0);
+
+		// 頂点座標の設定
+		pVtx[0].pos.x = 0.0f;
+		pVtx[0].pos.y = 0.0f;
+		pVtx[0].pos.z = 0.0f;
+		pVtx[1].pos.x = SCREEN_WIDTH;
+		pVtx[1].pos.y = 0.0f;
+		pVtx[1].pos.z = 0.0f;
+		pVtx[2].pos.x = 0.0f;
+		pVtx[2].pos.y = SCREEN_HEIGHT;
+		pVtx[2].pos.z = 0.0f;
+		pVtx[3].pos.x = SCREEN_WIDTH;
+		pVtx[3].pos.y = SCREEN_HEIGHT;
+		pVtx[3].pos.z = 0.0f;
+
+		// 頂点カラーの設定
+		pVtx[0].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+		pVtx[1].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+		pVtx[2].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+		pVtx[3].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+
+		// 頂点バッファをアンロックする
+		m_pVtxBuffMT->Unlock();
+
+		// 頂点バッファをデータストリームに設定
+		m_pD3DDevice->SetStreamSource(0, m_pVtxBuffMT, 0, sizeof(VERTEX_2D));
+
+		// 頂点フォーマットの設定
+		m_pD3DDevice->SetFVF(FVF_VERTEX_2D);
+
+		// テクスチャの設定
+		m_pD3DDevice->SetTexture(0, m_apTextureMT[0]);
+
+		// ポリゴンの描画
+		m_pD3DDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
+
+		// テクスチャ[0]とテクスチャ[1]を入れ替える
+		pTextureWk = m_apTextureMT[0];
+		m_apTextureMT[0] = m_apTextureMT[1];
+		m_apTextureMT[1] = pTextureWk;
+
+		pRenderWk = m_apRenderMT[0];
+		m_apRenderMT[0] = m_apRenderMT[1];
+		m_apRenderMT[1] = pRenderWk;
 #endif
 
 		// フェード
@@ -285,7 +479,7 @@ void CRenderer::ChangeTarget(D3DXVECTOR3 posV, D3DXVECTOR3 posR, D3DXVECTOR3 vec
 	float fAspect;
 
 	// レンダリングターゲットを生成したテクスチャに設定
-	m_pD3DDevice->SetRenderTarget(0, m_pRenderMT);
+	m_pD3DDevice->SetRenderTarget(0, m_apRenderMT[0]);
 
 	// Zバッファを生成したZバッファに設定
 	m_pD3DDevice->SetDepthStencilSurface(m_pZBuffMT);

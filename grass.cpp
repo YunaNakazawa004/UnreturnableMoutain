@@ -12,6 +12,7 @@
 
 #include "game.h"
 #include "mountain.h"
+#include "beach.h"
 #include "player.h"
 
 //************************************************************************
@@ -153,11 +154,17 @@ void CGrass::Update(void)
 {
 	// ローカル変数
 	CMountain* pMountain = CGame::GetMountain();					// 山の取得
+	CBeach* pBeach = CGame::GetBeach();								// 砂浜の取得
 	D3DXVECTOR3 pos = CObject3D::GetPosition();
 	D3DXVECTOR3 rot = CObject3D::GetRotation();
 
+	float fHeightM = 0.0f;		// 山の地面の高さ
+	D3DXVECTOR2 polygonIdxM = { -1.0f,-1.0f };		// ポリゴン番号
+
+	float fHeightB = 0.0f;		// 砂浜の地面の高さ
+	D3DXVECTOR2 polygonIdxB = { -1.0f,-1.0f };		// ポリゴン番号
+
 	float fHeight = 0.0f;		// 地面の高さ
-	D3DXVECTOR2 polygonIdx = { -1.0f,-1.0f };		// ポリゴン番号
 
 	// オフセットの向きを抜いた値にする
 	rot -= m_rotOff;
@@ -169,11 +176,20 @@ void CGrass::Update(void)
 	// プレイヤーとの当たり判定
 	CollisionPlayer();
 
-	// ポリゴン番号を取得
-	polygonIdx = pMountain->GetPolygonIdx(pos);
+	// 山のポリゴン番号を取得
+	polygonIdxM = pMountain->GetPolygonIdx(pos);
 
-	// 地面の高さを取得
-	fHeight = pMountain->GetHeight(pos, polygonIdx);
+	// 山の地面の高さを取得
+	fHeightM = pMountain->GetHeight(pos, polygonIdxM);
+
+	// 砂浜のポリゴン番号を取得
+	polygonIdxB = pMountain->GetPolygonIdx(pos);
+
+	// 砂浜の地面の高さを取得
+	fHeightB = pMountain->GetHeight(pos, polygonIdxB);
+
+	// 最終的な高さ
+	fHeight = (fHeightM >= fHeightB) ? fHeightM : fHeightB;
 
 	if (fHeight == ERROR_HEIGHT)
 	{// 無効な高さだったら
