@@ -16,6 +16,7 @@
 
 #include "mountain.h"
 #include "beach.h"
+#include "watersurface.h"
 #include "grass.h"
 #include "map_object.h"
 #include "player.h"
@@ -32,6 +33,7 @@ CPlayer* CGame::m_pPlayer = NULL;					// プレイヤーのインスタンス
 CShip* CGame::m_pShip = NULL;						// 船のインスタンス
 CMountain* CGame::m_pMountain = NULL;				// 山のインスタンス
 CBeach* CGame::m_pBeach = NULL;						// 砂浜のインスタンス
+CWaterSurface* CGame::m_pWaterSurface = NULL;		// 海のインスタンス
 CMapObject* CGame::m_pMapObject = NULL;				// マップオブジェクトのインスタンス
 CEnergyUI* CGame::m_pEnergyUI = NULL;				// エネルギーUIのインスタンス
 CJumpMeterUI* CGame::m_pJumpMeterUI = NULL;			// ジャンプメーターUIのインスタンス
@@ -48,6 +50,7 @@ CGame::CGame() : CScene(CScene::MODE_GAME)
 	m_pShip = NULL;
 	m_pMountain = NULL;
 	m_pBeach = NULL;
+	m_pWaterSurface = NULL;
 	m_pMapObject = NULL;
 	m_pEnergyUI = NULL;
 	m_pJumpMeterUI = NULL;
@@ -75,6 +78,7 @@ HRESULT CGame::Init(void)
 	CJumpMeterUI::Load();
 	CMountain::Load();
 	CBeach::Load();
+	CWaterSurface::Load();
 	CGrass::Load();
 
 	// ポーズを生成
@@ -127,7 +131,7 @@ HRESULT CGame::Init(void)
 			return E_FAIL;
 		}
 	}
-	
+
 	// 砂浜を生成
 	if (m_pBeach == NULL)
 	{// NULLチェック
@@ -143,6 +147,26 @@ HRESULT CGame::Init(void)
 
 		// ステージのデータを読み込む
 		if (FAILED(m_pBeach->ReadData("data\\Outstage.bin")))
+		{// もし失敗したら
+			return E_FAIL;
+		}
+	}
+
+	// 海を生成
+	if (m_pWaterSurface == NULL)
+	{// NULLチェック
+		m_pWaterSurface = CWaterSurface::Create(D3DXVECTOR3(0.0f, 30.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR2(150.0f, 150.0f),
+			D3DXVECTOR2(100.0f, 100.0f));
+
+		if (m_pWaterSurface == NULL)
+		{// NULLチェック
+			OutputDebugStringA("! ! ! 海の生成に失敗しました ! ! !\n");
+
+			return E_FAIL;
+		}
+
+		// ステージのデータを読み込む
+		if (FAILED(m_pWaterSurface->ReadData("data\\watersurface.bin")))
 		{// もし失敗したら
 			return E_FAIL;
 		}
@@ -210,6 +234,7 @@ void CGame::Uninit(void)
 {
 	// テクスチャを破棄
 	CGrass::Unload();
+	CWaterSurface::Unload();
 	CBeach::Unload();
 	CMountain::Unload();
 	CJumpMeterUI::Unload();
@@ -239,12 +264,18 @@ void CGame::Uninit(void)
 		m_pPlayer = NULL;
 	}
 
+	// 海の破棄
+	if (m_pWaterSurface != NULL)
+	{// NULLチェック
+		m_pWaterSurface = NULL;
+	}
+	
 	// 砂浜の破棄
 	if (m_pBeach != NULL)
 	{// NULLチェック
 		m_pBeach = NULL;
 	}
-	
+
 	// 山の破棄
 	if (m_pMountain != NULL)
 	{// NULLチェック

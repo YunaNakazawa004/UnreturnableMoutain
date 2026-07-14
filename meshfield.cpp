@@ -137,7 +137,7 @@ HRESULT CMeshField::Init(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot,
 			pVtx[nVtx].pos.z = -((float)nCntMeshField1 * m_size.y * 2.0f) + ((m_block.y * m_size.y * 2.0f) * 0.5f);
 
 			// 頂点カラーの設定
-			pVtx[nVtx].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.0f);
+			pVtx[nVtx].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 
 			// テクスチャ座標の設定
 			pVtx[nVtx].tex = D3DXVECTOR2((float)nCntMeshField2, (float)nCntMeshField1);
@@ -293,6 +293,43 @@ void CMeshField::SetPosition(const D3DXVECTOR3 pos)
 }
 
 //========================================================================
+// 頂点の位置設定
+//========================================================================
+void CMeshField::SetPosVtx(const int nCntVtx, const D3DXVECTOR3 pos)
+{
+	VERTEX_3D_MALTI* pVtx;
+
+	// 頂点バッファをロックし、頂点情報へのポインタを取得
+	m_pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
+
+	// 頂点カラーの設定
+	pVtx[nCntVtx].pos = pos;
+
+	// 頂点バッファをアンロックする
+	m_pVtxBuff->Unlock();
+}
+
+//========================================================================
+// 頂点の位置取得
+//========================================================================
+D3DXVECTOR3 CMeshField::GetPosVtx(const int nCntVtx)
+{
+	VERTEX_3D_MALTI* pVtx;
+	D3DXVECTOR3 pos;
+
+	// 頂点バッファをロックし、頂点情報へのポインタを取得
+	m_pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
+
+	// 頂点カラーの設定
+	pos = pVtx[nCntVtx].pos;
+
+	// 頂点バッファをアンロックする
+	m_pVtxBuff->Unlock();
+
+	return pos;
+}
+
+//========================================================================
 // スケール設定
 //========================================================================
 void CMeshField::SetScale(const D3DXVECTOR3 scale)
@@ -373,6 +410,42 @@ void CMeshField::SetTexUV(const int nCntVtx, const float ftexU, const float ftex
 
 	// テクスチャ座標の設定
 	pVtx[nCntVtx].tex = D3DXVECTOR2(ftexU, ftexV);
+
+	// 頂点バッファをアンロックする
+	m_pVtxBuff->Unlock();
+}
+
+//========================================================================
+// テクスチャスクロール
+//========================================================================
+void CMeshField::SetTexScroll(const int nCntVtx, const float fScrollU, const float fScrollV)
+{
+	VERTEX_3D_MALTI* pVtx;
+
+	// 頂点バッファをロックし、頂点情報へのポインタを取得
+	m_pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
+
+	// テクスチャ座標の設定
+	pVtx[nCntVtx].tex.x += fScrollU;
+	pVtx[nCntVtx].tex.y += fScrollV;
+
+	// 頂点バッファをアンロックする
+	m_pVtxBuff->Unlock();
+}
+
+//========================================================================
+// マルチテクスチャスクロール
+//========================================================================
+void CMeshField::SetTexMScroll(const int nCntVtx, const float fScrollU, const float fScrollV)
+{
+	VERTEX_3D_MALTI* pVtx;
+
+	// 頂点バッファをロックし、頂点情報へのポインタを取得
+	m_pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
+
+	// テクスチャ座標の設定
+	pVtx[nCntVtx].texM.x += fScrollU;
+	pVtx[nCntVtx].texM.y += fScrollV;
 
 	// 頂点バッファをアンロックする
 	m_pVtxBuff->Unlock();
@@ -720,6 +793,10 @@ void CMeshField::SetNor(void)
 				float fDistDef = D3DXVec3Length(&distDef);
 				float fAlpha = (fDist / (fDistDef * 0.45f)) * (fDist / (fDistDef * 0.45f)) * (fDist / (fDistDef * 0.45f)) * (fDist / (fDistDef * 0.45f));
 				pVtx[nVtx].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, fAlpha * fAlpha);
+			}
+			else if (GetType() == CObject::TYPE_WATERSURFACE)
+			{// 海
+				pVtx[nVtx].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.75f);
 			}
 		}
 	}

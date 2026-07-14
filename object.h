@@ -19,6 +19,7 @@
 #define BULLET_PRIORITY		(1)				// デフォルト弾優先順位
 #define OBJECT_PRIORITY		(2)				// デフォルトオブジェクト優先順位
 #define PLAYER_PRIORITY		(3)				// デフォルトプレイヤー優先順位
+#define FIELD_PRIORITY		(4)				// デフォルトフィールド優先順位
 #define EFFECT_PRIORITY		(2)				// デフォルトエフェクト優先順位
 #define FRAME_PRIORITY		(5)				// デフォルトUIフレーム優先順位
 #define UI_PRIORITY			(6)				// デフォルトUI優先順位
@@ -76,6 +77,7 @@ public:
 		TYPE_OBJECTBILLBOARD,	// オブジェクトビルボード
 		TYPE_MOUNTAIN,			// 山
 		TYPE_BEACH,				// 砂浜
+		TYPE_WATERSURFACE,		// 海
 		TYPE_PLAYER,			// プレイヤー
 		TYPE_SHIP,				// 船
 		TYPE_ENERGYROCK,		// エネルギー鉱物

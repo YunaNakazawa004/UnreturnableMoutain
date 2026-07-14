@@ -38,6 +38,8 @@ public:
 
 	void SetPosition(const D3DXVECTOR3 pos);
 	D3DXVECTOR3 GetPosition(void) { return m_pos; }
+	void SetPosVtx(const int nCntVtx, const D3DXVECTOR3 pos);
+	D3DXVECTOR3 GetPosVtx(const int nCntVtx);
 	void SetRotation(const D3DXVECTOR3 rot);
 	D3DXVECTOR3 GetRotation(void) { return m_rot; }
 	void SetScale(const D3DXVECTOR3 scale);
@@ -46,6 +48,12 @@ public:
 	void SetColor(const int nCntVtx, const D3DXCOLOR col);
 	D3DXCOLOR GetColor(void) { return m_col; }
 	void SetTexUV(const int nCntVtx, const float ftexU, const float ftexV);
+	void SetTexScroll(const int nCntVtx, const float fScrollU, const float fScrollV);
+	void SetTexMScroll(const int nCntVtx, const float fScrollU, const float fScrollV);
+	D3DXVECTOR2 GetSize(void) { return m_size; }
+	D3DXVECTOR2 GetBlock(void) { return m_block; }
+	int GetNumVtx(void) { return m_nNumVtx; }
+	int GetNumIdx(void) { return m_nNumIdx; }
 	void SetNor(void);
 	void SetDisp(const bool bDisp) { m_bDisp = bDisp; }
 	void SwapDisp(void) { m_bDisp = m_bDisp ? false : true; }
