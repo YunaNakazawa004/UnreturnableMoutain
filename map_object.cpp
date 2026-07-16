@@ -19,6 +19,7 @@
 #include "rock.h"
 #include "flower.h"
 #include "energyrock.h"
+#include "UI_item.h"
 
 #include "player.h"
 
@@ -42,47 +43,47 @@ int CMapObject::m_nNumCollectObj = 0;					  				// 収集アイテムの総数
 //========================================================================
 void CMapObject::Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot, const int mapObj, const bool bCollect)
 {
-	if (m_aMapObject[m_nNumObject].m_apObject == NULL)
+	if (m_aMapObject[m_nNumObject].apObject == NULL)
 	{// NULLチェック
 		switch (mapObj)
 		{
 		case MAP_OBJ_GRASS:			// 草を生成
-			m_aMapObject[m_nNumObject].m_apObject = CGrass::Create(pos, rot);
-			m_aMapObject[m_nNumObject].m_aObjType = mapObj;
-			m_aMapObject[m_nNumObject].m_bCollect = bCollect;
+			m_aMapObject[m_nNumObject].apObject = CGrass::Create(pos, rot);
+			m_aMapObject[m_nNumObject].aObjType = mapObj;
+			m_aMapObject[m_nNumObject].bCollect = bCollect;
 
 			break;
 
 		case MAP_OBJ_TREE:			// 木を生成
-			m_aMapObject[m_nNumObject].m_apObject = CTree::Create(pos, rot);
-			m_aMapObject[m_nNumObject].m_aObjType = mapObj;
-			m_aMapObject[m_nNumObject].m_bCollect = bCollect;
+			m_aMapObject[m_nNumObject].apObject = CTree::Create(pos, rot);
+			m_aMapObject[m_nNumObject].aObjType = mapObj;
+			m_aMapObject[m_nNumObject].bCollect = bCollect;
 
 			break;
 
 		case MAP_OBJ_ROCK:			// 岩を生成
-			m_aMapObject[m_nNumObject].m_apObject = CRock::Create(pos, rot);
-			m_aMapObject[m_nNumObject].m_aObjType = mapObj;
-			m_aMapObject[m_nNumObject].m_bCollect = bCollect;
+			m_aMapObject[m_nNumObject].apObject = CRock::Create(pos, rot);
+			m_aMapObject[m_nNumObject].aObjType = mapObj;
+			m_aMapObject[m_nNumObject].bCollect = bCollect;
 
 			break;
 
 		case MAP_OBJ_FLOWER:		// 花を生成
-			m_aMapObject[m_nNumObject].m_apObject = CFlower::Create(pos, rot);
-			m_aMapObject[m_nNumObject].m_aObjType = mapObj;
-			m_aMapObject[m_nNumObject].m_bCollect = bCollect;
+			m_aMapObject[m_nNumObject].apObject = CFlower::Create(pos, rot);
+			m_aMapObject[m_nNumObject].aObjType = mapObj;
+			m_aMapObject[m_nNumObject].bCollect = bCollect;
 
 			break;
 
 		case MAP_OBJ_ENERGYROCK:	// エネルギー鉱石を生成
-			m_aMapObject[m_nNumObject].m_apObject = CEnergyRock::Create(pos, rot);
-			m_aMapObject[m_nNumObject].m_aObjType = mapObj;
-			m_aMapObject[m_nNumObject].m_bCollect = bCollect;
+			m_aMapObject[m_nNumObject].apObject = CEnergyRock::Create(pos, rot);
+			m_aMapObject[m_nNumObject].aObjType = mapObj;
+			m_aMapObject[m_nNumObject].bCollect = bCollect;
 
 			break;
 		}
 
-		if (m_aMapObject[m_nNumObject].m_apObject != NULL)
+		if (m_aMapObject[m_nNumObject].apObject != NULL)
 		{// 生成できた
 			// 総数をカウントアップ
 			m_nNumObject++;
@@ -134,12 +135,12 @@ void CMapObject::Uninit(void)
 {
 	for (int nCnt = 0; nCnt < MAX_MAP_OBJECT; nCnt++)
 	{
-		if (m_aMapObject[nCnt].m_apObject != NULL)
+		if (m_aMapObject[nCnt].apObject != NULL)
 		{// NULLチェック
 			// 終了処理
-			m_aMapObject[nCnt].m_apObject->Uninit();
+			m_aMapObject[nCnt].apObject->Uninit();
 
-			m_aMapObject[nCnt].m_apObject = NULL;
+			m_aMapObject[nCnt].apObject = NULL;
 		}
 	}
 }
@@ -154,14 +155,14 @@ void CMapObject::Update(void)
 
 	for (int nCnt = 0; nCnt < MAX_MAP_OBJECT; nCnt++)
 	{
-		if (m_aMapObject[nCnt].m_apObject != NULL)
+		if (m_aMapObject[nCnt].apObject != NULL)
 		{// NULLチェック
-			if (m_aMapObject[nCnt].m_bCollect == true)
+			if (m_aMapObject[nCnt].bCollect == true)
 			{// 収集アイテムだったら
-				CParticle3D::Create(m_aMapObject[nCnt].m_apObject->GetPosition(), 1, 1, 1.0f, 0.1f, 0.03f,
+				CParticle3D::Create(m_aMapObject[nCnt].apObject->GetPosition(), 1, 1, 1.0f, 0.1f, 0.03f,
 					CEffect3D::TYPE_BLENDADD, CParticle3D::TYPE_NORMAL, 100, 0.3f, false);
 
-				CollectCollision(m_aMapObject[nCnt].m_apObject->GetPosition(), nCnt);
+				CollectCollision(m_aMapObject[nCnt].apObject->GetPosition(), nCnt);
 			}
 		}
 	}
@@ -181,6 +182,7 @@ void CMapObject::Update(void)
 //========================================================================
 bool CMapObject::CollectCollision(const D3DXVECTOR3 pos, const int nIdx)
 {
+	CItemUI* pItemUI = CGame::GetItemUI();		// アイテムUIを取得
 	D3DXVECTOR3 posPlayer = CGame::GetPlayer()->GetPosition();
 	D3DXVECTOR3 dist;
 
@@ -189,7 +191,7 @@ bool CMapObject::CollectCollision(const D3DXVECTOR3 pos, const int nIdx)
 
 	if (D3DXVec3Length(&dist) <= COLLECT_DIST)
 	{// 収集アイテムと距離が近い
-		m_aMapObject[nIdx].m_bCollect = false;
+		m_aMapObject[nIdx].bCollect = false;
 
 		CParticle3D::Create(pos, 5, 10, 1.0f, 0.1f, 0.01f,
 			CEffect3D::TYPE_BLENDADD, CParticle3D::TYPE_NORMAL, 600, 0.3f, false,
@@ -232,13 +234,13 @@ HRESULT CMapObject::WriteData(const char* pFilename)
 
 		for (int nCnt = 0; nCnt < m_nNumObject; nCnt++)
 		{
-			D3DXVECTOR3 pos = m_aMapObject[nCnt].m_apObject->GetPosition();
-			D3DXVECTOR3 rot = m_aMapObject[nCnt].m_apObject->GetRotation();
+			D3DXVECTOR3 pos = m_aMapObject[nCnt].apObject->GetPosition();
+			D3DXVECTOR3 rot = m_aMapObject[nCnt].apObject->GetRotation();
 
-			file.write((const char*)&m_aMapObject[nCnt].m_aObjType, sizeof(int));
+			file.write((const char*)&m_aMapObject[nCnt].aObjType, sizeof(int));
 			file.write((const char*)&pos, sizeof(pos));
 			file.write((const char*)&rot, sizeof(rot));
-			file.write((const char*)&m_aMapObject[nCnt].m_bCollect, sizeof(bool));
+			file.write((const char*)&m_aMapObject[nCnt].bCollect, sizeof(bool));
 		}
 
 		// ファイルを閉じる
@@ -259,6 +261,8 @@ HRESULT CMapObject::WriteData(const char* pFilename)
 //========================================================================
 HRESULT CMapObject::ReadData(const char* pFilename)
 {
+	CItemUI* pItemUI = CGame::GetItemUI();		// アイテムUIを取得
+
 	// バイナリ形式でファイルオープン
 	std::ifstream file(pFilename, std::ios_base::in | std::ios_base::binary);
 
@@ -280,13 +284,21 @@ HRESULT CMapObject::ReadData(const char* pFilename)
 			D3DXVECTOR3 pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 			D3DXVECTOR3 rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 
-			file.read((char*)&m_aMapObject[nCnt].m_aObjType, sizeof(int));
+			file.read((char*)&m_aMapObject[nCnt].aObjType, sizeof(int));
 			file.read((char*)&pos, sizeof(pos));
 			file.read((char*)&rot, sizeof(rot));
-			file.read((char*)&m_aMapObject[nCnt].m_bCollect, sizeof(bool));
+			file.read((char*)&m_aMapObject[nCnt].bCollect, sizeof(bool));
 
 			// オブジェクトの生成
-			Create(pos, rot, m_aMapObject[nCnt].m_aObjType, m_aMapObject[nCnt].m_bCollect);
+			Create(pos, rot, m_aMapObject[nCnt].aObjType, m_aMapObject[nCnt].bCollect);
+
+			if (m_aMapObject[nCnt].bCollect == true)
+			{// 収集アイテムだった場合
+				if (pItemUI != NULL)
+				{// NULLチェック
+					pItemUI->SetItem(m_aMapObject[nCnt].aObjType);
+				}
+			}
 		}
 
 		// 総数を確認

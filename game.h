@@ -22,6 +22,7 @@ class CWaterSurface;
 class CMapObject;
 class CEnergyUI;
 class CJumpMeterUI;
+class CItemUI;
 
 //************************************************************************
 // ゲーム画面クラス
@@ -46,6 +47,7 @@ public:
 	static CMapObject* GetMapObject(void) { return m_pMapObject; }
 	static CEnergyUI* GetEnergyUI(void) { return m_pEnergyUI; }
 	static CJumpMeterUI* GetJumpMeterUI(void) { return m_pJumpMeterUI; }
+	static CItemUI* GetItemUI(void) { return m_pItemUI; }
 
 	static void SetFadeEnable(void) { m_bFade = true; }
 
@@ -59,6 +61,7 @@ private:
 	static CMapObject* m_pMapObject;				// マップオブジェクトのインスタンス
 	static CEnergyUI* m_pEnergyUI;					// エネルギーUIのインスタンス
 	static CJumpMeterUI* m_pJumpMeterUI;			// ジャンプメーターUIのインスタンス
+	static CItemUI* m_pItemUI;						// アイテムUIのインスタンス
 
 	static bool m_bFade;		// 遷移フラグ
 };

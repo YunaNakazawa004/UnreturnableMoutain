@@ -24,6 +24,7 @@
 #include "energyrock.h"
 #include "UI_energy.h"
 #include "UI_jump_meter.h"
+#include "UI_item.h"
 
 //************************************************************************
 // 静的メンバ変数宣言
@@ -37,6 +38,7 @@ CWaterSurface* CGame::m_pWaterSurface = NULL;		// 海のインスタンス
 CMapObject* CGame::m_pMapObject = NULL;				// マップオブジェクトのインスタンス
 CEnergyUI* CGame::m_pEnergyUI = NULL;				// エネルギーUIのインスタンス
 CJumpMeterUI* CGame::m_pJumpMeterUI = NULL;			// ジャンプメーターUIのインスタンス
+CItemUI* CGame::m_pItemUI = NULL;					// アイテムUIのインスタンス
 bool CGame::m_bFade = false;						// 遷移フラグ
 
 //========================================================================
@@ -54,6 +56,7 @@ CGame::CGame() : CScene(CScene::MODE_GAME)
 	m_pMapObject = NULL;
 	m_pEnergyUI = NULL;
 	m_pJumpMeterUI = NULL;
+	m_pItemUI = NULL;
 	m_bFade = false;
 }
 
@@ -76,6 +79,7 @@ HRESULT CGame::Init(void)
 	// テクスチャを読み込み
 	CEnergyUI::Load();
 	CJumpMeterUI::Load();
+	CItemUI::Load();
 	CMountain::Load();
 	CBeach::Load();
 	CWaterSurface::Load();
@@ -89,6 +93,45 @@ HRESULT CGame::Init(void)
 		if (m_pPause == NULL)
 		{// NULLチェック
 			OutputDebugStringA("! ! ! ポーズの生成に失敗しました ! ! !\n");
+
+			return E_FAIL;
+		}
+	}
+
+	// エネルギーUIを生成
+	if (m_pEnergyUI == NULL)
+	{// NULLチェック
+		m_pEnergyUI = CEnergyUI::Create(D3DXVECTOR3(1150.0f, 600.0f, 0.0f), 100.0f, 100.0f);
+
+		if (m_pEnergyUI == NULL)
+		{// NULLチェック
+			OutputDebugStringA("! ! ! エネルギーUIの生成に失敗しました ! ! !\n");
+
+			return E_FAIL;
+		}
+	}
+
+	// ジャンプメーターUIを生成
+	if (m_pJumpMeterUI == NULL)
+	{// NULLチェック
+		m_pJumpMeterUI = CJumpMeterUI::Create(D3DXVECTOR3(680.0f, 340.0f, 0.0f), 5.0f, 30.0f, 100.0f);
+
+		if (m_pJumpMeterUI == NULL)
+		{// NULLチェック
+			OutputDebugStringA("! ! ! ジャンプメーターUIの生成に失敗しました ! ! !\n");
+
+			return E_FAIL;
+		}
+	}
+
+	// アイテムUIを生成
+	if (m_pItemUI == NULL)
+	{// NULLチェック
+		m_pItemUI = CItemUI::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), 340.0f, 40.0f);
+
+		if (m_pItemUI == NULL)
+		{// NULLチェック
+			OutputDebugStringA("! ! ! アイテムUIの生成に失敗しました ! ! !\n");
 
 			return E_FAIL;
 		}
@@ -198,32 +241,6 @@ HRESULT CGame::Init(void)
 		}
 	}
 
-	// エネルギーUIを生成
-	if (m_pEnergyUI == NULL)
-	{// NULLチェック
-		m_pEnergyUI = CEnergyUI::Create(D3DXVECTOR3(1150.0f, 600.0f, 0.0f), 100.0f, 100.0f);
-
-		if (m_pEnergyUI == NULL)
-		{// NULLチェック
-			OutputDebugStringA("! ! ! エネルギーUIの生成に失敗しました ! ! !\n");
-
-			return E_FAIL;
-		}
-	}
-
-	// ジャンプメーターUIを生成
-	if (m_pJumpMeterUI == NULL)
-	{// NULLチェック
-		m_pJumpMeterUI = CJumpMeterUI::Create(D3DXVECTOR3(680.0f, 340.0f, 0.0f), 5.0f, 30.0f, 100.0f);
-
-		if (m_pJumpMeterUI == NULL)
-		{// NULLチェック
-			OutputDebugStringA("! ! ! エネルギーUIの生成に失敗しました ! ! !\n");
-
-			return E_FAIL;
-		}
-	}
-
 	return S_OK;
 }
 
@@ -237,9 +254,16 @@ void CGame::Uninit(void)
 	CWaterSurface::Unload();
 	CBeach::Unload();
 	CMountain::Unload();
+	CItemUI::Unload();
 	CJumpMeterUI::Unload();
 	CEnergyUI::Unload();
 
+	// アイテムUIの破棄
+	if (m_pItemUI != NULL)
+	{// NULLチェック
+		m_pItemUI = NULL;
+	}
+	
 	// ジャンプメーターUIの破棄
 	if (m_pJumpMeterUI != NULL)
 	{// NULLチェック

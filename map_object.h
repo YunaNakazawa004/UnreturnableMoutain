@@ -39,9 +39,9 @@ public:
 	// オブジェクトの保存情報
 	typedef struct
 	{
-		CObject* m_apObject;		// 配置したオブジェクトの情報
-		int m_aObjType;				// 配置したオブジェクトの種類
-		bool m_bCollect;			// 配置したオブジェクトが収集アイテムかどうか
+		CObject* apObject;		// 配置したオブジェクトの情報
+		int aObjType;				// 配置したオブジェクトの種類
+		bool bCollect;			// 配置したオブジェクトが収集アイテムかどうか
 	}Map_Obj;
 
 	CMapObject();

@@ -186,6 +186,7 @@
     <ClCompile Include="title.cpp" />
     <ClCompile Include="tree.cpp" />
     <ClCompile Include="UI_energy.cpp" />
+    <ClCompile Include="UI_item.cpp" />
     <ClCompile Include="UI_jump_meter.cpp" />
     <ClCompile Include="UI_result.cpp" />
     <ClCompile Include="watersurface.cpp" />
@@ -232,6 +233,7 @@
     <ClInclude Include="title.h" />
     <ClInclude Include="tree.h" />
     <ClInclude Include="UI_energy.h" />
+    <ClInclude Include="UI_item.h" />
     <ClInclude Include="UI_jump_meter.h" />
     <ClInclude Include="UI_result.h" />
     <ClInclude Include="watersurface.h" />
