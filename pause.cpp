@@ -10,6 +10,7 @@
 #include "manager.h"
 #include "input.h"
 #include "fade.h"
+#include "transition.h"
 
 #include "object2D.h"
 
@@ -117,6 +118,7 @@ void CPause::Update(void)
 	CInputKeyboard* pInputKeyboard = CManager::GetInputKeyboard();		// キーボード入力の取得
 	CInputJoypad* pInputJoypad = CManager::GetInputJoypad();			// ジョイパッド入力の取得
 	CFade* pFade = CManager::GetFade();									// フェードの取得
+	CTransition* pTransition = CManager::GetTransition();				// 画面遷移の取得
 
 	for (int nCnt = 0; nCnt < MENU_MAX; nCnt++)
 	{
@@ -152,9 +154,9 @@ void CPause::Update(void)
 		case MENU_RETRY:			// モード設定(ゲーム画面に移行)
 			m_menu = MENU_RETRY;
 
-			if (pFade != NULL)
+			if (pTransition != NULL)
 			{// NULLチェック
-				pFade->SetFade(CScene::MODE_GAME);
+				pTransition->SetTransition(CScene::MODE_GAME);
 			}
 
 			// サウンドの再生
@@ -165,9 +167,9 @@ void CPause::Update(void)
 		case MENU_QUIT:			// モード設定(タイトル画面に移行)
 			m_menu = MENU_QUIT;
 
-			if (pFade != NULL)
+			if (pTransition != NULL)
 			{// NULLチェック
-				pFade->SetFade(CScene::MODE_TITLE);
+				pTransition->SetTransition(CScene::MODE_TITLE);
 			}
 
 			// サウンドの再生
