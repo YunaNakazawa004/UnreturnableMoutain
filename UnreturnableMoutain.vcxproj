@@ -185,6 +185,7 @@
     <ClCompile Include="sound.cpp" />
     <ClCompile Include="texture.cpp" />
     <ClCompile Include="title.cpp" />
+    <ClCompile Include="transition.cpp" />
     <ClCompile Include="tree.cpp" />
     <ClCompile Include="UI_energy.cpp" />
     <ClCompile Include="UI_item.cpp" />
@@ -233,6 +234,7 @@
     <ClInclude Include="sound.h" />
     <ClInclude Include="texture.h" />
     <ClInclude Include="title.h" />
+    <ClInclude Include="transition.h" />
     <ClInclude Include="tree.h" />
     <ClInclude Include="UI_energy.h" />
     <ClInclude Include="UI_item.h" />

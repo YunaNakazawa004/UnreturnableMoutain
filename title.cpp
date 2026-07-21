@@ -12,6 +12,7 @@
 #include "debugproc.h"
 #include "camera.h"
 #include "fade.h"
+#include "transition.h"
 
 #include "object2D.h"
 
@@ -84,15 +85,17 @@ void CTitle::Uninit(void)
 void CTitle::Update(void)
 {
 	CInputKeyboard* pInputKeyboard = CManager::GetInputKeyboard();		// キーボード入力の取得
-	CFade* pFade = CManager::GetFade();									// フェードの取得
+	CTransition* pTransition = CManager::GetTransition();				// 画面遷移の取得
 
 	// 画面遷移
 	if (pInputKeyboard->GetTrigger(DIK_RETURN) == true)
 	{// ENTERが押された
-		if (pFade != NULL)
+		if (pTransition != NULL)
 		{// NULLチェック
-			pFade->SetFade(MODE_GAME);
+			pTransition->SetTransition(MODE_GAME);
 		}
+
+		return;
 	}
 }
 

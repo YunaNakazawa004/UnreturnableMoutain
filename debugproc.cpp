@@ -106,7 +106,7 @@ void CDebugProc::Draw(void)
 	if (m_bDebug == true)
 	{// 表示するときだけ
 		// テキストの描画
-		m_pFont->DrawText(NULL, &m_aStrDebug[0], -1, &rect, DT_LEFT, COLOR_ORANGE);
+		m_pFont->DrawText(NULL, &m_aStrDebug[0], -1, &rect, DT_LEFT, COLOR_MAGENTA);
 	}
 
 	// デバッグ情報バッファのクリア

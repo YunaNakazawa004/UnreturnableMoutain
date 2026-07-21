@@ -27,6 +27,7 @@
 
 #include "screen.h"
 #include "fade.h"
+#include "transition.h"
 
 #include "effect2D.h"
 #include "effect3D.h"
@@ -46,6 +47,7 @@ CLight* CManager::m_pLight = NULL;						// ライトのインスタンス
 CTexture* CManager::m_pTexture = NULL;					// テクスチャのインスタンス
 CScene* CManager::m_pScene = NULL;						// シーンのインスタンス
 CFade* CManager::m_pFade = NULL;						// フェードのインスタンス
+CTransition* CManager::m_pTransition = NULL;			// 画面遷移のインスタンス
 CScreen* CManager::m_pScreen = NULL;					// 画面のインスタンス
 int CManager::m_nCountFPS = 0;							// FPSカウンター
 bool CManager::m_bPause = false;						// ポーズするかしないか
@@ -67,6 +69,7 @@ CManager::CManager()
 	m_pTexture = NULL;
 	m_pScene = NULL;
 	m_pFade = NULL;
+	m_pTransition = NULL;
 	m_pScreen = NULL;
 	m_nCountFPS = 0;
 	m_bPause = false;
@@ -199,6 +202,7 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	CEffect3D::Load();
 	CExplosion::Load();
 	CNumber::Load();
+	CTransition::Load();
 	
 #ifdef MALTITARGET_RENDERING
 	// 画面の生成
@@ -231,6 +235,19 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 			return E_FAIL;
 		}
 	}
+	
+	// 画面遷移の生成
+	if (m_pTransition == NULL)
+	{// NULLチェック
+		m_pTransition = CTransition::Create();
+
+		if (m_pTransition == NULL)
+		{// NULLチェック
+			OutputDebugStringA("! ! ! 画面遷移の生成に失敗しました ! ! !\n");
+
+			return E_FAIL;
+		}
+	}
 
 	// FPSカウンタを初期化
 	m_nCountFPS = 0;
@@ -247,11 +264,22 @@ void CManager::Uninit(void)
 	CObject::ReleaseAll();
 
 	// オブジェクトのテクスチャを破棄
+	CTransition::Unload();
 	CNumber::Unload();
 	CExplosion::Unload();
 	CEffect3D::Unload();
 	CEffect2D::Unload();
 
+	// 画面遷移の破棄
+	if (m_pTransition != NULL)
+	{// NULLチェック
+		// 終了処理
+		m_pTransition->Uninit();
+
+		delete m_pTransition;
+		m_pTransition = NULL;
+	}
+	
 	// フェードの破棄
 	if (m_pFade != NULL)
 	{// NULLチェック
@@ -396,6 +424,12 @@ void CManager::Update(void)
 		m_pDebugProc->Print("オブジェクトの総数 : %d\n", CObject::GetNumAll());
 	}
 
+	if (m_pTransition != NULL)
+	{// NULLチェック
+		// 画面遷移の更新
+		m_pTransition->Update();
+	}
+	
 	if (m_pFade != NULL)
 	{// NULLチェック
 		// フェードの更新

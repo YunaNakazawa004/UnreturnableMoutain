@@ -24,6 +24,7 @@ class CLight;
 class CTexture;
 class CScene;
 class CFade;
+class CTransition;
 class CScreen;
 
 //************************************************************************
@@ -50,6 +51,7 @@ public:
 	static CLight* GetLight(void) { return m_pLight; }
 	static CTexture* GetTexture(void) { return m_pTexture; }
 	static CFade* GetFade(void) { return m_pFade; }
+	static CTransition* GetTransition(void) { return m_pTransition; }
 	static CScreen* GetScreen(void) { return m_pScreen; }
 
 	static void SetMode(const CScene::MODE mode);
@@ -74,6 +76,7 @@ private:
 	static CTexture* m_pTexture;					// テクスチャのインスタンス
 	static CScene* m_pScene;						// シーンのインスタンス
 	static CFade* m_pFade;							// フェードのインスタンス
+	static CTransition* m_pTransition;				// 画面遷移のインスタンス
 	static CScreen* m_pScreen;						// 画面のインスタンス
 		
 	static int m_nCountFPS;							// FPSカウンター

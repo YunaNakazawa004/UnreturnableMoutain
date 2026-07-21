@@ -10,6 +10,7 @@
 #include "debugproc.h"
 #include "object.h"
 #include "fade.h"
+#include "transition.h"
 #include "screen.h"
 #include "camera.h"
 
@@ -451,6 +452,15 @@ void CRenderer::Draw(void)
 		{// NULLチェック
 			// フェードの描画
 			pFade->Draw();
+		}
+
+		// 画面遷移
+		CTransition* pTransition = CManager::GetTransition();
+
+		if (pTransition != NULL)
+		{// NULLチェック
+			// 画面遷移の描画
+			pTransition->Draw();
 		}
 
 		// デバッグ表示

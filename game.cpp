@@ -13,6 +13,7 @@
 #include "camera.h"
 #include "pause.h"
 #include "fade.h"
+#include "transition.h"
 
 #include "mountain.h"
 #include "beach.h"
@@ -336,6 +337,7 @@ void CGame::Update(void)
 {
 	CInputKeyboard* pInputKeyboard = CManager::GetInputKeyboard();		// キーボード入力の取得
 	CFade* pFade = CManager::GetFade();									// フェードの取得
+	CTransition* pTransition = CManager::GetTransition();				// 画面遷移の取得
 
 	if (m_pPause != NULL)
 	{// NULLチェック
@@ -370,9 +372,9 @@ void CGame::Update(void)
 	// 画面遷移
 	if (pInputKeyboard->GetTrigger(DIK_RETURN) == true || m_bFade == true)
 	{// ENTERが押された
-		if (pFade != NULL)
+		if (pTransition != NULL)
 		{// NULLチェック
-			pFade->SetFade(MODE_RESULT);
+			pTransition->SetTransition(MODE_RESULT);
 		}
 
 		return;
