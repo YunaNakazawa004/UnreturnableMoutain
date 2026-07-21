@@ -28,6 +28,14 @@ class CNumber;
 class CEnergyUI : public CObject2D
 {
 public:
+	// 状態
+	enum STATE
+	{
+		STATE_NORMAL = 0,		// 通常状態
+		STATE_BLINK,			// 点滅
+		STATE_MAX
+	};
+
 	CEnergyUI(const int nPriority = UI_PRIORITY);
 	~CEnergyUI();
 
@@ -44,7 +52,9 @@ public:
 
 private:
 	static int m_nIdxTexture;					// テクスチャのインデックス
-	CNumber* m_apNumber[ENERGYUI_NUMPLACE];		// エネルギーの数値
+	int m_nPatternAnim;							// アニメーションパターンNO.
+	int m_state;								// 状態
+	int m_nCounterState;						// 状態カウンター
 };
 
 #endif

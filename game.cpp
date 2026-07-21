@@ -101,7 +101,7 @@ HRESULT CGame::Init(void)
 	// エネルギーUIを生成
 	if (m_pEnergyUI == NULL)
 	{// NULLチェック
-		m_pEnergyUI = CEnergyUI::Create(D3DXVECTOR3(1150.0f, 600.0f, 0.0f), 100.0f, 100.0f);
+		m_pEnergyUI = CEnergyUI::Create(D3DXVECTOR3(1180.0f, 70.0f, 0.0f), 100.0f, 50.0f);
 
 		if (m_pEnergyUI == NULL)
 		{// NULLチェック
@@ -127,7 +127,7 @@ HRESULT CGame::Init(void)
 	// アイテムUIを生成
 	if (m_pItemUI == NULL)
 	{// NULLチェック
-		m_pItemUI = CItemUI::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), 340.0f, 40.0f);
+		m_pItemUI = CItemUI::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), 310.0f, 40.0f);
 
 		if (m_pItemUI == NULL)
 		{// NULLチェック

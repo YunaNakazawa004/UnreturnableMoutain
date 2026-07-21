@@ -34,7 +34,7 @@ HRESULT CEnergyUI::Load(void)
 	CTexture* pTexture = CManager::GetTexture();			// テクスチャへのポインタ
 
 	// テクスチャの設定
-	m_nIdxTexture = pTexture->Register("data\\TEXTURE\\UI\\energy.png");
+	m_nIdxTexture = pTexture->Register("data\\TEXTURE\\UI\\energy000.png");
 
 	if (m_nIdxTexture == -1)
 	{// テクスチャが設定できていない
@@ -107,7 +107,9 @@ CEnergyUI* CEnergyUI::Create(const D3DXVECTOR3 pos, const float fWidth, const fl
 CEnergyUI::CEnergyUI(const int nPriority) :CObject2D(nPriority)
 {
 	// エネルギーUIクラスの値をクリア
-	memset(&m_apNumber[0], NULL, sizeof m_apNumber);
+	m_nPatternAnim = 0;
+	m_state = STATE_NORMAL;
+	m_nCounterState = 0;
 }
 
 //========================================================================
@@ -129,22 +131,6 @@ HRESULT CEnergyUI::Init(const D3DXVECTOR3 pos, const float fWidth, const float f
 		return E_FAIL;
 	}
 
-	// エネルギーUIクラスの値を初期化
-	for (int nCntNum = 0; nCntNum < ENERGYUI_NUMPLACE; nCntNum++)
-	{
-		if (m_apNumber[nCntNum] == NULL)
-		{// NULLチェック
-			m_apNumber[nCntNum] =
-				CNumber::Create(D3DXVECTOR3((pos.x - fWidth) + (nCntNum * (fWidth / 2.0f)), pos.y - (fHeight / 2.0f), 0.0f),
-					fWidth / 2.0f, fHeight);
-		}
-
-		if (m_apNumber[nCntNum] != NULL)
-		{// NULLチェック
-			m_apNumber[nCntNum]->SetTexUV(0, TEXTURE_WIDTH, 1);
-		}
-	}
-
 	return S_OK;
 }
 
@@ -153,18 +139,6 @@ HRESULT CEnergyUI::Init(const D3DXVECTOR3 pos, const float fWidth, const float f
 //========================================================================
 void CEnergyUI::Uninit(void)
 {
-	for (int nCntNum = 0; nCntNum < ENERGYUI_NUMPLACE; nCntNum++)
-	{
-		if (m_apNumber[nCntNum] != NULL)
-		{// NULLチェック
-			// 終了処理
-			m_apNumber[nCntNum]->Uninit();
-
-			delete m_apNumber[nCntNum];
-			m_apNumber[nCntNum] = NULL;
-		}
-	}
-
 	// 終了処理
 	CObject2D::Uninit();
 }
@@ -174,6 +148,23 @@ void CEnergyUI::Uninit(void)
 //========================================================================
 void CEnergyUI::Update(void)
 {
+	switch (m_state)
+	{
+	case STATE_NORMAL:		// 通常状態
+		SetDisp(true);
+
+		break;
+
+	case STATE_BLINK:		// 点滅状態
+		if (m_nCounterState % 15 == 0)
+		{// 一定間隔で点滅
+			SwapDisp();
+		}
+
+		break;
+	}
+
+	m_nCounterState++;
 }
 
 //========================================================================
@@ -183,15 +174,6 @@ void CEnergyUI::Draw(void)
 {
 	// 描画処理
 	CObject2D::Draw();
-
-	for (int nCntNum = 0; nCntNum < ENERGYUI_NUMPLACE; nCntNum++)
-	{
-		if (m_apNumber[nCntNum] != NULL)
-		{// NULLチェック
-			// 描画処理
-			m_apNumber[nCntNum]->Draw();
-		}
-	}
 }
 
 //========================================================================
@@ -199,15 +181,41 @@ void CEnergyUI::Draw(void)
 //========================================================================
 void CEnergyUI::SetEnergy(const float fEnergy)
 {
-	// ローカル変数
-	int aTexU[ENERGYUI_NUMPLACE];				// 各桁の数字を格納
-
-	for (int nCntNum = 0; nCntNum < ENERGYUI_NUMPLACE; nCntNum++)
-	{
-		// 各桁の数字を設定
-		aTexU[nCntNum] = (int)fEnergy % (int)pow(POWER, ENERGYUI_NUMPLACE - nCntNum) / (int)pow(POWER, ENERGYUI_NUMPLACE - nCntNum - 1);
-
-		// テクスチャ座標を設定
-		m_apNumber[nCntNum]->SetTexUV(aTexU[nCntNum], TEXTURE_WIDTH, 1);
+	if (fEnergy > 70.0f)
+	{// 7割より多い
+		m_nPatternAnim = 3;
+		m_state = STATE_NORMAL;
 	}
+	else if (fEnergy > 60.0f)
+	{// 6割より多い
+		m_nPatternAnim = 3;
+		m_state = STATE_BLINK;
+	}
+	else if (fEnergy > 40.0f)
+	{// 4割より多い
+		m_nPatternAnim = 2;
+		m_state = STATE_NORMAL;
+	}
+	else if (fEnergy > 30.0f)
+	{// 3割より多い
+		m_nPatternAnim = 2;
+		m_state = STATE_BLINK;
+	}
+	else if (fEnergy > 10.0f)
+	{// 1割より多い
+		m_nPatternAnim = 1;
+		m_state = STATE_NORMAL;
+	}
+	else if(fEnergy > 0.0f)
+	{// 0ではない
+		m_nPatternAnim = 1;
+		m_state = STATE_BLINK;
+	}
+	else
+	{// 0
+		m_nPatternAnim = 0;
+		m_state = STATE_NORMAL;
+	}
+
+	SetTexUV(m_nPatternAnim, 4, 1, 0.0f, 0.0f);
 }
