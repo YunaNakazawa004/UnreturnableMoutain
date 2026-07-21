@@ -14,12 +14,12 @@
 #include "fade.h"
 #include "transition.h"
 
-#include "object2D.h"
+#include "UI_title_logo.h"
 
 //************************************************************************
 // 静的メンバ変数宣言
 //************************************************************************
-CObject2D* CTitle::m_pObject2D = NULL;						// 背景のインスタンス
+CTitleLogo* CTitle::m_pTitleLogo = NULL;				// タイトルロゴのインスタンス
 
 //========================================================================
 // タイトル画面クラスのコンストラクタ
@@ -27,7 +27,7 @@ CObject2D* CTitle::m_pObject2D = NULL;						// 背景のインスタンス
 CTitle::CTitle() : CScene(CScene::MODE_TITLE)
 {
 	// 値をクリア
-	m_pObject2D = NULL;
+	m_pTitleLogo = NULL;
 }
 
 //========================================================================
@@ -46,15 +46,17 @@ HRESULT CTitle::Init(void)
 	CCamera *pCamera = CManager::GetCamera();
 	pCamera->SetType(CCamera::TYPE_STOP);
 
-	// 背景を生成
-	if (m_pObject2D == NULL)
-	{// NULLチェック
-		m_pObject2D = CObject2D::Create(D3DXVECTOR3(640.0f, 360.0f, 0.0f), SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2,
-			CObject::TYPE_BG, "data\\TEXTURE\\UI\\title.png");
+	// テクスチャを読み込み
+	CTitleLogo::Load();
 
-		if (m_pObject2D == NULL)
+	// タイトルロゴを生成
+	if (m_pTitleLogo == NULL)
+	{// NULLチェック
+		m_pTitleLogo = CTitleLogo::Create(D3DXVECTOR3(960.0f, 170.0f, 0.0f), 300.0f, 150.0f);
+
+		if (m_pTitleLogo == NULL)
 		{// NULLチェック
-			OutputDebugStringA("! ! ! 背景の生成に失敗しました ! ! !\n");
+			OutputDebugStringA("! ! ! タイトルロゴの生成に失敗しました ! ! !\n");
 
 			return E_FAIL;
 		}
@@ -68,9 +70,12 @@ HRESULT CTitle::Init(void)
 //========================================================================
 void CTitle::Uninit(void)
 {
-	if (m_pObject2D != NULL)
+	// テクスチャを破棄
+	CTitleLogo::Unload();
+
+	if (m_pTitleLogo != NULL)
 	{// NULLチェック
-		m_pObject2D = NULL;
+		m_pTitleLogo = NULL;
 	}
 
 #ifdef ENABLE_INHERITANCE_COBJECT

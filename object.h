@@ -70,6 +70,7 @@ public:
 		TYPE_PARTICLE3D,		// パーティクル3D
 		TYPE_PAUSE,				// ポーズ
 		TYPE_BG,				// 背景
+		TYPE_TITLELOGO,			// タイトルロゴ
 		TYPE_RESULTUI,			// リザルトUI
 		TYPE_JUMPUI,			// ジャンプUI
 		TYPE_ITEMUI,			// アイテムUI

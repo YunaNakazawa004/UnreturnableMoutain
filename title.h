@@ -13,7 +13,7 @@
 //************************************************************************
 // 前方宣言
 //************************************************************************
-class CObject2D;
+class CTitleLogo;
 
 //************************************************************************
 // タイトル画面クラス
@@ -29,10 +29,10 @@ public:
 	void Update(void);
 	void Draw(void);
 
-	static CObject2D* GetObject2D(void) { return m_pObject2D; }
+	static CTitleLogo* GetTitleLogo(void) { return m_pTitleLogo; }
 
 private:
-	static CObject2D* m_pObject2D;						// 背景のインスタンス
+	static CTitleLogo* m_pTitleLogo;				// タイトルロゴのインスタンス
 };
 
 #endif
