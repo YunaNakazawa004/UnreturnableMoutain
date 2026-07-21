@@ -40,7 +40,6 @@ CMapObject* CGame::m_pMapObject = NULL;				// マップオブジェクトのインスタンス
 CEnergyUI* CGame::m_pEnergyUI = NULL;				// エネルギーUIのインスタンス
 CJumpMeterUI* CGame::m_pJumpMeterUI = NULL;			// ジャンプメーターUIのインスタンス
 CItemUI* CGame::m_pItemUI = NULL;					// アイテムUIのインスタンス
-bool CGame::m_bFade = false;						// 遷移フラグ
 
 //========================================================================
 // ゲーム画面クラスのコンストラクタ
@@ -58,7 +57,6 @@ CGame::CGame() : CScene(CScene::MODE_GAME)
 	m_pEnergyUI = NULL;
 	m_pJumpMeterUI = NULL;
 	m_pItemUI = NULL;
-	m_bFade = false;
 }
 
 //========================================================================
@@ -370,7 +368,7 @@ void CGame::Update(void)
 	}
 
 	// 画面遷移
-	if (pInputKeyboard->GetTrigger(DIK_RETURN) == true || m_bFade == true)
+	if (pInputKeyboard->GetTrigger(DIK_RETURN) == true || isFade() == true)
 	{// ENTERが押された
 		if (pTransition != NULL)
 		{// NULLチェック

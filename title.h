@@ -14,6 +14,7 @@
 // 前方宣言
 //************************************************************************
 class CTitleLogo;
+class CEnterUI;
 
 //************************************************************************
 // タイトル画面クラス
@@ -30,9 +31,11 @@ public:
 	void Draw(void);
 
 	static CTitleLogo* GetTitleLogo(void) { return m_pTitleLogo; }
+	static CEnterUI* GetEnterUI(void) { return m_pEnterUI; }
 
 private:
 	static CTitleLogo* m_pTitleLogo;				// タイトルロゴのインスタンス
+	static CEnterUI* m_pEnterUI;					// エンターUIのインスタンス
 };
 
 #endif

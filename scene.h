@@ -47,13 +47,17 @@ public:
 
 	MODE GetMode(void) { return m_mode; }
 
+	static void SetFadeEnable(void) { m_bFade = true; }
+	static bool isFade(void) { return m_bFade; }
+
 #ifdef ENABLE_INHERITANCE_COBJECT
 	D3DXVECTOR3 GetPosition(void) { return DEFAULT_VECTER3; }
 	D3DXVECTOR3 GetRotation(void) { return DEFAULT_VECTER3; }
 #endif
 
 private:
-	MODE m_mode;			// シーンのモード
+	MODE m_mode;				// シーンのモード
+	static bool m_bFade;		// 遷移フラグ
 };
 
 #endif

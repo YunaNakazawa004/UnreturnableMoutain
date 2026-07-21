@@ -49,8 +49,6 @@ public:
 	static CJumpMeterUI* GetJumpMeterUI(void) { return m_pJumpMeterUI; }
 	static CItemUI* GetItemUI(void) { return m_pItemUI; }
 
-	static void SetFadeEnable(void) { m_bFade = true; }
-
 private:
 	static CPause* m_pPause;						// ポーズのインスタンス
 	static CPlayer* m_pPlayer;						// プレイヤーのインスタンス
@@ -62,8 +60,6 @@ private:
 	static CEnergyUI* m_pEnergyUI;					// エネルギーUIのインスタンス
 	static CJumpMeterUI* m_pJumpMeterUI;			// ジャンプメーターUIのインスタンス
 	static CItemUI* m_pItemUI;						// アイテムUIのインスタンス
-
-	static bool m_bFade;		// 遷移フラグ
 };
 
 #endif

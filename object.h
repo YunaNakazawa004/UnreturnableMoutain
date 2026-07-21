@@ -71,6 +71,7 @@ public:
 		TYPE_PAUSE,				// ポーズ
 		TYPE_BG,				// 背景
 		TYPE_TITLELOGO,			// タイトルロゴ
+		TYPE_ENTERUI,			// エンターUI
 		TYPE_RESULTUI,			// リザルトUI
 		TYPE_JUMPUI,			// ジャンプUI
 		TYPE_ITEMUI,			// アイテムUI

@@ -15,11 +15,13 @@
 #include "transition.h"
 
 #include "UI_title_logo.h"
+#include "UI_enter.h"
 
 //************************************************************************
 // 静的メンバ変数宣言
 //************************************************************************
 CTitleLogo* CTitle::m_pTitleLogo = NULL;				// タイトルロゴのインスタンス
+CEnterUI* CTitle::m_pEnterUI = NULL;					// エンターUIのインスタンス
 
 //========================================================================
 // タイトル画面クラスのコンストラクタ
@@ -28,6 +30,7 @@ CTitle::CTitle() : CScene(CScene::MODE_TITLE)
 {
 	// 値をクリア
 	m_pTitleLogo = NULL;
+	m_pEnterUI = NULL;
 }
 
 //========================================================================
@@ -48,6 +51,7 @@ HRESULT CTitle::Init(void)
 
 	// テクスチャを読み込み
 	CTitleLogo::Load();
+	CEnterUI::Load();
 
 	// タイトルロゴを生成
 	if (m_pTitleLogo == NULL)
@@ -57,6 +61,19 @@ HRESULT CTitle::Init(void)
 		if (m_pTitleLogo == NULL)
 		{// NULLチェック
 			OutputDebugStringA("! ! ! タイトルロゴの生成に失敗しました ! ! !\n");
+
+			return E_FAIL;
+		}
+	}
+	
+	// エンターUIを生成
+	if (m_pEnterUI == NULL)
+	{// NULLチェック
+		m_pEnterUI = CEnterUI::Create(D3DXVECTOR3(640.0f, 480.0f, 0.0f), 300.0f, 50.0f);
+
+		if (m_pEnterUI == NULL)
+		{// NULLチェック
+			OutputDebugStringA("! ! ! エンターUIの生成に失敗しました ! ! !\n");
 
 			return E_FAIL;
 		}
@@ -71,8 +88,16 @@ HRESULT CTitle::Init(void)
 void CTitle::Uninit(void)
 {
 	// テクスチャを破棄
+	CEnterUI::Unload();
 	CTitleLogo::Unload();
 
+	// エンターUIの破棄
+	if (m_pEnterUI != NULL)
+	{// NULLチェック
+		m_pEnterUI = NULL;
+	}
+
+	// タイトルロゴの破棄
 	if (m_pTitleLogo != NULL)
 	{// NULLチェック
 		m_pTitleLogo = NULL;
@@ -93,7 +118,7 @@ void CTitle::Update(void)
 	CTransition* pTransition = CManager::GetTransition();				// 画面遷移の取得
 
 	// 画面遷移
-	if (pInputKeyboard->GetTrigger(DIK_RETURN) == true)
+	if (isFade() == true)
 	{// ENTERが押された
 		if (pTransition != NULL)
 		{// NULLチェック

@@ -53,6 +53,8 @@ public:
 	void SetDisp(const bool bDisp) { m_bDisp = bDisp; }
 	void SwapDisp(void) { m_bDisp = m_bDisp ? false : true; }
 
+	bool MouseCollision(const POINT MousePos, const float fWidth, const float fHeight);
+
 private:
 	LPDIRECT3DVERTEXBUFFER9 m_pVtxBuff;			// 頂点バッファへのポインタ
 	int m_nIdxTexture;			// テクスチャのインデックス

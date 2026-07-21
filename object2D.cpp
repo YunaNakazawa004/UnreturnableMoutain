@@ -19,7 +19,7 @@
 //========================================================================
 // オブジェクト2Dクラスの生成処理
 //========================================================================
-CObject2D* CObject2D::Create(const D3DXVECTOR3 pos, const float fWidth, const float fHeight, 
+CObject2D* CObject2D::Create(const D3DXVECTOR3 pos, const float fWidth, const float fHeight,
 	const CObject::TYPE type, const char* pFilename, const int nPriority, const int posType)
 {
 #ifndef LIST
@@ -713,4 +713,51 @@ void CObject2D::SetTexUV(const float fStartX, const float fEndX, const float fSt
 
 	// 頂点バッファをアンロックする
 	m_pVtxBuff->Unlock();
+}
+
+//========================================================================
+// マウスとの当たり判定
+//========================================================================
+bool CObject2D::MouseCollision(const POINT MousePos, const float fWidth, const float fHeight)
+{
+	switch (m_posType)
+	{
+	case POS_CENTER:			// 真ん中
+		if (m_pos.x - fWidth < MousePos.x && m_pos.x + fWidth > MousePos.x &&
+			m_pos.y - fHeight < MousePos.y && m_pos.y + fHeight > MousePos.y)
+		{// 中にいる
+			return true;
+		}
+
+		break;
+
+	case POS_LEFT:				// 左
+		if (m_pos.x < MousePos.x && m_pos.x + fWidth * 2.0f > MousePos.x &&
+			m_pos.y - fHeight < MousePos.y && m_pos.y + fHeight > MousePos.y)
+		{// 中にいる
+			return true;
+		}
+
+		break;
+
+	case POS_LEFT_TOP:			// 左上
+		if (m_pos.x < MousePos.x && m_pos.x + fWidth * 2.0f > MousePos.x &&
+			m_pos.y < MousePos.y && m_pos.y + fHeight * 2.0f > MousePos.y)
+		{// 中にいる
+			return true;
+		}
+
+		break;
+
+	case POS_MID_BOTTOM:		// 真ん中下
+		if (m_pos.x - fWidth < MousePos.x && m_pos.x + fWidth > MousePos.x &&
+			m_pos.y - fHeight * 2.0f < MousePos.y && m_pos.y > MousePos.y)
+		{// 中にいる
+			return true;
+		}
+
+		break;
+	}
+
+	return false;
 }
