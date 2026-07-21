@@ -375,7 +375,9 @@ bool CShip::Collision(D3DXVECTOR3* pos, D3DXVECTOR3* posOld, D3DXVECTOR3* move,
 				D3DXVECTOR3 posPart =
 					D3DXVECTOR3(m_apModel[nCntPart]->GetMtxWorld()._41, m_apModel[nCntPart]->GetMtxWorld()._42, m_apModel[nCntPart]->GetMtxWorld()._43);
 
-				if (m_apModel[nCntPart]->Collision(posPart, m_scale, pos, posOld, move, fRadius, fHeight) == true)
+				CorrectAngle(&m_rot.y, m_rot.y);
+
+				if (m_apModel[nCntPart]->Collision(posPart, m_rot, m_scale, pos, posOld, move, fRadius, fHeight) == true)
 				{// “–‚½‚Á‚Ä‚¢‚é
 					*pLand = true;
 				}

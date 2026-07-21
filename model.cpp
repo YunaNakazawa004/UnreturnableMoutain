@@ -392,7 +392,7 @@ void CModel::SetColor(const D3DXCOLOR col)
 //========================================================================
 // 当たり判定
 //========================================================================
-bool CModel::Collision(const D3DXVECTOR3 posMe, const D3DXVECTOR3 scaleMe, D3DXVECTOR3* pPos, D3DXVECTOR3* pPosOld, D3DXVECTOR3* pMove,
+bool CModel::Collision(const D3DXVECTOR3 posMe, const D3DXVECTOR3 rotMe, const D3DXVECTOR3 scaleMe, D3DXVECTOR3* pPos, D3DXVECTOR3* pPosOld, D3DXVECTOR3* pMove,
 	const float fRadius, const float fHeight)
 {
 	bool bLand = false;		// 着地しているか
@@ -417,11 +417,8 @@ bool CModel::Collision(const D3DXVECTOR3 posMe, const D3DXVECTOR3 scaleMe, D3DXV
 		float fOffXE = (nCnt == 1 || nCnt == 0) ? +(fXLength * 0.5f + fRadius) : -(fXLength * 0.5f + fRadius);		// 向き0のときの座標
 		float fOffZE = (nCnt == 1 || nCnt == 2) ? +(fZLength * 0.5f + fRadius) : -(fZLength * 0.5f + fRadius);		// 向き0のときの座標
 
-		float fSin = sinf(-m_rot.y);		// 現在向きのsin
-		float fCos = cosf(-m_rot.y);		// 現在向きのcos
-
-		// Y向きを調整
-		CObject::CorrectAngle(&m_rot.y, m_rot.y);
+		float fSin = sinf(-rotMe.y);		// 現在向きのsin
+		float fCos = cosf(-rotMe.y);		// 現在向きのcos
 
 		// 始点のXZ座標
 		fXS = fOffXS * fCos - fOffZS * fSin;

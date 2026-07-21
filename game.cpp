@@ -214,10 +214,19 @@ HRESULT CGame::Init(void)
 		}
 	}
 
+	// 船とプレイヤーの生成位置
+	D3DXVECTOR3 pos, rot;
+	rot.x = 0.0f;
+	rot.y = ((float)(rand() % 629 - 314) / 100.0f);
+	rot.z = 0.0f;
+	pos.x = sinf(rot.y) * 1700.0f;
+	pos.y = 0.0f;
+	pos.z = cosf(rot.y) * 1700.0f;
+
 	// プレイヤーを生成
 	if (m_pPlayer == NULL)
 	{// NULLチェック
-		m_pPlayer = CPlayer::Create(D3DXVECTOR3(1500.0f, 0.0f, -1500.0f), DEFAULT_VECTER3);
+		m_pPlayer = CPlayer::Create(pos, rot);
 
 		if (m_pPlayer == NULL)
 		{// NULLチェック
@@ -230,7 +239,7 @@ HRESULT CGame::Init(void)
 	// 船を生成
 	if (m_pShip == NULL)
 	{// NULLチェック
-		m_pShip = CShip::Create(D3DXVECTOR3(1500.0f, 0.0f, -1500.0f), DEFAULT_VECTER3);
+		m_pShip = CShip::Create(pos, rot);
 
 		if (m_pShip == NULL)
 		{// NULLチェック
@@ -262,7 +271,7 @@ void CGame::Uninit(void)
 	{// NULLチェック
 		m_pItemUI = NULL;
 	}
-	
+
 	// ジャンプメーターUIの破棄
 	if (m_pJumpMeterUI != NULL)
 	{// NULLチェック
@@ -292,7 +301,7 @@ void CGame::Uninit(void)
 	{// NULLチェック
 		m_pWaterSurface = NULL;
 	}
-	
+
 	// 砂浜の破棄
 	if (m_pBeach != NULL)
 	{// NULLチェック
