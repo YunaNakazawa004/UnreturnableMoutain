@@ -30,6 +30,7 @@
 
 #include "effect2D.h"
 #include "effect3D.h"
+#include "explosion.h"
 
 //************************************************************************
 // 静的メンバ変数宣言
@@ -196,6 +197,7 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	// オブジェクトのテクスチャを読み込み
 	CEffect2D::Load();
 	CEffect3D::Load();
+	CExplosion::Load();
 	CNumber::Load();
 	
 #ifdef MALTITARGET_RENDERING
@@ -246,6 +248,7 @@ void CManager::Uninit(void)
 
 	// オブジェクトのテクスチャを破棄
 	CNumber::Unload();
+	CExplosion::Unload();
 	CEffect3D::Unload();
 	CEffect2D::Unload();
 

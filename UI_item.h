@@ -53,7 +53,8 @@ public:
 	void Update(void);
 	void Draw(void);
 
-	void SetItem(const int Item);
+	int SetItem(const int Item);
+	void Check(const int nIdx);
 
 private:
 	static int m_aIdxTexture[TYPE_MAX + 1];		// テクスチャのインデックス

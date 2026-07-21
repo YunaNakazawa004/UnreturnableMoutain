@@ -20,6 +20,7 @@
 
 #include "effect3D.h"
 #include "particle3D.h"
+#include "explosion.h"
 #include "energyrock.h"
 #include "tree.h"
 #include "rock.h"
@@ -501,6 +502,9 @@ void CPlayer::Update(void)
 			// ƒ‚[ƒVƒ‡ƒ“‚ðÝ’è
 			m_pMotion->Set(MOTIONTYPE_LANDING, true, 20);
 			m_bLand = true;
+
+			// “yšº
+			CExplosion::Ray(pos, 1.0f, 0, 0.5f, D3DXCOLOR(COLOR_DARKGRAY.r, COLOR_DARKGRAY.g, COLOR_DARKGRAY.b, 0.5f));
 		}
 
 		if (pos.y < fHeight && bHead == true)

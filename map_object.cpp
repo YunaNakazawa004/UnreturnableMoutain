@@ -197,6 +197,9 @@ bool CMapObject::CollectCollision(const D3DXVECTOR3 pos, const int nIdx)
 			CEffect3D::TYPE_BLENDADD, CParticle3D::TYPE_NORMAL, 600, 0.3f, false,
 			COLOR_WHITE, 0.0f, true, CGame::GetPlayer(), 0.05f);
 
+		// アイテムをチェックする
+		pItemUI->Check(m_aMapObject[nIdx].nItemIdx);
+
 		// 総数を減らす
 		m_nNumCollectObj--;
 
@@ -296,7 +299,7 @@ HRESULT CMapObject::ReadData(const char* pFilename)
 			{// 収集アイテムだった場合
 				if (pItemUI != NULL)
 				{// NULLチェック
-					pItemUI->SetItem(m_aMapObject[nCnt].aObjType);
+					m_aMapObject[nCnt].nItemIdx = pItemUI->SetItem(m_aMapObject[nCnt].aObjType);
 				}
 			}
 		}

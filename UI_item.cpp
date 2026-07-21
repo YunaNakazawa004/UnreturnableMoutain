@@ -202,25 +202,45 @@ void CItemUI::Draw(void)
 //========================================================================
 // アイテムUIの設定処理
 //========================================================================
-void CItemUI::SetItem(const int Item)
+int CItemUI::SetItem(const int Item)
 {
 	if (m_nNumItem >= ITEMUI_NUM)
+	{// 要素数を越えている
+		return -1;
+	}
+
+	int nIdx = m_nNumItem;
+
+	m_Item[nIdx].type = Item;
+
+	if (m_Item[nIdx].pItem != NULL)
+	{// NULLチェック
+		// テクスチャを設定
+		m_Item[nIdx].pItem->BindTexture(m_aIdxTexture[Item]);
+	}
+
+	if (m_Item[nIdx].pCheck != NULL)
+	{// NULLチェック
+		m_Item[nIdx].pCheck->SetDisp(false);
+	}
+
+	m_nNumItem++;
+
+	return nIdx;
+}
+
+//========================================================================
+// アイテムのチェック
+//========================================================================
+void CItemUI::Check(const int nIdx)
+{
+	if (nIdx >= ITEMUI_NUM)
 	{// 要素数を越えている
 		return;
 	}
 
-	m_Item[m_nNumItem].type = Item;
-
-	if (m_Item[m_nNumItem].pItem != NULL)
+	if (m_Item[nIdx].pCheck != NULL)
 	{// NULLチェック
-		// テクスチャを設定
-		m_Item[m_nNumItem].pItem->BindTexture(m_aIdxTexture[Item]);
+		m_Item[nIdx].pCheck->SetDisp(true);
 	}
-
-	if (m_Item[m_nNumItem].pCheck != NULL)
-	{// NULLチェック
-		m_Item[m_nNumItem].pCheck->SetDisp(false);
-	}
-
-	m_nNumItem++;
 }

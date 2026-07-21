@@ -40,8 +40,9 @@ public:
 	typedef struct
 	{
 		CObject* apObject;		// 配置したオブジェクトの情報
-		int aObjType;				// 配置したオブジェクトの種類
+		int aObjType;			// 配置したオブジェクトの種類
 		bool bCollect;			// 配置したオブジェクトが収集アイテムかどうか
+		int nItemIdx;			// 配置したオブジェクトがアイテムだった場合のインデックス
 	}Map_Obj;
 
 	CMapObject();
