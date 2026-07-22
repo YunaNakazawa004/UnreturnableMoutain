@@ -99,6 +99,7 @@ private:
 	float m_fRadius;				// 半径
 	float m_fHeight;				// 高さ
 	float m_fJumpHigh;				// ジャンプ量
+	int m_nCounter;					// 色々なものに使えるカウンター
 
 	float m_fEnergy;				// エネルギー
 	int m_nEnergyCounter;			// エネルギー減少カウンター

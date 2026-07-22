@@ -126,7 +126,7 @@ HRESULT CGame::Init(void)
 	// アイテムUIを生成
 	if (m_pItemUI == NULL)
 	{// NULLチェック
-		m_pItemUI = CItemUI::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), 310.0f, 40.0f);
+		m_pItemUI = CItemUI::Create(D3DXVECTOR3(360.0f, 640.0f, 0.0f), 310.0f, 40.0f);
 
 		if (m_pItemUI == NULL)
 		{// NULLチェック
@@ -219,9 +219,9 @@ HRESULT CGame::Init(void)
 	rot.x = 0.0f;
 	rot.y = ((float)(rand() % 629 - 314) / 100.0f);
 	rot.z = 0.0f;
-	pos.x = sinf(rot.y) * 1700.0f;
+	pos.x = sinf(rot.y) * 2000.0f;
 	pos.y = 0.0f;
-	pos.z = cosf(rot.y) * 1700.0f;
+	pos.z = cosf(rot.y) * 2000.0f;
 
 	// プレイヤーを生成
 	if (m_pPlayer == NULL)

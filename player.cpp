@@ -21,6 +21,7 @@
 #include "effect3D.h"
 #include "particle3D.h"
 #include "explosion.h"
+#include "spray.h"
 #include "energyrock.h"
 #include "tree.h"
 #include "rock.h"
@@ -29,6 +30,7 @@
 #include "object3D.h"
 #include "mountain.h"
 #include "beach.h"
+#include "watersurface.h"
 #include "UI_energy.h"
 #include "UI_jump_meter.h"
 
@@ -58,6 +60,7 @@
 #define ONE_ENERGY		(5.0f)									// 鉱石ひとつあたりのエネルギー
 #define MINUS_ENERGY	(90)									// エネルギー減少の間隔
 #define UNCLIMB_SLOPE	(0.4f)									// 登れない傾斜の角度
+#define OUTMAP			(3000.0f)								// マップ外
 
 //========================================================================
 // プレイヤークラスの生成処理
@@ -122,6 +125,7 @@ CPlayer::CPlayer(const int nPriority) :CObject(nPriority)
 	m_fRadius = 0.0f;
 	m_fHeight = 0.0f;
 	m_fJumpHigh = 0.0f;
+	m_nCounter = 0;
 	m_fEnergy = 0.0f;
 	m_nEnergyCounter = 0;
 	m_fUsedEnergy = 0.0f;
@@ -150,6 +154,7 @@ HRESULT CPlayer::Init(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot)
 	m_pos = pos;
 	m_posOld = pos;
 	m_rot = rot;
+	m_rotDest = rot;
 	m_scale = D3DXVECTOR3(1.0f, 1.0f, 1.0f);
 	m_col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 	m_fEnergy = FIRST_ENERGY;
@@ -220,6 +225,7 @@ void CPlayer::Update(void)
 	CDebugProc* pDebugProc = CManager::GetDebugProc();					// デバッグ表示の取得
 	CMountain* pMountain = CGame::GetMountain();						// 山の取得
 	CBeach* pBeach = CGame::GetBeach();									// 砂浜の取得
+	CWaterSurface* pWaterSurface = CGame::GetWaterSurface();			// 水面の取得
 	CEnergyUI* pEnergyUI = CGame::GetEnergyUI();			// エネルギーUIの取得
 	CJumpMeterUI* pJumpMeterUI = CGame::GetJumpMeterUI();	// ジャンプメーターUIの取得
 	CShip* pShip = CGame::GetShip();						// 船の取得
@@ -235,6 +241,9 @@ void CPlayer::Update(void)
 
 	float fHeightB = 0.0f;		// 砂浜の地面の高さ
 	D3DXVECTOR2 polygonIdxB = { -1.0f,-1.0f };		// ポリゴン番号
+	
+	float fHeightW = 0.0f;		// 水面の地面の高さ
+	D3DXVECTOR2 polygonIdxW = { -1.0f,-1.0f };		// ポリゴン番号
 
 	float fHeight = 0.0f;		// 地面の高さ
 	D3DXVECTOR2 polygonIdx = { -1.0f,-1.0f };		// ポリゴン番号
@@ -402,6 +411,12 @@ void CPlayer::Update(void)
 		m_move.z += (0.0f - m_move.z) * MOVE_INERTIA;
 	}
 
+	// マップ外には行かない
+	if (D3DXVec3Length(&pos) >= OUTMAP)
+	{// マップ外
+		pos = m_posOld;
+	}
+
 	// XZ方向への移動量(動いているかいないか)※Y座標のみの変化はとらない
 	move = D3DXVECTOR2(m_move.x, m_move.z);
 
@@ -459,6 +474,12 @@ void CPlayer::Update(void)
 
 	// 砂浜の地面の高さを取得
 	fHeightB = pBeach->GetHeight(pos, polygonIdxB);
+	
+	// 水面のポリゴン番号を取得
+	polygonIdxW = pWaterSurface->GetPolygonIdx(pos);
+
+	// 水面の地面の高さを取得
+	fHeightW = pWaterSurface->GetHeight(pos, polygonIdxW);
 
 	// 最終的な高さ/ポリゴン番号
 	if (fHeightM >= fHeightB)
@@ -533,6 +554,17 @@ void CPlayer::Update(void)
 		// ジャンプ量リセット
 		m_fJumpHigh = 0.0f;
 		UpperPos.y = UpperPosOff.y;
+	}
+
+	// 水面より下にいたら水しぶき
+	if (fHeightW > fHeight && D3DXVec2Length(&move) >= 0.6f)
+	{// 水面より下
+		m_nCounter++;
+
+		if (m_nCounter % 10 == 0)
+		{// 一定間隔
+			CSpray::Create(D3DXVECTOR3(pos.x, fHeightW + 1.0f, pos.z), D3DXVECTOR3(0.0f, 0.0f, 0.0f), 5.0f);
+		}
 	}
 
 	// 転ぶ

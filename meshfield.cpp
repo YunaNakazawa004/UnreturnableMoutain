@@ -905,7 +905,7 @@ float CMeshField::GetHeight(const D3DXVECTOR3 pos, const D3DXVECTOR2 polygonIdx)
 			// 頂点バッファをアンロックする
 			m_pVtxBuff->Unlock();
 
-			return fHeight;
+			return fHeight + m_pos.y;
 		}
 	}
 	else
@@ -964,7 +964,7 @@ float CMeshField::GetHeight(const D3DXVECTOR3 pos, const D3DXVECTOR2 polygonIdx)
 			// 頂点バッファをアンロックする
 			m_pVtxBuff->Unlock();
 
-			return fHeight;
+			return fHeight + m_pos.y;
 		}
 	}
 	else
