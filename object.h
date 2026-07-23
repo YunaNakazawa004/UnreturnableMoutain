@@ -75,6 +75,7 @@ public:
 		TYPE_RESULTUI,			// リザルトUI
 		TYPE_JUMPUI,			// ジャンプUI
 		TYPE_ITEMUI,			// アイテムUI
+		TYPE_SCORE,				// スコア
 		TYPE_LINE,				// 線
 		TYPE_OBJECTX,			// オブジェクトX
 		TYPE_OBJECTBILLBOARD,	// オブジェクトビルボード

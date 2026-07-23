@@ -34,6 +34,7 @@
 #include "watersurface.h"
 #include "UI_energy.h"
 #include "UI_jump_meter.h"
+#include "score.h"
 
 #include <iostream>
 #include <fstream>
@@ -234,6 +235,7 @@ void CPlayer::Update(void)
 	CShip* pShip = 
 		(CManager::GetMode() == CScene::MODE_GAME) ? 
 		CGame::GetShip() : CTitle::GetShip();				// 船の取得
+	CScore* pScore = CGame::GetScore();						// スコアの取得
 	D3DXVECTOR3 pos = CPlayer::GetPosition();				// プレイヤーの位置	
 	D3DXVECTOR3 rot = CPlayer::GetRotation();				// プレイヤーの向き
 	D3DXVECTOR2 move = { 0.0f,0.0f };						// XZ方向に動いているかどうかの判断用
@@ -392,6 +394,8 @@ void CPlayer::Update(void)
 				// エネルギーを消費する
 				m_fEnergy -= fMinusEnergy;
 				m_fUsedEnergy += fMinusEnergy;
+
+				pScore->Minus((int)(fMinusEnergy * 1000.0f));
 			}
 
 			fMinusEnergy = 0.0f;		// リセット
@@ -451,7 +455,7 @@ void CPlayer::Update(void)
 	// 角度を慣性ありで加算
 	rot.y += (m_rotDest.y - rot.y) * 0.1f;
 
-	if (m_state == STATE_NORMAL || m_state == STATE_APPEAR)
+	if (m_state == STATE_NORMAL || m_state == STATE_APPEAR || m_state == STATE_DEATH)
 	{// 通常状態のみ
 		// 山のポリゴン番号を取得
 		polygonIdxM = pMountain->GetPolygonIdx(pos);
@@ -673,11 +677,15 @@ void CPlayer::Update(void)
 		{// 地上
 			m_fEnergy -= 2.0f - pMeshField->GetSlope(pos, polygonIdx);		// 減らす
 			m_fUsedEnergy += 2.0f - pMeshField->GetSlope(pos, polygonIdx);
+
+			pScore->Minus((int)((2.0f - pMeshField->GetSlope(pos, polygonIdx)) * 1000.0f));
 		}
 		else
 		{// 空中
 			m_fEnergy -= 1.0f;
 			m_fUsedEnergy += 1.0f;
+
+			pScore->Minus((int)(1.0f * 1000.0f));
 		}
 
 		m_nEnergyCounter = 0;	// リセット
@@ -709,7 +717,7 @@ void CPlayer::Update(void)
 
 	pDebugProc->Print("使用したエネルギー量 : %f\n", m_fUsedEnergy);
 
-	if (m_state == STATE_NORMAL || m_state == STATE_TUTORIAL || m_state == STATE_APPEAR)
+	if (m_state == STATE_NORMAL || m_state == STATE_TUTORIAL || m_state == STATE_APPEAR || m_state == STATE_DEATH)
 	{// 通常状態/チュートリアル中のみ
 		// エネルギー量をUIに設定
 		pEnergyUI->SetEnergy(m_fEnergy);

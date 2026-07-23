@@ -20,6 +20,7 @@
 #include "flower.h"
 #include "energyrock.h"
 #include "UI_item.h"
+#include "score.h"
 
 #include "player.h"
 
@@ -183,6 +184,7 @@ void CMapObject::Update(void)
 bool CMapObject::CollectCollision(const D3DXVECTOR3 pos, const int nIdx)
 {
 	CItemUI* pItemUI = CGame::GetItemUI();		// アイテムUIを取得
+	CScore* pScore = CGame::GetScore();			// スコアを取得
 	D3DXVECTOR3 posPlayer = CGame::GetPlayer()->GetPosition();
 	D3DXVECTOR3 dist;
 
@@ -199,6 +201,9 @@ bool CMapObject::CollectCollision(const D3DXVECTOR3 pos, const int nIdx)
 
 		// アイテムをチェックする
 		pItemUI->Check(m_aMapObject[nIdx].nItemIdx);
+
+		// スコア加算
+		pScore->Add(20000);
 
 		// 総数を減らす
 		m_nNumCollectObj--;

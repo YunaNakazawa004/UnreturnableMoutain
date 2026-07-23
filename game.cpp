@@ -26,6 +26,7 @@
 #include "UI_energy.h"
 #include "UI_jump_meter.h"
 #include "UI_item.h"
+#include "score.h"
 
 //************************************************************************
 // 静的メンバ変数宣言
@@ -40,6 +41,7 @@ CMapObject* CGame::m_pMapObject = NULL;				// マップオブジェクトのインスタンス
 CEnergyUI* CGame::m_pEnergyUI = NULL;				// エネルギーUIのインスタンス
 CJumpMeterUI* CGame::m_pJumpMeterUI = NULL;			// ジャンプメーターUIのインスタンス
 CItemUI* CGame::m_pItemUI = NULL;					// アイテムUIのインスタンス
+CScore* CGame::m_pScore = NULL;						// スコアのインスタンス
 
 //========================================================================
 // ゲーム画面クラスのコンストラクタ
@@ -57,6 +59,7 @@ CGame::CGame() : CScene(CScene::MODE_GAME)
 	m_pEnergyUI = NULL;
 	m_pJumpMeterUI = NULL;
 	m_pItemUI = NULL;
+	m_pScore = NULL;
 }
 
 //========================================================================
@@ -134,6 +137,21 @@ HRESULT CGame::Init(void)
 
 			return E_FAIL;
 		}
+	}
+	
+	// スコアを生成
+	if (m_pScore == NULL)
+	{// NULLチェック
+		m_pScore = CScore::Create(D3DXVECTOR3(500.0f, 560.0f, 0.0f), SCORE_WIDTH, SCORE_HEIGHT);
+
+		if (m_pScore == NULL)
+		{// NULLチェック
+			OutputDebugStringA("! ! ! スコアの生成に失敗しました ! ! !\n");
+
+			return E_FAIL;
+		}
+
+		m_pScore->SetNum(1000000);
 	}
 
 	// マップオブジェクトの生成
@@ -266,6 +284,12 @@ void CGame::Uninit(void)
 	CJumpMeterUI::Unload();
 	CEnergyUI::Unload();
 
+	// スコアの破棄
+	if (m_pScore != NULL)
+	{// NULLチェック
+		m_pScore = NULL;
+	}
+	
 	// アイテムUIの破棄
 	if (m_pItemUI != NULL)
 	{// NULLチェック
