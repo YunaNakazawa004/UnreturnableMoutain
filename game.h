@@ -24,6 +24,7 @@ class CEnergyUI;
 class CJumpMeterUI;
 class CItemUI;
 class CScore;
+class CActionUI;
 
 //************************************************************************
 // ゲーム画面クラス
@@ -50,6 +51,7 @@ public:
 	static CJumpMeterUI* GetJumpMeterUI(void) { return m_pJumpMeterUI; }
 	static CItemUI* GetItemUI(void) { return m_pItemUI; }
 	static CScore* GetScore(void) { return m_pScore; }
+	static CActionUI* GetActionUI(void) { return m_pActionUI; }
 
 private:
 	static CPause* m_pPause;						// ポーズのインスタンス
@@ -63,6 +65,7 @@ private:
 	static CJumpMeterUI* m_pJumpMeterUI;			// ジャンプメーターUIのインスタンス
 	static CItemUI* m_pItemUI;						// アイテムUIのインスタンス
 	static CScore* m_pScore;						// スコアのインスタンス
+	static CActionUI* m_pActionUI;					// アクションUIのインスタンス
 };
 
 #endif

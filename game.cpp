@@ -27,6 +27,7 @@
 #include "UI_jump_meter.h"
 #include "UI_item.h"
 #include "score.h"
+#include "UI_action.h"
 
 //************************************************************************
 // 静的メンバ変数宣言
@@ -42,6 +43,7 @@ CEnergyUI* CGame::m_pEnergyUI = NULL;				// エネルギーUIのインスタンス
 CJumpMeterUI* CGame::m_pJumpMeterUI = NULL;			// ジャンプメーターUIのインスタンス
 CItemUI* CGame::m_pItemUI = NULL;					// アイテムUIのインスタンス
 CScore* CGame::m_pScore = NULL;						// スコアのインスタンス
+CActionUI* CGame::m_pActionUI = NULL;				// アクションUIのインスタンス
 
 //========================================================================
 // ゲーム画面クラスのコンストラクタ
@@ -60,6 +62,7 @@ CGame::CGame() : CScene(CScene::MODE_GAME)
 	m_pJumpMeterUI = NULL;
 	m_pItemUI = NULL;
 	m_pScore = NULL;
+	m_pActionUI = NULL;
 }
 
 //========================================================================
@@ -86,6 +89,7 @@ HRESULT CGame::Init(void)
 	CBeach::Load();
 	CWaterSurface::Load();
 	CGrass::Load();
+	CActionUI::Load();
 
 	// ポーズを生成
 	if (m_pPause == NULL)
@@ -152,6 +156,21 @@ HRESULT CGame::Init(void)
 		}
 
 		m_pScore->SetNum(1000000);
+	}
+	
+	// アクションUIを生成
+	if (m_pActionUI == NULL)
+	{// NULLチェック
+		m_pActionUI = CActionUI::Create(D3DXVECTOR3(580.0f, 300.0f, 0.0f), 20.0f, 20.0f);
+
+		if (m_pActionUI == NULL)
+		{// NULLチェック
+			OutputDebugStringA("! ! ! アクションUIの生成に失敗しました ! ! !\n");
+
+			return E_FAIL;
+		}
+
+		m_pActionUI->SetDisp(false);
 	}
 
 	// マップオブジェクトの生成
@@ -276,6 +295,7 @@ HRESULT CGame::Init(void)
 void CGame::Uninit(void)
 {
 	// テクスチャを破棄
+	CActionUI::Unload();
 	CGrass::Unload();
 	CWaterSurface::Unload();
 	CBeach::Unload();
@@ -284,6 +304,12 @@ void CGame::Uninit(void)
 	CJumpMeterUI::Unload();
 	CEnergyUI::Unload();
 
+	// アクションUIの破棄
+	if (m_pActionUI != NULL)
+	{// NULLチェック
+		m_pActionUI = NULL;
+	}
+	
 	// スコアの破棄
 	if (m_pScore != NULL)
 	{// NULLチェック

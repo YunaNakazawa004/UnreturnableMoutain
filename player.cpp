@@ -538,6 +538,15 @@ void CPlayer::Update(void)
 			}
 		}
 	}
+	else if (m_state == STATE_TUTORIAL)
+	{// チュートリアル中
+		fHeight = 0.0f;
+
+		if (pos.y <= fHeight)
+		{// 地面にめり込んだときだけ
+			pos.y = fHeight;
+		}
+	}
 
 	// 当たり判定
 	CEnergyRock* pEnergyRock = CEnergyRock::Collision(&pos, &m_posOld, &m_move, m_fRadius, m_fHeight);

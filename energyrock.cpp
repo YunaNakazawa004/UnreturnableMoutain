@@ -10,6 +10,8 @@
 #include "manager.h"
 
 #include "game.h"
+#include "title.h"
+#include "UI_action.h"
 #include "mountain.h"
 #include "beach.h"
 
@@ -179,6 +181,9 @@ void CEnergyRock::Minus(const int nValue)
 CEnergyRock* CEnergyRock::Collision(D3DXVECTOR3* pPos, D3DXVECTOR3* posOld, D3DXVECTOR3* move,
 	const float fRadius, const float fHeight)
 {
+	CActionUI* pActionUI = (CManager::GetMode() == CScene::MODE_GAME) ?
+		CGame::GetActionUI() : CTitle::GetActionUI();		// アクションUIを取得
+
 	for (int nCntPri = 0; nCntPri < MAX_PRIORITY_NUM; nCntPri++)
 	{
 #ifdef LIST
@@ -205,11 +210,17 @@ CEnergyRock* CEnergyRock::Collision(D3DXVECTOR3* pPos, D3DXVECTOR3* posOld, D3DX
 				if ((D3DXVec3Length(&dist) < ENERGYROCK_RADIUS + fRadius) &&
 					pPos->y < posRock.y + ENERGYROCK_HEIGHT && pPos->y + fHeight > posRock.y)
 				{// エネルギー鉱物と重なった
+					pActionUI->SetFade(CActionUI::FADE_OUT);
+					pActionUI->NearEnergyrock(true);
+
 					// 当たり判定
 					dynamic_cast<CObjectX*>(pObj)->Collision(pPos, posOld, move, fRadius, fHeight, NULL);
 
 					return dynamic_cast<CEnergyRock*>(pObj);
 				}
+
+				pActionUI->NearEnergyrock(false);
+				pActionUI->SetFade(CActionUI::FADE_IN);
 			}
 
 			pObj = pObjNext;			// 次のオブジェクトを代入

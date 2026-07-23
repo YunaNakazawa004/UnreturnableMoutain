@@ -20,6 +20,7 @@
 #include "ship.h"
 #include "UI_energy.h"
 #include "UI_jump_meter.h"
+#include "UI_action.h"
 
 //************************************************************************
 // 静的メンバ変数宣言
@@ -30,6 +31,7 @@ CPlayer* CTitle::m_pPlayer = NULL;					// プレイヤーのインスタンス
 CShip* CTitle::m_pShip = NULL;						// 船のインスタンス
 CEnergyUI* CTitle::m_pEnergyUI = NULL;				// エネルギーUIのインスタンス
 CJumpMeterUI* CTitle::m_pJumpMeterUI = NULL;		// ジャンプメーターUIのインスタンス
+CActionUI* CTitle::m_pActionUI = NULL;				// アクションUIのインスタンス
 
 //========================================================================
 // タイトル画面クラスのコンストラクタ
@@ -43,6 +45,7 @@ CTitle::CTitle() : CScene(CScene::MODE_TITLE)
 	m_pShip = NULL;
 	m_pEnergyUI = NULL;
 	m_pJumpMeterUI = NULL;
+	m_pActionUI = NULL;
 }
 
 //========================================================================
@@ -58,14 +61,15 @@ CTitle::~CTitle()
 HRESULT CTitle::Init(void)
 {
 	// カメラの設定
-	CCamera *pCamera = CManager::GetCamera();
-	pCamera->SetType(CCamera::TYPE_STOP);
+	CCamera* pCamera = CManager::GetCamera();
+	pCamera->SetPosition(D3DXVECTOR3(0.0f,30.0f,-200.0f), DEFAULT_VECTER3, DEFAULT_VECTER3, CCamera::TYPE_STOP);
 
 	// テクスチャを読み込み
 	CTitleLogo::Load();
 	CEnterUI::Load();
 	CEnergyUI::Load();
 	CJumpMeterUI::Load();
+	CActionUI::Load();
 
 	// タイトルロゴを生成
 	if (m_pTitleLogo == NULL)
@@ -81,7 +85,7 @@ HRESULT CTitle::Init(void)
 
 		m_pTitleLogo->SetDisp(true);
 	}
-	
+
 	// エンターUIを生成
 	if (m_pEnterUI == NULL)
 	{// NULLチェック
@@ -127,10 +131,25 @@ HRESULT CTitle::Init(void)
 		m_pJumpMeterUI->SetDisp(false);
 	}
 
+	// アクションUIを生成
+	if (m_pActionUI == NULL)
+	{// NULLチェック
+		m_pActionUI = CActionUI::Create(D3DXVECTOR3(580.0f, 300.0f, 0.0f), 20.0f, 20.0f);
+
+		if (m_pActionUI == NULL)
+		{// NULLチェック
+			OutputDebugStringA("! ! ! アクションUIの生成に失敗しました ! ! !\n");
+
+			return E_FAIL;
+		}
+
+		m_pActionUI->SetDisp(false);
+	}
+
 	// プレイヤーを生成
 	if (m_pPlayer == NULL)
 	{// NULLチェック
-		m_pPlayer = CPlayer::Create(D3DXVECTOR3(0.0f, -15.0f, -130.0f), DEFAULT_VECTER3);
+		m_pPlayer = CPlayer::Create(D3DXVECTOR3(0.0f, 7.0f, -130.0f), DEFAULT_VECTER3);
 
 		if (m_pPlayer == NULL)
 		{// NULLチェック
@@ -145,7 +164,7 @@ HRESULT CTitle::Init(void)
 	// 船を生成
 	if (m_pShip == NULL)
 	{// NULLチェック
-		m_pShip = CShip::Create(D3DXVECTOR3(0.0f,-15.0f,-130.0f), DEFAULT_VECTER3);
+		m_pShip = CShip::Create(D3DXVECTOR3(0.0f, 0.0f, -130.0f), DEFAULT_VECTER3);
 
 		if (m_pShip == NULL)
 		{// NULLチェック
@@ -164,6 +183,7 @@ HRESULT CTitle::Init(void)
 void CTitle::Uninit(void)
 {
 	// テクスチャを破棄
+	CActionUI::Unload();
 	CJumpMeterUI::Unload();
 	CEnergyUI::Unload();
 	CEnterUI::Unload();
@@ -181,11 +201,17 @@ void CTitle::Uninit(void)
 		m_pPlayer = NULL;
 	}
 
+	// アクションUIの破棄
+	if (m_pActionUI != NULL)
+	{// NULLチェック
+		m_pActionUI = NULL;
+	}
+
 	// ジャンプメーターUIの破棄
 	if (m_pJumpMeterUI != NULL)
 	{// NULLチェック
 		m_pJumpMeterUI = NULL;
-	}
+}
 
 	// エネルギーUIの破棄
 	if (m_pEnergyUI != NULL)
@@ -218,6 +244,7 @@ void CTitle::Update(void)
 {
 	CInputKeyboard* pInputKeyboard = CManager::GetInputKeyboard();		// キーボード入力の取得
 	CTransition* pTransition = CManager::GetTransition();				// 画面遷移の取得
+	CCamera* pCamera = CManager::GetCamera();							// カメラの取得
 
 	if (m_pPlayer->GetState() == CPlayer::STATE_TUTORIAL)
 	{// チュートリアル中
@@ -225,6 +252,7 @@ void CTitle::Update(void)
 		m_pEnterUI->SetDisp(false);
 		m_pJumpMeterUI->SetDisp(true);
 		m_pTitleLogo->SetDisp(false);
+		pCamera->SetType(CCamera::TYPE_PLAYER);
 	}
 
 	// 画面遷移

@@ -12,6 +12,7 @@
 #include "input.h"
 
 #include "game.h"
+#include "title.h"
 #include "player.h"
 
 //*****************************************************************************
@@ -145,7 +146,8 @@ void CCamera::Update(void)
 	switch (m_type)
 	{
 	case TYPE_PLAYER:
-		pPlayer = CGame::GetPlayer();							// プレイヤー取得
+		pPlayer = (CManager::GetMode() == CScene::MODE_GAME) ?
+			CGame::GetPlayer() : CTitle::GetPlayer();			// プレイヤー取得
 		pos = pPlayer->GetPosition();
 		rot = pPlayer->GetRotation();
 

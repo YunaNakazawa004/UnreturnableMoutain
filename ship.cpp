@@ -21,6 +21,7 @@
 #include "mountain.h"
 #include "beach.h"
 #include "player.h"
+#include "UI_action.h"
 
 #include <iostream>
 #include <fstream>
@@ -165,6 +166,7 @@ void CShip::Update(void)
 	CPlayer* pPlayer = CGame::GetPlayer();					// プレイヤーの取得
 	CMountain* pMountain = CGame::GetMountain();			// 山の取得
 	CBeach* pBeach = CGame::GetBeach();						// 砂浜の取得
+	CActionUI* pActionUI = CGame::GetActionUI();			// アクションUIの取得
 	D3DXVECTOR3 pos = GetPosition();
 
 	float fHeightM = 0.0f;		// 山の地面の高さ
@@ -218,6 +220,9 @@ void CShip::Update(void)
 
 		if (pPlayer->IsNear(m_pos, NEAR_BUTTON) == true)
 		{// 近くにいるとき
+			pActionUI->SetFade(CActionUI::FADE_OUT);
+			pActionUI->NearShip(true);
+
 			if (pInputKeyboard->GetTrigger(DIK_E) == true || pInputJoypad->GetTrigger(0, CInputJoypad::JOYKEY_B) == true)
 			{// ボタンを押した
 				// 遷移フラグをON
@@ -228,6 +233,11 @@ void CShip::Update(void)
 
 				return;
 			}
+		}
+		else
+		{// 近くじゃない
+			pActionUI->NearShip(false);
+			pActionUI->SetFade(CActionUI::FADE_IN);
 		}
 
 		break;

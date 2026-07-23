@@ -189,6 +189,7 @@
     <ClCompile Include="title.cpp" />
     <ClCompile Include="transition.cpp" />
     <ClCompile Include="tree.cpp" />
+    <ClCompile Include="UI_action.cpp" />
     <ClCompile Include="UI_energy.cpp" />
     <ClCompile Include="UI_enter.cpp" />
     <ClCompile Include="UI_item.cpp" />
@@ -242,6 +243,7 @@
     <ClInclude Include="title.h" />
     <ClInclude Include="transition.h" />
     <ClInclude Include="tree.h" />
+    <ClInclude Include="UI_action.h" />
     <ClInclude Include="UI_energy.h" />
     <ClInclude Include="UI_enter.h" />
     <ClInclude Include="UI_item.h" />
