@@ -13,6 +13,7 @@
 #include "texture.h"
 
 #include "game.h"
+#include "title.h"
 #include "result.h"
 #include "camera.h"
 #include "model.h"
@@ -226,9 +227,13 @@ void CPlayer::Update(void)
 	CMountain* pMountain = CGame::GetMountain();						// 山の取得
 	CBeach* pBeach = CGame::GetBeach();									// 砂浜の取得
 	CWaterSurface* pWaterSurface = CGame::GetWaterSurface();			// 水面の取得
-	CEnergyUI* pEnergyUI = CGame::GetEnergyUI();			// エネルギーUIの取得
-	CJumpMeterUI* pJumpMeterUI = CGame::GetJumpMeterUI();	// ジャンプメーターUIの取得
-	CShip* pShip = CGame::GetShip();						// 船の取得
+	CEnergyUI* pEnergyUI = (CManager::GetMode() == CScene::MODE_GAME) ?
+		CGame::GetEnergyUI() : CTitle::GetEnergyUI();		// エネルギーUIの取得
+	CJumpMeterUI* pJumpMeterUI = (CManager::GetMode() == CScene::MODE_GAME) ?
+		CGame::GetJumpMeterUI() : CTitle::GetJumpMeterUI();	// ジャンプメーターUIの取得
+	CShip* pShip = 
+		(CManager::GetMode() == CScene::MODE_GAME) ? 
+		CGame::GetShip() : CTitle::GetShip();				// 船の取得
 	D3DXVECTOR3 pos = CPlayer::GetPosition();				// プレイヤーの位置	
 	D3DXVECTOR3 rot = CPlayer::GetRotation();				// プレイヤーの向き
 	D3DXVECTOR2 move = { 0.0f,0.0f };						// XZ方向に動いているかどうかの判断用
@@ -284,6 +289,11 @@ void CPlayer::Update(void)
 
 		break;
 
+	case STATE_TUTORIAL:	// チュートリアル状態
+		pDebugProc->Print("状態 : チュートリアル状態\n");
+
+		break;
+		
 	case STATE_WAIT:		// 待機状態
 		pDebugProc->Print("状態 : 待機状態\n");
 
@@ -319,8 +329,8 @@ void CPlayer::Update(void)
 	}
 
 	// 移動処理
-	if (m_state == STATE_NORMAL)
-	{// 通常状態のとき
+	if (m_state == STATE_NORMAL || m_state == STATE_TUTORIAL)
+	{// 通常状態/チュートリアル中のとき
 		if (Movement(rot) == true)
 		{// 移動している
 			if (m_bJump == false)
@@ -329,8 +339,11 @@ void CPlayer::Update(void)
 				m_pMotion->Set(MOTIONTYPE_MOVE, true, 20);
 			}
 
-			// 移動するとエネルギーが減る
-			m_nEnergyCounter++;
+			if (m_state == STATE_NORMAL)
+			{// 通常状態のみ
+				// 移動するとエネルギーが減る
+				m_nEnergyCounter++;
+			}
 		}
 		else if (m_bJump == false && m_bLand == false && m_bAct == false)
 		{// 移動していない
@@ -339,7 +352,7 @@ void CPlayer::Update(void)
 		}
 	}
 
-	if (m_bJump == false && m_state == STATE_NORMAL)
+	if (m_bJump == false && (m_state == STATE_NORMAL || m_state == STATE_TUTORIAL))
 	{// ジャンプしていないとき
 		static float fMinusEnergy = 0.0f;
 
@@ -374,13 +387,18 @@ void CPlayer::Update(void)
 			m_fJumpHigh = 0.0f;
 			UpperPos.y = UpperPosOff.y;
 
-			// エネルギーを消費する
-			m_fEnergy -= fMinusEnergy;
-			m_fUsedEnergy += fMinusEnergy;
+			if (m_state == STATE_NORMAL)
+			{// 通常状態のみ
+				// エネルギーを消費する
+				m_fEnergy -= fMinusEnergy;
+				m_fUsedEnergy += fMinusEnergy;
+			}
+
 			fMinusEnergy = 0.0f;		// リセット
 		}
 	}
 
+#ifdef _DEBUG
 	if (pInputKeyboard->GetTrigger(DIK_BACKSPACE) == true || pInputJoypad->GetTrigger(0, CInputJoypad::JOYKEY_START) == true)
 	{// 位置回転リセット
 		pos = DEFAULT_VECTER3;
@@ -397,6 +415,7 @@ void CPlayer::Update(void)
 		// モーションを設定
 		m_pMotion->Set(MOTIONTYPE_NEUTRAL, true, 20);
 	}
+#endif
 
 	// 位置に移動量を加算
 	pos += m_move;
@@ -411,10 +430,13 @@ void CPlayer::Update(void)
 		m_move.z += (0.0f - m_move.z) * MOVE_INERTIA;
 	}
 
-	// マップ外には行かない
-	if (D3DXVec3Length(&pos) >= OUTMAP)
-	{// マップ外
-		pos = m_posOld;
+	if (m_state == STATE_NORMAL)
+	{// 通常状態のみ
+		// マップ外には行かない
+		if (D3DXVec3Length(&pos) >= OUTMAP)
+		{// マップ外
+			pos = m_posOld;
+		}
 	}
 
 	// XZ方向への移動量(動いているかいないか)※Y座標のみの変化はとらない
@@ -429,84 +451,87 @@ void CPlayer::Update(void)
 	// 角度を慣性ありで加算
 	rot.y += (m_rotDest.y - rot.y) * 0.1f;
 
-	// 山のポリゴン番号を取得
-	polygonIdxM = pMountain->GetPolygonIdx(pos);
+	if (m_state == STATE_NORMAL || m_state == STATE_APPEAR)
+	{// 通常状態のみ
+		// 山のポリゴン番号を取得
+		polygonIdxM = pMountain->GetPolygonIdx(pos);
 
-	// 山の地面の高さを取得
-	fHeightM = pMountain->GetHeight(pos, polygonIdxM);
+		// 山の地面の高さを取得
+		fHeightM = pMountain->GetHeight(pos, polygonIdxM);
 
-	// 砂浜のポリゴン番号を取得
-	polygonIdxB = pBeach->GetPolygonIdx(pos);
+		// 砂浜のポリゴン番号を取得
+		polygonIdxB = pBeach->GetPolygonIdx(pos);
 
-	// 砂浜の地面の高さを取得
-	fHeightB = pBeach->GetHeight(pos, polygonIdxB);
+		// 砂浜の地面の高さを取得
+		fHeightB = pBeach->GetHeight(pos, polygonIdxB);
 
-	// 最終的な高さ/ポリゴン番号
-	if (fHeightM >= fHeightB)
-	{// 山
-		fHeight = fHeightM;
-		polygonIdx = polygonIdxM;
-		pMeshField = pMountain;
-	}
-	else
-	{// 砂浜
-		fHeight = fHeightB;
-		polygonIdx = polygonIdxB;
-		pMeshField = pBeach;
-	}
+		// 最終的な高さ/ポリゴン番号
+		if (fHeightM >= fHeightB)
+		{// 山
+			fHeight = fHeightM;
+			polygonIdx = polygonIdxM;
+			pMeshField = pMountain;
+		}
+		else
+		{// 砂浜
+			fHeight = fHeightB;
+			polygonIdx = polygonIdxB;
+			pMeshField = pBeach;
+		}
 
-	pDebugProc->Print("傾斜 : %f\n", pMeshField->GetSlope(pos, polygonIdx));
+		pDebugProc->Print("傾斜 : %f\n", pMeshField->GetSlope(pos, polygonIdx));
 
-	if (m_bJump == false)
-	{// 地上にいるときだけ
-		// 傾斜によって進む距離を調整
-		pos = m_posOld + ((pos - m_posOld) * pMeshField->GetSlope(pos, polygonIdx));
-	}
+		if (m_bJump == false)
+		{// 地上にいるときだけ
+			// 傾斜によって進む距離を調整
+			pos = m_posOld + ((pos - m_posOld) * pMeshField->GetSlope(pos, polygonIdx));
+		}
 
-	// 山のポリゴン番号を取得
-	polygonIdxM = pMountain->GetPolygonIdx(pos);
+		// 山のポリゴン番号を取得
+		polygonIdxM = pMountain->GetPolygonIdx(pos);
 
-	// 山の地面の高さを取得
-	fHeightM = pMountain->GetHeight(pos, polygonIdxM);
+		// 山の地面の高さを取得
+		fHeightM = pMountain->GetHeight(pos, polygonIdxM);
 
-	// 砂浜のポリゴン番号を取得
-	polygonIdxB = pBeach->GetPolygonIdx(pos);
+		// 砂浜のポリゴン番号を取得
+		polygonIdxB = pBeach->GetPolygonIdx(pos);
 
-	// 砂浜の地面の高さを取得
-	fHeightB = pBeach->GetHeight(pos, polygonIdxB);
-	
-	// 水面のポリゴン番号を取得
-	polygonIdxW = pWaterSurface->GetPolygonIdx(pos);
+		// 砂浜の地面の高さを取得
+		fHeightB = pBeach->GetHeight(pos, polygonIdxB);
 
-	// 水面の地面の高さを取得
-	fHeightW = pWaterSurface->GetHeight(pos, polygonIdxW);
+		// 水面のポリゴン番号を取得
+		polygonIdxW = pWaterSurface->GetPolygonIdx(pos);
 
-	// 最終的な高さ/ポリゴン番号
-	if (fHeightM >= fHeightB)
-	{// 山
-		fHeight = fHeightM;
-		polygonIdx = polygonIdxM;
-		pMeshField = pMountain;
-	}
-	else
-	{// 砂浜
-		fHeight = fHeightB;
-		polygonIdx = polygonIdxB;
-		pMeshField = pBeach;
-	}
+		// 水面の地面の高さを取得
+		fHeightW = pWaterSurface->GetHeight(pos, polygonIdxW);
 
-	if (fHeight == ERROR_HEIGHT)
-	{// 無効な高さだったら
-		fHeight = 0.0f;
-	}
+		// 最終的な高さ/ポリゴン番号
+		if (fHeightM >= fHeightB)
+		{// 山
+			fHeight = fHeightM;
+			polygonIdx = polygonIdxM;
+			pMeshField = pMountain;
+		}
+		else
+		{// 砂浜
+			fHeight = fHeightB;
+			polygonIdx = polygonIdxB;
+			pMeshField = pBeach;
+		}
 
-	if (pos.y <= fHeight)
-	{// 地面にめり込んだときだけ
-		pos.y = fHeight;
+		if (fHeight == ERROR_HEIGHT)
+		{// 無効な高さだったら
+			fHeight = 0.0f;
+		}
 
-		if (pMeshField->GetSlope(pos, polygonIdx) <= UNCLIMB_SLOPE && m_bJump == false)
-		{// 傾斜の角度的に登れない/地面にいる
-			pos = m_posOld;
+		if (pos.y <= fHeight)
+		{// 地面にめり込んだときだけ
+			pos.y = fHeight;
+
+			if (pMeshField->GetSlope(pos, polygonIdx) <= UNCLIMB_SLOPE && m_bJump == false)
+			{// 傾斜の角度的に登れない/地面にいる
+				pos = m_posOld;
+			}
 		}
 	}
 
@@ -525,7 +550,7 @@ void CPlayer::Update(void)
 			m_bLand = true;
 
 			// 土埃
-			CExplosion::Ray(pos, 1.0f, 0, 0.5f, D3DXCOLOR(COLOR_DARKGRAY.r, COLOR_DARKGRAY.g, COLOR_DARKGRAY.b, 0.5f));
+			CExplosion::Ray(pos, 1.0f, 2, 0.5f, D3DXCOLOR(COLOR_DARKGRAY.r, COLOR_DARKGRAY.g, COLOR_DARKGRAY.b, 0.5f));
 		}
 
 		if (pos.y < fHeight && bHead == true)
@@ -556,14 +581,17 @@ void CPlayer::Update(void)
 		UpperPos.y = UpperPosOff.y;
 	}
 
-	// 水面より下にいたら水しぶき
-	if (fHeightW > fHeight && D3DXVec2Length(&move) >= 0.6f)
-	{// 水面より下
-		m_nCounter++;
+	if (m_state == STATE_NORMAL)
+	{// 通常状態のみ
+		// 水面より下にいたら水しぶき
+		if (fHeightW > fHeight && D3DXVec2Length(&move) >= 0.6f)
+		{// 水面より下
+			m_nCounter++;
 
-		if (m_nCounter % 10 == 0)
-		{// 一定間隔
-			CSpray::Create(D3DXVECTOR3(pos.x, fHeightW + 1.0f, pos.z), D3DXVECTOR3(0.0f, 0.0f, 0.0f), 5.0f);
+			if (m_nCounter % 10 == 0)
+			{// 一定間隔
+				CSpray::Create(D3DXVECTOR3(pos.x, fHeightW + 1.0f, pos.z), D3DXVECTOR3(0.0f, 0.0f, 0.0f), 5.0f);
+			}
 		}
 	}
 
@@ -681,11 +709,14 @@ void CPlayer::Update(void)
 
 	pDebugProc->Print("使用したエネルギー量 : %f\n", m_fUsedEnergy);
 
-	// エネルギー量をUIに設定
-	pEnergyUI->SetEnergy(m_fEnergy);
+	if (m_state == STATE_NORMAL || m_state == STATE_TUTORIAL || m_state == STATE_APPEAR)
+	{// 通常状態/チュートリアル中のみ
+		// エネルギー量をUIに設定
+		pEnergyUI->SetEnergy(m_fEnergy);
 
-	// ジャンプ量をUIに設定
-	pJumpMeterUI->SetJumpMeter(m_fJumpHigh);
+		// ジャンプ量をUIに設定
+		pJumpMeterUI->SetJumpMeter(m_fJumpHigh);
+	}
 
 	// 位置/向きを適用
 	SetPosition(pos);

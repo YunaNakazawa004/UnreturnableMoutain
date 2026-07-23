@@ -152,6 +152,11 @@ void CShip::Uninit(void)
 //========================================================================
 void CShip::Update(void)
 {
+	if (CManager::GetMode() != CScene::MODE_GAME)
+	{// ゲーム以外は更新しない
+		return;
+	}
+
 	// ローカル変数
 	CInputKeyboard* pInputKeyboard = CManager::GetInputKeyboard();		// キーボード入力の取得
 	CInputJoypad* pInputJoypad = CManager::GetInputJoypad();			// ジョイパッド入力の取得

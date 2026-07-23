@@ -15,6 +15,10 @@
 //************************************************************************
 class CTitleLogo;
 class CEnterUI;
+class CPlayer;
+class CShip;
+class CEnergyUI;
+class CJumpMeterUI;
 
 //************************************************************************
 // タイトル画面クラス
@@ -32,10 +36,18 @@ public:
 
 	static CTitleLogo* GetTitleLogo(void) { return m_pTitleLogo; }
 	static CEnterUI* GetEnterUI(void) { return m_pEnterUI; }
+	static CPlayer* GetPlayer(void) { return m_pPlayer; }
+	static CShip* GetShip(void) { return m_pShip; }
+	static CEnergyUI* GetEnergyUI(void) { return m_pEnergyUI; }
+	static CJumpMeterUI* GetJumpMeterUI(void) { return m_pJumpMeterUI; }
 
 private:
 	static CTitleLogo* m_pTitleLogo;				// タイトルロゴのインスタンス
 	static CEnterUI* m_pEnterUI;					// エンターUIのインスタンス
+	static CPlayer* m_pPlayer;						// プレイヤーのインスタンス
+	static CShip* m_pShip;							// 船のインスタンス
+	static CEnergyUI* m_pEnergyUI;					// エネルギーUIのインスタンス
+	static CJumpMeterUI* m_pJumpMeterUI;			// ジャンプメーターUIのインスタンス
 };
 
 #endif

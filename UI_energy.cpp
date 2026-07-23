@@ -131,6 +131,9 @@ HRESULT CEnergyUI::Init(const D3DXVECTOR3 pos, const float fWidth, const float f
 		return E_FAIL;
 	}
 
+	// ’l‚Ì‰Šú‰»
+	SetTexUV(3, 4, 1, 0.0f, 0.0f);
+
 	return S_OK;
 }
 

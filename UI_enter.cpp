@@ -13,6 +13,7 @@
 #include "texture.h"
 
 #include "title.h"
+#include "player.h"
 
 //************************************************************************
 // マクロ定義
@@ -159,12 +160,13 @@ void CEnterUI::Update(void)
 	CInputKeyboard* pInputKeyboard = CManager::GetInputKeyboard();		// キーボード入力の取得
 	CInputJoypad* pInputJoypad = CManager::GetInputJoypad();			// ジョイパッド入力の取得
 	CInputMouse* pInputMouse = CManager::GetInputMouse();				// マウス入力の取得
+	CPlayer* pPlayer = CTitle::GetPlayer();
 	D3DXCOLOR col = GetColor();
 
 	switch (m_state)
 	{
 	case STATE_NONE:
-		SetDisp(true);
+		SetDisp(false);
 		SetColor(COLOR_WHITE);
 
 		break;
@@ -195,8 +197,10 @@ void CEnterUI::Update(void)
 		}
 
 		if (m_nCounterState > FADE_COUNT)
-		{// すこし経ってから遷移フラグを立てる
-			CTitle::SetFadeEnable();
+		{// すこし経ってからチュートリアルに進む
+			pPlayer->SetState(CPlayer::STATE_TUTORIAL);
+
+			m_state = STATE_NONE;
 		}
 
 		break;

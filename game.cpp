@@ -220,7 +220,7 @@ HRESULT CGame::Init(void)
 	rot.y = ((float)(rand() % 629 - 314) / 100.0f);
 	rot.z = 0.0f;
 	pos.x = sinf(rot.y) * 2000.0f;
-	pos.y = 0.0f;
+	pos.y = 40.0f;
 	pos.z = cosf(rot.y) * 2000.0f;
 
 	// ÉvÉåÉCÉÑÅ[Çê∂ê¨

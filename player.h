@@ -47,6 +47,7 @@ public:
 	typedef enum
 	{
 		STATE_NONE = 0,		// 状態無し
+		STATE_TUTORIAL,		// チュートリアル状態
 		STATE_WAIT,			// 待機状態
 		STATE_APPEAR,		// 出現状態
 		STATE_NORMAL,		// 通常状態
@@ -75,6 +76,8 @@ public:
 	D3DXCOLOR GetColor(void) { return m_col; }
 	void SetDisp(const bool bDisp) { m_bDisp = bDisp; }
 	void SwapDisp(void) { m_bDisp = m_bDisp ? false : true; }
+	void SetState(const STATE state) { m_state = state; }
+	STATE GetState(void) { return m_state; }
 
 	bool IsNear(const D3DXVECTOR3 pos, const float fRadius);
 
