@@ -59,9 +59,9 @@ public:
 	CPlayer(const int nPriority = PLAYER_PRIORITY);
 	virtual ~CPlayer();
 
-	static CPlayer* Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot);
+	static CPlayer* Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot, const float fEnergy);
 	HRESULT Init(void) { return S_OK; }
-	HRESULT Init(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot);
+	HRESULT Init(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot, const float fEnergy);
 	void Uninit(void);
 	void Update(void);
 	void Draw(void);

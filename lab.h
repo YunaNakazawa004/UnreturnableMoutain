@@ -1,11 +1,11 @@
 //========================================================================
 // 
-// 船ヘッダー [ ship.h ]
+// 研究所ヘッダー [ lab.h ]
 // Author : Nakazawa Yuna
 // 
 //========================================================================
-#ifndef _SHIP_H_		// このマクロ定義がされていなかったら
-#define _SHIP_H_		// 2重インクルード防止のマクロを定義する
+#ifndef _LAB_H_		// このマクロ定義がされていなかったら
+#define _LAB_H_		// 2重インクルード防止のマクロを定義する
 
 #include "main.h"
 #include "object.h"
@@ -13,7 +13,7 @@
 //************************************************************************
 // マクロ定義
 //************************************************************************
-#define MAX_MODEL		(16)		// 船の最大
+#define MAX_MODEL		(16)		// 研究所の最大
 
 //************************************************************************
 // 前方宣言
@@ -21,26 +21,15 @@
 class CModel;
 
 //************************************************************************
-// 船クラス
+// 研究所クラス
 //************************************************************************
-class CShip : public CObject
+class CLab : public CObject
 {
 public:
-	// 状態
-	typedef enum
-	{
-		STATE_NONE = 0,		// 状態無し
-		STATE_WAIT,			// 待機状態
-		STATE_APPEAR,		// 出現状態
-		STATE_NORMAL,		// 通常状態
-		STATE_READY,		// 準備完了状態
-		STATE_MAX
-	}STATE;
+	CLab(const int nPriority = OBJECT_PRIORITY);
+	virtual ~CLab();
 
-	CShip(const int nPriority = OBJECT_PRIORITY);
-	virtual ~CShip();
-
-	static CShip* Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot);
+	static CLab* Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot);
 	HRESULT Init(void) { return S_OK; }
 	HRESULT Init(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot);
 	void Uninit(void);
@@ -61,12 +50,10 @@ public:
 	bool Collision(D3DXVECTOR3* pos, D3DXVECTOR3* posOld, D3DXVECTOR3* move,
 		const float fRadius, const float fHeight, bool* pLand);
 
-	void SetState(const STATE state) { m_state = state; };
-
 private:
 	HRESULT SetModel(const char* pFilename);
 
-	const char* m_apFileName[MAX_MODEL];		// 船Xファイルの名前
+	const char* m_apFileName[MAX_MODEL];		// 研究所Xファイルの名前
 	CModel* m_apModel[MAX_MODEL];				// モデル（パーツ）へのポインタ
 	int m_nNumModel;							// モデル（パーツ）の総数
 
@@ -79,9 +66,6 @@ private:
 	D3DXCOLOR m_col;				// 色
 	float m_fRadius;				// 半径
 	float m_fHeight;				// 高さ
-
-	STATE m_state;					// 状態
-	int m_nCounterState;			// 状態カウンター
 
 	bool m_bDisp;					// 表示するかどうか
 };

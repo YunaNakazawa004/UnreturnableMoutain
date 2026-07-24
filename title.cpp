@@ -18,6 +18,7 @@
 #include "UI_enter.h"
 #include "player.h"
 #include "ship.h"
+#include "lab.h"
 #include "UI_energy.h"
 #include "UI_jump_meter.h"
 #include "UI_action.h"
@@ -29,9 +30,11 @@ CTitleLogo* CTitle::m_pTitleLogo = NULL;			// タイトルロゴのインスタンス
 CEnterUI* CTitle::m_pEnterUI = NULL;				// エンターUIのインスタンス
 CPlayer* CTitle::m_pPlayer = NULL;					// プレイヤーのインスタンス
 CShip* CTitle::m_pShip = NULL;						// 船のインスタンス
+CLab* CTitle::m_pLab = NULL;						// 研究所のインスタンス
 CEnergyUI* CTitle::m_pEnergyUI = NULL;				// エネルギーUIのインスタンス
 CJumpMeterUI* CTitle::m_pJumpMeterUI = NULL;		// ジャンプメーターUIのインスタンス
 CActionUI* CTitle::m_pActionUI = NULL;				// アクションUIのインスタンス
+bool CTitle::m_bTutorial = false;					// チュートリアル中かどうかのフラグ
 
 //========================================================================
 // タイトル画面クラスのコンストラクタ
@@ -43,9 +46,11 @@ CTitle::CTitle() : CScene(CScene::MODE_TITLE)
 	m_pEnterUI = NULL;
 	m_pPlayer = NULL;
 	m_pShip = NULL;
+	m_pLab = NULL;
 	m_pEnergyUI = NULL;
 	m_pJumpMeterUI = NULL;
 	m_pActionUI = NULL;
+	m_bTutorial = false;
 }
 
 //========================================================================
@@ -114,6 +119,7 @@ HRESULT CTitle::Init(void)
 		}
 
 		m_pEnergyUI->SetDisp(false);
+		m_pEnergyUI->SetState(0);
 	}
 
 	// ジャンプメーターUIを生成
@@ -149,7 +155,7 @@ HRESULT CTitle::Init(void)
 	// プレイヤーを生成
 	if (m_pPlayer == NULL)
 	{// NULLチェック
-		m_pPlayer = CPlayer::Create(D3DXVECTOR3(0.0f, 7.0f, -130.0f), DEFAULT_VECTER3);
+		m_pPlayer = CPlayer::Create(D3DXVECTOR3(0.0f, 7.0f, -130.0f), DEFAULT_VECTER3, 40.0f);
 
 		if (m_pPlayer == NULL)
 		{// NULLチェック
@@ -172,6 +178,21 @@ HRESULT CTitle::Init(void)
 
 			return E_FAIL;
 		}
+
+		m_pShip->SetState(CShip::STATE_WAIT);
+	}
+	
+	// 研究所を生成
+	if (m_pLab == NULL)
+	{// NULLチェック
+		m_pLab = CLab::Create(D3DXVECTOR3(0.0f, 0.0f, -130.0f), DEFAULT_VECTER3);
+
+		if (m_pLab == NULL)
+		{// NULLチェック
+			OutputDebugStringA("! ! ! 船の生成に失敗しました ! ! !\n");
+
+			return E_FAIL;
+		}
 	}
 
 	return S_OK;
@@ -189,6 +210,12 @@ void CTitle::Uninit(void)
 	CEnterUI::Unload();
 	CTitleLogo::Unload();
 
+	// 研究所の破棄
+	if (m_pLab != NULL)
+	{// NULLチェック
+		m_pLab = NULL;
+	}
+	
 	// 船の破棄
 	if (m_pShip != NULL)
 	{// NULLチェック
@@ -246,13 +273,19 @@ void CTitle::Update(void)
 	CTransition* pTransition = CManager::GetTransition();				// 画面遷移の取得
 	CCamera* pCamera = CManager::GetCamera();							// カメラの取得
 
-	if (m_pPlayer->GetState() == CPlayer::STATE_TUTORIAL)
+	if (m_bTutorial == false && m_pPlayer->GetState() == CPlayer::STATE_TUTORIAL)
 	{// チュートリアル中
+		// チュートリアル状態に設定
 		m_pEnergyUI->SetDisp(true);
 		m_pEnterUI->SetDisp(false);
 		m_pJumpMeterUI->SetDisp(true);
 		m_pTitleLogo->SetDisp(false);
+		m_pActionUI->SetDisp(true);
 		pCamera->SetType(CCamera::TYPE_PLAYER);
+		m_pShip->SetState(CShip::STATE_READY);
+
+		// フラグON
+		m_bTutorial = true;
 	}
 
 	// 画面遷移

@@ -17,6 +17,7 @@ class CTitleLogo;
 class CEnterUI;
 class CPlayer;
 class CShip;
+class CLab;
 class CEnergyUI;
 class CJumpMeterUI;
 class CActionUI;
@@ -39,6 +40,7 @@ public:
 	static CEnterUI* GetEnterUI(void) { return m_pEnterUI; }
 	static CPlayer* GetPlayer(void) { return m_pPlayer; }
 	static CShip* GetShip(void) { return m_pShip; }
+	static CLab* GetLab(void) { return m_pLab; }
 	static CEnergyUI* GetEnergyUI(void) { return m_pEnergyUI; }
 	static CJumpMeterUI* GetJumpMeterUI(void) { return m_pJumpMeterUI; }
 	static CActionUI* GetActionUI(void) { return m_pActionUI; }
@@ -48,9 +50,12 @@ private:
 	static CEnterUI* m_pEnterUI;					// エンターUIのインスタンス
 	static CPlayer* m_pPlayer;						// プレイヤーのインスタンス
 	static CShip* m_pShip;							// 船のインスタンス
+	static CLab* m_pLab;							// 研究所のインスタンス
 	static CEnergyUI* m_pEnergyUI;					// エネルギーUIのインスタンス
 	static CJumpMeterUI* m_pJumpMeterUI;			// ジャンプメーターUIのインスタンス
 	static CActionUI* m_pActionUI;					// アクションUIのインスタンス
+
+	static bool m_bTutorial;		// チュートリアル中かどうかのフラグ
 };
 
 #endif

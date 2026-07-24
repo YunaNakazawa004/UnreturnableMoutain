@@ -27,6 +27,7 @@
 #include "tree.h"
 #include "rock.h"
 #include "ship.h"
+#include "lab.h"
 
 #include "object3D.h"
 #include "mountain.h"
@@ -58,7 +59,6 @@
 #define MAX_JUMP		(1.0f)									// ジャンプ量の最大値
 #define GRAVITY			(-0.3f)									// 重力
 #define MAX_ENERGY		(100.0f)								// 最大所持エネルギー
-#define FIRST_ENERGY	(80.0f)									// 初期所持エネルギー
 #define ONE_ENERGY		(5.0f)									// 鉱石ひとつあたりのエネルギー
 #define MINUS_ENERGY	(90)									// エネルギー減少の間隔
 #define UNCLIMB_SLOPE	(0.4f)									// 登れない傾斜の角度
@@ -67,7 +67,7 @@
 //========================================================================
 // プレイヤークラスの生成処理
 //========================================================================
-CPlayer* CPlayer::Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot)
+CPlayer* CPlayer::Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot, const float fEnergy)
 {
 #ifndef LIST
 	if (CObject::GetNumAll() >= MAX_OBJECT)
@@ -89,7 +89,7 @@ CPlayer* CPlayer::Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot)
 	if (pPlayer != NULL)
 	{// NULLチェック
 		// 初期化処理
-		if (FAILED(pPlayer->Init(pos, rot)))
+		if (FAILED(pPlayer->Init(pos, rot, fEnergy)))
 		{// もし失敗した場合
 			OutputDebugStringA("! ! ! プレイヤーの初期化に失敗しました ! ! !\n");
 
@@ -150,7 +150,7 @@ CPlayer::~CPlayer()
 //========================================================================
 // プレイヤークラスの初期化処理(オーバーロード)
 //========================================================================
-HRESULT CPlayer::Init(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot)
+HRESULT CPlayer::Init(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot, const float fEnergy)
 {
 	// プレイヤーの情報の初期化
 	m_pos = pos;
@@ -159,7 +159,7 @@ HRESULT CPlayer::Init(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot)
 	m_rotDest = rot;
 	m_scale = D3DXVECTOR3(1.0f, 1.0f, 1.0f);
 	m_col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
-	m_fEnergy = FIRST_ENERGY;
+	m_fEnergy = fEnergy;
 	m_state = STATE_APPEAR;
 
 	// モーションを生成/初期化
@@ -412,7 +412,7 @@ void CPlayer::Update(void)
 		m_move = DEFAULT_VECTER3;
 
 		m_nEnergyCounter = 0;
-		m_fEnergy = FIRST_ENERGY;
+		m_fEnergy = 80.0f;
 
 		m_state = STATE_NORMAL;
 
@@ -440,6 +440,27 @@ void CPlayer::Update(void)
 		if (D3DXVec3Length(&pos) >= OUTMAP)
 		{// マップ外
 			pos = m_posOld;
+		}
+	}
+	else if (m_state == STATE_TUTORIAL)
+	{// チュートリアル中
+		// 移動制限
+		if (pos.x > 241.0f)
+		{// Xの範囲
+			pos.x = 241.0f;
+		}
+		else if (pos.x < -241.0f)
+		{// Xの範囲
+			pos.x = -241.0f;
+		}
+
+		if (pos.z > 112.0f)
+		{// Zの範囲
+			pos.z = 112.0f;
+		}
+		else if (pos.z < -372.0f)
+		{// Zの範囲
+			pos.z = -372.0f;
 		}
 	}
 
@@ -554,6 +575,13 @@ void CPlayer::Update(void)
 	CRock::Collision(&pos, &m_posOld, &m_move, m_fRadius, m_fHeight, &bLand, &bHead);
 	pShip->Collision(&pos, &m_posOld, &m_move, m_fRadius, m_fHeight, &bLand);
 
+	if (m_state == STATE_TUTORIAL)
+	{// チュートリアル中
+		CLab* pLab = CTitle::GetLab();		// 研究所取得
+
+		pLab->Collision(&pos, &m_posOld, &m_move, m_fRadius, m_fHeight, &bLand);
+	}
+
 	if (pos.y <= fHeight || bLand == true)
 	{// 地面との当たり判定
 		if (m_bJump == true && m_state == STATE_NORMAL)
@@ -605,6 +633,9 @@ void CPlayer::Update(void)
 			{// 一定間隔
 				CSpray::Create(D3DXVECTOR3(pos.x, fHeightW + 1.0f, pos.z), D3DXVECTOR3(0.0f, 0.0f, 0.0f), 5.0f);
 			}
+
+			// エネルギーを消費する
+			m_nEnergyCounter++;
 		}
 	}
 
@@ -649,7 +680,7 @@ void CPlayer::Update(void)
 	}
 
 	if (pEnergyRock != NULL &&
-		m_bJump == false && m_state == STATE_NORMAL)
+		m_bJump == false && (m_state == STATE_NORMAL || m_state == STATE_TUTORIAL))
 	{// エネルギー鉱物と当たっているとき/空中ではないとき
 		if (pInputKeyboard->GetTrigger(DIK_E) == true || pInputJoypad->GetTrigger(0, CInputJoypad::JOYKEY_B) == true)
 		{// 回収するキーを押した
@@ -661,7 +692,7 @@ void CPlayer::Update(void)
 		}
 	}
 
-	if (m_bAct == true && m_pMotion->GetType() == MOTIONTYPE_ACTION && m_pMotion->IsFinish() == true)
+	if (pEnergyRock != NULL && m_bAct == true && m_pMotion->GetType() == MOTIONTYPE_ACTION && m_pMotion->IsFinish() == true)
 	{// アクションモーションが終わった
 		m_bAct = false;
 

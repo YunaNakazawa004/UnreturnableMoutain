@@ -153,6 +153,11 @@ void CEnergyUI::Update(void)
 {
 	switch (m_state)
 	{
+	case STATE_NONE:		// ó‘Ô‚È‚µ
+		SetDisp(false);
+
+		break;
+
 	case STATE_NORMAL:		// ’Êíó‘Ô
 		SetDisp(true);
 

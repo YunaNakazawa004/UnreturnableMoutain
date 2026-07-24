@@ -113,6 +113,11 @@ void CEnergyRock::Uninit(void)
 //========================================================================
 void CEnergyRock::Update(void)
 {
+	if (CManager::GetMode() != CScene::MODE_GAME)
+	{// ゲーム以外は更新しない
+		return;
+	}
+
 	CMountain* pMountain = CGame::GetMountain();					// 山の取得
 	CBeach* pBeach = CGame::GetBeach();								// 砂浜の取得
 	D3DXVECTOR3 pos = GetPosition();

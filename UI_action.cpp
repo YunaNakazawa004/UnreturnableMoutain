@@ -192,13 +192,11 @@ void CActionUI::SetFade(const int fade)
 			if (m_bEnergyrock == false && m_bShip == false)
 			{// どちらも近くにないときだけ
 				m_fade = fade;
-				SetDisp(true);
 			}
 		}
 		else
 		{// フェードアウトのときは気にしない
 			m_fade = fade;
-			SetDisp(true);
 		}
 	}
 }

@@ -157,6 +157,7 @@
     <ClCompile Include="game.cpp" />
     <ClCompile Include="grass.cpp" />
     <ClCompile Include="input.cpp" />
+    <ClCompile Include="lab.cpp" />
     <ClCompile Include="light.cpp" />
     <ClCompile Include="line.cpp" />
     <ClCompile Include="main.cpp" />
@@ -211,6 +212,7 @@
     <ClInclude Include="game.h" />
     <ClInclude Include="grass.h" />
     <ClInclude Include="input.h" />
+    <ClInclude Include="lab.h" />
     <ClInclude Include="light.h" />
     <ClInclude Include="line.h" />
     <ClInclude Include="main.h" />

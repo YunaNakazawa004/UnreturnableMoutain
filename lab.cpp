@@ -1,10 +1,10 @@
 //========================================================================
 // 
-// 船 [ ship.cpp ]
+// 研究所 [ lab.cpp ]
 // Author : Nakazawa Yuna
 // 
 //========================================================================
-#include "ship.h"
+#include "lab.h"
 
 #include "renderer.h"
 #include "manager.h"
@@ -13,16 +13,11 @@
 #include "texture.h"
 
 #include "game.h"
-#include "title.h"
 #include "result.h"
 #include "camera.h"
 #include "model.h"
 
-#include "map_object.h"
-#include "mountain.h"
-#include "beach.h"
-#include "player.h"
-#include "UI_action.h"
+#include "energyrock.h"
 
 #include <iostream>
 #include <fstream>
@@ -34,9 +29,9 @@
 #define NEAR_BUTTON			(30.0f)				// ボタンの近く
 
 //========================================================================
-// 船クラスの生成処理
+// 研究所クラスの生成処理
 //========================================================================
-CShip* CShip::Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot)
+CLab* CLab::Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot)
 {
 #ifndef LIST
 	if (CObject::GetNumAll() >= MAX_OBJECT)
@@ -47,41 +42,41 @@ CShip* CShip::Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot)
 	}
 #endif
 
-	CShip* pShip = NULL;
+	CLab* pLab = NULL;
 
-	if (pShip == NULL)
+	if (pLab == NULL)
 	{// NULLチェック
-		// 船の生成
-		pShip = new CShip;
+		// 研究所の生成
+		pLab = new CLab;
 	}
 
-	if (pShip != NULL)
+	if (pLab != NULL)
 	{// NULLチェック
 		// 初期化処理
-		if (FAILED(pShip->Init(pos, rot)))
+		if (FAILED(pLab->Init(pos, rot)))
 		{// もし失敗した場合
-			OutputDebugStringA("! ! ! 船の初期化に失敗しました ! ! !\n");
+			OutputDebugStringA("! ! ! 研究所の初期化に失敗しました ! ! !\n");
 
 			return NULL;
 		}
 
 		// 種類を設定
-		pShip->SetType(TYPE_SHIP);
+		pLab->SetType(TYPE_LAB);
 
-		return pShip;
+		return pLab;
 	}
 
-	OutputDebugStringA("! ! ! 船の生成に失敗しました ! ! !\n");
+	OutputDebugStringA("! ! ! 研究所の生成に失敗しました ! ! !\n");
 
 	return NULL;
 }
 
 //========================================================================
-// 船クラスのコンストラクタ
+// 研究所クラスのコンストラクタ
 //========================================================================
-CShip::CShip(const int nPriority) :CObject(nPriority)
+CLab::CLab(const int nPriority) :CObject(nPriority)
 {
-	// 船クラスの値をクリア
+	// 研究所クラスの値をクリア
 	memset(&m_apFileName[0], NULL, sizeof m_apFileName);
 	memset(&m_apModel[0], NULL, sizeof m_apModel);
 	m_nNumModel = 0;
@@ -93,45 +88,50 @@ CShip::CShip(const int nPriority) :CObject(nPriority)
 	m_col = COLOR_WHITE;
 	m_fRadius = 0.0f;
 	m_fHeight = 0.0f;
-	m_state = STATE_NONE;
-	m_nCounterState = 0;
 	m_bDisp = true;
 }
 
 //========================================================================
-// 船クラスのデストラクタ
+// 研究所クラスのデストラクタ
 //========================================================================
-CShip::~CShip()
+CLab::~CLab()
 {
 }
 
 //========================================================================
-// 船クラスの初期化処理(オーバーロード)
+// 研究所クラスの初期化処理(オーバーロード)
 //========================================================================
-HRESULT CShip::Init(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot)
+HRESULT CLab::Init(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot)
 {
-	// 船の情報の初期化
+	// 研究所の情報の初期化
 	m_pos = pos;
 	m_rot = rot;
-	m_scale = D3DXVECTOR3(3.0f, 3.0f, 3.0f);
+	m_scale = D3DXVECTOR3(1.0f, 1.0f, 1.0f);
 	m_col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
-	m_state = STATE_APPEAR;
 
-	// 船モデルを設定
-	if (FAILED(SetModel("data\\ship.txt")))
+	// 研究所モデルを設定
+	if (FAILED(SetModel("data\\lab.txt")))
 	{// もし失敗したら
-		OutputDebugStringA("! ! ! 船モデルの設定に失敗しました ! ! !\n");
+		OutputDebugStringA("! ! ! 研究所モデルの設定に失敗しました ! ! !\n");
 
 		return E_FAIL;
 	}
+
+	D3DXVECTOR3 posE;
+	posE.x = m_apModel[5]->GetMtxWorld()._41;
+	posE.y = m_apModel[5]->GetMtxWorld()._42 + 15.0f;
+	posE.z = m_apModel[5]->GetMtxWorld()._43 + 70.0f;
+
+	// チュートリアル用のエネルギー鉱石
+	CEnergyRock::Create(posE, DEFAULT_VECTER3);
 
 	return S_OK;
 }
 
 //========================================================================
-// 船クラスの終了処理
+// 研究所クラスの終了処理
 //========================================================================
-void CShip::Uninit(void)
+void CLab::Uninit(void)
 {
 	for (int nCntModel = 0; nCntModel < MAX_MODEL; nCntModel++)
 	{
@@ -150,147 +150,16 @@ void CShip::Uninit(void)
 }
 
 //========================================================================
-// 船クラスの更新処理
+// 研究所クラスの更新処理
 //========================================================================
-void CShip::Update(void)
+void CLab::Update(void)
 {
-	// ローカル変数
-	CInputKeyboard* pInputKeyboard = CManager::GetInputKeyboard();		// キーボード入力の取得
-	CInputJoypad* pInputJoypad = CManager::GetInputJoypad();			// ジョイパッド入力の取得
-	CDebugProc* pDebugProc = CManager::GetDebugProc();		// デバッグ表示の取得
-	CMapObject* pMapObj = NULL;								// マップオブジェクトの取得
-	CPlayer* pPlayer = (CManager::GetMode() == CScene::MODE_GAME) ?
-		CGame::GetPlayer() : CTitle::GetPlayer();			// プレイヤーの取得
-	CMountain* pMountain = NULL;							// 山の取得
-	CBeach* pBeach = NULL;									// 砂浜の取得
-	CActionUI* pActionUI = (CManager::GetMode() == CScene::MODE_GAME) ?
-		CGame::GetActionUI() : CTitle::GetActionUI();		// アクションUIの取得
-	D3DXVECTOR3 pos = GetPosition();
-
-	float fHeightM = 0.0f;		// 山の地面の高さ
-	D3DXVECTOR2 polygonIdxM = { -1.0f,-1.0f };		// ポリゴン番号
-
-	float fHeightB = 0.0f;		// 砂浜の地面の高さ
-	D3DXVECTOR2 polygonIdxB = { -1.0f,-1.0f };		// ポリゴン番号
-
-	float fHeight = 0.0f;		// 地面の高さ
-
-	if (CManager::GetMode() == CScene::MODE_GAME)
-	{// ゲーム中だけ
-		// ローカル変数
-		pMapObj = CGame::GetMapObject();			// マップオブジェクトの取得
-		pMountain = CGame::GetMountain();			// 山の取得
-		pBeach = CGame::GetBeach();					// 砂浜の取得
-	}
-
-	pDebugProc->Print("\n*** 船 ***\n");
-
-	// 状態管理
-	switch (m_state)
-	{
-	case STATE_NONE:		// 状態なし
-		pDebugProc->Print("状態 : 状態なし\n");
-
-		break;
-
-	case STATE_WAIT:		// 待機状態
-		pDebugProc->Print("状態 : 待機状態\n");
-
-		break;			
-
-	case STATE_APPEAR:		// 出現状態
-		pDebugProc->Print("状態 : 出現状態\n");
-
-		m_nCounterState++;
-
-		if (m_nCounterState > 10)
-		{// 一定時間経った
-			m_nCounterState = 0;
-			m_state = STATE_NORMAL;
-		}
-
-		break;
-
-	case STATE_NORMAL:		// 通常状態
-		pDebugProc->Print("状態 : 通常状態\n");
-
-		if (pMapObj != NULL && pMapObj->GetCollectObj() <= 0)
-		{// マップ上の収集アイテムがなくなったら
-			m_state = STATE_READY;
-		}
-
-		break;
-
-	case STATE_READY:		// 準備完了状態
-		pDebugProc->Print("状態 : 準備完了状態\n");
-
-		if (pPlayer->IsNear(m_pos, NEAR_BUTTON) == true)
-		{// 近くにいるとき
-			pActionUI->SetFade(CActionUI::FADE_OUT);
-			pActionUI->NearShip(true);
-
-			if (pInputKeyboard->GetTrigger(DIK_E) == true || pInputJoypad->GetTrigger(0, CInputJoypad::JOYKEY_B) == true)
-			{// ボタンを押した
-				if (CManager::GetMode() == CScene::MODE_GAME)
-				{// ゲーム中
-					// 遷移フラグをON
-					CGame::SetFadeEnable();
-
-					// クリアフラグを立てる
-					CResult::SetClear(true);
-				}
-				else if (CManager::GetMode() == CScene::MODE_TITLE)
-				{// タイトル
-					// 遷移フラグをON
-					CTitle::SetFadeEnable();
-				}
-
-				return;
-			}
-		}
-		else
-		{// 近くじゃない
-			pActionUI->NearShip(false);
-			pActionUI->SetFade(CActionUI::FADE_IN);
-		}
-
-		break;
-	}
-
-	if (CManager::GetMode() == CScene::MODE_GAME)
-	{// ゲーム中だけ
-		// 山のポリゴン番号を取得
-		polygonIdxM = pMountain->GetPolygonIdx(pos);
-
-		// 山の地面の高さを取得
-		fHeightM = pMountain->GetHeight(pos, polygonIdxM);
-
-		// 砂浜のポリゴン番号を取得
-		polygonIdxB = pBeach->GetPolygonIdx(pos);
-
-		// 砂浜の地面の高さを取得
-		fHeightB = pBeach->GetHeight(pos, polygonIdxB);
-
-		// 最終的な高さ
-		fHeight = (fHeightM >= fHeightB) ? fHeightM : fHeightB;
-
-		if (fHeight == ERROR_HEIGHT)
-		{// 無効な高さだったら
-			fHeight = 0.0f;
-		}
-
-		// 高さを代入
-		pos.y = fHeight;
-
-		// 位置を適用
-		SetPosition(pos);
-	}
 }
 
 //========================================================================
-// 船クラスの描画処理
+// 研究所クラスの描画処理
 //========================================================================
-void CShip::Draw(void)
+void CLab::Draw(void)
 {
 	if (m_bDisp == false)
 	{// 表示しない場合
@@ -335,7 +204,7 @@ void CShip::Draw(void)
 //========================================================================
 // 位置設定
 //========================================================================
-void CShip::SetPosition(const D3DXVECTOR3 pos)
+void CLab::SetPosition(const D3DXVECTOR3 pos)
 {
 	// 位置を変更
 	m_pos = pos;
@@ -344,7 +213,7 @@ void CShip::SetPosition(const D3DXVECTOR3 pos)
 //========================================================================
 // スケール設定
 //========================================================================
-void CShip::SetScale(const D3DXVECTOR3 scale)
+void CLab::SetScale(const D3DXVECTOR3 scale)
 {
 	// スケールを変更
 	m_scale = scale;
@@ -353,7 +222,7 @@ void CShip::SetScale(const D3DXVECTOR3 scale)
 //========================================================================
 // 角度設定
 //========================================================================
-void CShip::SetRotation(const D3DXVECTOR3 rot)
+void CLab::SetRotation(const D3DXVECTOR3 rot)
 {
 	// 向きを変更
 	m_rot = rot;
@@ -371,7 +240,7 @@ void CShip::SetRotation(const D3DXVECTOR3 rot)
 //========================================================================
 // 頂点カラー設定
 //========================================================================
-void CShip::SetColor(const D3DXCOLOR col)
+void CLab::SetColor(const D3DXCOLOR col)
 {
 	// 色を変更
 	m_col = col;
@@ -390,7 +259,7 @@ void CShip::SetColor(const D3DXCOLOR col)
 //========================================================================
 // 当たり判定
 //========================================================================
-bool CShip::Collision(D3DXVECTOR3* pos, D3DXVECTOR3* posOld, D3DXVECTOR3* move,
+bool CLab::Collision(D3DXVECTOR3* pos, D3DXVECTOR3* posOld, D3DXVECTOR3* move,
 	const float fRadius, const float fHeight, bool* pLand)
 {
 	D3DXVECTOR3 dist;
@@ -402,17 +271,14 @@ bool CShip::Collision(D3DXVECTOR3* pos, D3DXVECTOR3* posOld, D3DXVECTOR3* move,
 		// 各パーツの当たり判定
 		for (int nCntPart = 0; nCntPart < m_nNumModel; nCntPart++)
 		{
-			if (nCntPart != 5)
-			{// 当たり判定するものだけ
-				D3DXVECTOR3 posPart =
-					D3DXVECTOR3(m_apModel[nCntPart]->GetMtxWorld()._41, m_apModel[nCntPart]->GetMtxWorld()._42, m_apModel[nCntPart]->GetMtxWorld()._43);
+			D3DXVECTOR3 posPart =
+				D3DXVECTOR3(m_apModel[nCntPart]->GetMtxWorld()._41, m_apModel[nCntPart]->GetMtxWorld()._42, m_apModel[nCntPart]->GetMtxWorld()._43);
 
-				CorrectAngle(&m_rot.y, m_rot.y);
+			CorrectAngle(&m_rot.y, m_rot.y);
 
-				if (m_apModel[nCntPart]->Collision(posPart, m_rot, m_scale, pos, posOld, move, fRadius, fHeight) == true)
-				{// 当たっている
-					*pLand = true;
-				}
+			if (m_apModel[nCntPart]->Collision(posPart, m_rot, m_scale, pos, posOld, move, fRadius, fHeight) == true)
+			{// 当たっている
+				*pLand = true;
 			}
 		}
 
@@ -425,7 +291,7 @@ bool CShip::Collision(D3DXVECTOR3* pos, D3DXVECTOR3* posOld, D3DXVECTOR3* move,
 //========================================================================
 // 外部ファイルからモデルデータを読み込む
 //========================================================================
-HRESULT CShip::SetModel(const char* pFilename)
+HRESULT CLab::SetModel(const char* pFilename)
 {
 	// ローカル変数宣言
 	std::string filename = pFilename;	// 読み込むファイル名

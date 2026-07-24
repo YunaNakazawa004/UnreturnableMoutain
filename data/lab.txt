@@ -1,0 +1,75 @@
+#==============================================================================
+#
+# 『モーションビューワ』スクリプトファイル [motion.txt]
+# Author : AKIRA TANAKA
+#
+#==============================================================================
+SCRIPT			# この行は絶対消さないこと！
+
+#------------------------------------------------------------------------------
+# モデル数
+#------------------------------------------------------------------------------
+NUM_MODEL = 6
+
+#------------------------------------------------------------------------------
+# モデルファイル名
+#------------------------------------------------------------------------------
+MODEL_FILENAME = data/MODEL/LAB/00_floor.x		# [0]床
+MODEL_FILENAME = data/MODEL/LAB/01_wall_0.x		# [1]壁
+MODEL_FILENAME = data/MODEL/LAB/02_wall_1.x		# [2]壁
+MODEL_FILENAME = data/MODEL/LAB/03_wall_2.x		# [3]壁
+MODEL_FILENAME = data/MODEL/LAB/04_wall_3.x		# [4]壁
+MODEL_FILENAME = data/MODEL/LAB/05_table.x		# [5]台
+
+#------------------------------------------------------------------------------
+# キャラクター情報
+#------------------------------------------------------------------------------
+CHARACTERSET
+	NUM_PARTS = 6					# パーツ数
+	RADIUS = 1000
+	
+	PARTSSET	
+		INDEX = 0					# [0]床
+		PARENT = -1					# (親)NULL
+		POS = 0.0 0.0 0.0
+		ROT = 0.0 0.0 0.0
+	END_PARTSSET
+
+	PARTSSET	
+		INDEX = 1					# [1]壁
+		PARENT = 0					# (親)床
+		POS = 0.0 0.0 252.0
+		ROT = 0.0 0.0 0.0
+	END_PARTSSET
+
+	PARTSSET	
+		INDEX = 2					# [2]壁
+		PARENT = 0					# (親)床
+		POS = 0.0 0.0 -252.0
+		ROT = 0.0 0.0 0.0
+	END_PARTSSET
+
+	PARTSSET	
+		INDEX = 3					# [3]壁
+		PARENT = 0					# (親)床
+		POS = 252.0 0.0 0.0
+		ROT = 0.0 0.0 0.0
+	END_PARTSSET
+
+	PARTSSET	
+		INDEX = 4					# [4]壁
+		PARENT = 0					# (親)床
+		POS = -252.0 0.0 0.0
+		ROT = 0.0 0.0 0.0
+	END_PARTSSET
+
+	PARTSSET	
+		INDEX = 5					# [5]台
+		PARENT = 0					# (親)床
+		POS = 0.0 0.0 198.0
+		ROT = 0.0 0.0 0.0
+	END_PARTSSET
+
+END_CHARACTERSET
+
+END_SCRIPT		# この行は絶対消さないこと！

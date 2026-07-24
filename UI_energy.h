@@ -31,7 +31,8 @@ public:
 	// 状態
 	enum STATE
 	{
-		STATE_NORMAL = 0,		// 通常状態
+		STATE_NONE = 0,			// 状態なし
+		STATE_NORMAL,			// 通常状態
 		STATE_BLINK,			// 点滅
 		STATE_MAX
 	};
@@ -49,6 +50,7 @@ public:
 	void Draw(void);
 
 	void SetEnergy(const float fEnergy);
+	void SetState(const int state) { m_state = state; }
 
 private:
 	static int m_nIdxTexture;					// テクスチャのインデックス

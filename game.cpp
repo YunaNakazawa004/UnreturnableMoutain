@@ -169,8 +169,6 @@ HRESULT CGame::Init(void)
 
 			return E_FAIL;
 		}
-
-		m_pActionUI->SetDisp(false);
 	}
 
 	// マップオブジェクトの生成
@@ -263,7 +261,7 @@ HRESULT CGame::Init(void)
 	// プレイヤーを生成
 	if (m_pPlayer == NULL)
 	{// NULLチェック
-		m_pPlayer = CPlayer::Create(pos, rot);
+		m_pPlayer = CPlayer::Create(pos, rot, 80.0f);
 
 		if (m_pPlayer == NULL)
 		{// NULLチェック
