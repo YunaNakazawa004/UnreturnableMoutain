@@ -267,8 +267,8 @@ void CMeshField::Draw(void)
 	pDevice->SetTexture(1, pTexture->GetAddress(m_aIdxTexture[1]));
 
 	// ƒ|ƒŠƒSƒ“‚Ì•`‰æ
-	pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLESTRIP, 0, 0, ((int)m_block.x + 1) * ((int)m_block.y + 1), 0,
-		(((int)m_block.x) * ((int)m_block.y) * 2) + (((int)m_block.y - 1) * 4));
+	pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLESTRIP, 0, 0, m_nNumVtx, 0,
+		m_nNumIdx - 2);
 }
 
 //========================================================================

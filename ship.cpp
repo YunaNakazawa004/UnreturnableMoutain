@@ -125,6 +125,51 @@ HRESULT CShip::Init(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot)
 		return E_FAIL;
 	}
 
+	CMountain* pMountain = NULL;							// 山の取得
+	CBeach* pBeach = NULL;									// 砂浜の取得
+	D3DXVECTOR3 posC = GetPosition();
+
+	float fHeightM = 0.0f;		// 山の地面の高さ
+	D3DXVECTOR2 polygonIdxM = { -1.0f,-1.0f };		// ポリゴン番号
+
+	float fHeightB = 0.0f;		// 砂浜の地面の高さ
+	D3DXVECTOR2 polygonIdxB = { -1.0f,-1.0f };		// ポリゴン番号
+
+	float fHeight = 0.0f;		// 地面の高さ
+
+	// ローカル変数
+	pMountain = CGame::GetMountain();			// 山の取得
+	pBeach = CGame::GetBeach();					// 砂浜の取得
+
+	if (pMountain != NULL && pBeach != NULL)
+	{// NULLチェック
+		// 山のポリゴン番号を取得
+		polygonIdxM = pMountain->GetPolygonIdx(posC);
+
+		// 山の地面の高さを取得
+		fHeightM = pMountain->GetHeight(posC, polygonIdxM);
+
+		// 砂浜のポリゴン番号を取得
+		polygonIdxB = pBeach->GetPolygonIdx(posC);
+
+		// 砂浜の地面の高さを取得
+		fHeightB = pBeach->GetHeight(posC, polygonIdxB);
+	}
+
+	// 最終的な高さ
+	fHeight = (fHeightM >= fHeightB) ? fHeightM : fHeightB;
+
+	if (fHeight == ERROR_HEIGHT)
+	{// 無効な高さだったら
+		fHeight = 0.0f;
+	}
+
+	// 高さを代入
+	posC.y = fHeight;
+
+	// 位置を適用
+	SetPosition(posC);
+
 	return S_OK;
 }
 
@@ -161,29 +206,16 @@ void CShip::Update(void)
 	CMapObject* pMapObj = NULL;								// マップオブジェクトの取得
 	CPlayer* pPlayer = (CManager::GetMode() == CScene::MODE_GAME) ?
 		CGame::GetPlayer() : CTitle::GetPlayer();			// プレイヤーの取得
-	CMountain* pMountain = NULL;							// 山の取得
-	CBeach* pBeach = NULL;									// 砂浜の取得
 	CActionUI* pActionUI = (CManager::GetMode() == CScene::MODE_GAME) ?
 		CGame::GetActionUI() : CTitle::GetActionUI();		// アクションUIの取得
-	D3DXVECTOR3 pos = GetPosition();
 
-	float fHeightM = 0.0f;		// 山の地面の高さ
-	D3DXVECTOR2 polygonIdxM = { -1.0f,-1.0f };		// ポリゴン番号
-
-	float fHeightB = 0.0f;		// 砂浜の地面の高さ
-	D3DXVECTOR2 polygonIdxB = { -1.0f,-1.0f };		// ポリゴン番号
-
-	float fHeight = 0.0f;		// 地面の高さ
+	pDebugProc->Print("\n*** 船 ***\n");
 
 	if (CManager::GetMode() == CScene::MODE_GAME)
 	{// ゲーム中だけ
 		// ローカル変数
 		pMapObj = CGame::GetMapObject();			// マップオブジェクトの取得
-		pMountain = CGame::GetMountain();			// 山の取得
-		pBeach = CGame::GetBeach();					// 砂浜の取得
 	}
-
-	pDebugProc->Print("\n*** 船 ***\n");
 
 	// 状態管理
 	switch (m_state)
@@ -196,7 +228,7 @@ void CShip::Update(void)
 	case STATE_WAIT:		// 待機状態
 		pDebugProc->Print("状態 : 待機状態\n");
 
-		break;			
+		break;
 
 	case STATE_APPEAR:		// 出現状態
 		pDebugProc->Print("状態 : 出現状態\n");
@@ -255,35 +287,6 @@ void CShip::Update(void)
 		}
 
 		break;
-	}
-
-	if (CManager::GetMode() == CScene::MODE_GAME)
-	{// ゲーム中だけ
-		// 山のポリゴン番号を取得
-		polygonIdxM = pMountain->GetPolygonIdx(pos);
-
-		// 山の地面の高さを取得
-		fHeightM = pMountain->GetHeight(pos, polygonIdxM);
-
-		// 砂浜のポリゴン番号を取得
-		polygonIdxB = pBeach->GetPolygonIdx(pos);
-
-		// 砂浜の地面の高さを取得
-		fHeightB = pBeach->GetHeight(pos, polygonIdxB);
-
-		// 最終的な高さ
-		fHeight = (fHeightM >= fHeightB) ? fHeightM : fHeightB;
-
-		if (fHeight == ERROR_HEIGHT)
-		{// 無効な高さだったら
-			fHeight = 0.0f;
-		}
-
-		// 高さを代入
-		pos.y = fHeight;
-
-		// 位置を適用
-		SetPosition(pos);
 	}
 }
 

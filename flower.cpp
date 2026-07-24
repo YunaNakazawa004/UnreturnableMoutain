@@ -99,6 +99,44 @@ HRESULT CFlower::Init(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot)
 	CObjectX::SetPosition(pos);
 	CObjectX::SetRotation(rot);
 
+	CMountain* pMountain = CGame::GetMountain();					// 山の取得
+	CBeach* pBeach = CGame::GetBeach();								// 砂浜の取得
+	D3DXVECTOR3 posC = GetPosition();
+
+	float fHeightM = 0.0f;		// 山の地面の高さ
+	D3DXVECTOR2 polygonIdxM = { -1.0f,-1.0f };		// ポリゴン番号
+
+	float fHeightB = 0.0f;		// 砂浜の地面の高さ
+	D3DXVECTOR2 polygonIdxB = { -1.0f,-1.0f };		// ポリゴン番号
+
+	float fHeight = 0.0f;		// 地面の高さ
+
+	// 山のポリゴン番号を取得
+	polygonIdxM = pMountain->GetPolygonIdx(posC);
+
+	// 山の地面の高さを取得
+	fHeightM = pMountain->GetHeight(posC, polygonIdxM);
+
+	// 砂浜のポリゴン番号を取得
+	polygonIdxB = pBeach->GetPolygonIdx(posC);
+
+	// 砂浜の地面の高さを取得
+	fHeightB = pBeach->GetHeight(posC, polygonIdxB);
+
+	// 最終的な高さ
+	fHeight = (fHeightM >= fHeightB) ? fHeightM : fHeightB;
+
+	if (fHeight == ERROR_HEIGHT)
+	{// 無効な高さだったら
+		fHeight = 0.0f;
+	}
+
+	// 高さを代入
+	posC.y = fHeight;
+
+	// 位置を適用
+	SetPosition(posC);
+
 	return S_OK;
 }
 
@@ -116,43 +154,6 @@ void CFlower::Uninit(void)
 //========================================================================
 void CFlower::Update(void)
 {
-	CMountain* pMountain = CGame::GetMountain();					// 山の取得
-	CBeach* pBeach = CGame::GetBeach();								// 砂浜の取得
-	D3DXVECTOR3 pos = GetPosition();
-
-	float fHeightM = 0.0f;		// 山の地面の高さ
-	D3DXVECTOR2 polygonIdxM = { -1.0f,-1.0f };		// ポリゴン番号
-
-	float fHeightB = 0.0f;		// 砂浜の地面の高さ
-	D3DXVECTOR2 polygonIdxB = { -1.0f,-1.0f };		// ポリゴン番号
-
-	float fHeight = 0.0f;		// 地面の高さ
-
-	// 山のポリゴン番号を取得
-	polygonIdxM = pMountain->GetPolygonIdx(pos);
-
-	// 山の地面の高さを取得
-	fHeightM = pMountain->GetHeight(pos, polygonIdxM);
-
-	// 砂浜のポリゴン番号を取得
-	polygonIdxB = pBeach->GetPolygonIdx(pos);
-
-	// 砂浜の地面の高さを取得
-	fHeightB = pBeach->GetHeight(pos, polygonIdxB);
-
-	// 最終的な高さ
-	fHeight = (fHeightM >= fHeightB) ? fHeightM : fHeightB;
-
-	if (fHeight == ERROR_HEIGHT)
-	{// 無効な高さだったら
-		fHeight = 0.0f;
-	}
-
-	// 高さを代入
-	pos.y = fHeight;
-
-	// 位置を適用
-	SetPosition(pos);
 }
 
 //========================================================================

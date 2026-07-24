@@ -135,6 +135,44 @@ HRESULT CGrass::Init(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot)
 	m_rotOff = rot;
 	m_fShake = 0.0f;
 
+	CMountain* pMountain = CGame::GetMountain();					// 山の取得
+	CBeach* pBeach = CGame::GetBeach();								// 砂浜の取得
+	D3DXVECTOR3 posC = CObject3D::GetPosition();
+
+	float fHeightM = 0.0f;		// 山の地面の高さ
+	D3DXVECTOR2 polygonIdxM = { -1.0f,-1.0f };		// ポリゴン番号
+
+	float fHeightB = 0.0f;		// 砂浜の地面の高さ
+	D3DXVECTOR2 polygonIdxB = { -1.0f,-1.0f };		// ポリゴン番号
+
+	float fHeight = 0.0f;		// 地面の高さ
+
+	// 山のポリゴン番号を取得
+	polygonIdxM = pMountain->GetPolygonIdx(posC);
+
+	// 山の地面の高さを取得
+	fHeightM = pMountain->GetHeight(posC, polygonIdxM);
+
+	// 砂浜のポリゴン番号を取得
+	polygonIdxB = pMountain->GetPolygonIdx(posC);
+
+	// 砂浜の地面の高さを取得
+	fHeightB = pMountain->GetHeight(posC, polygonIdxB);
+
+	// 最終的な高さ
+	fHeight = (fHeightM >= fHeightB) ? fHeightM : fHeightB;
+
+	if (fHeight == ERROR_HEIGHT)
+	{// 無効な高さだったら
+		fHeight = 0.0f;
+	}
+
+	// 高さを代入
+	posC.y = fHeight;
+
+	// 位置/向きを適用
+	SetPosition(posC);
+
 	return S_OK;
 }
 
@@ -153,18 +191,7 @@ void CGrass::Uninit(void)
 void CGrass::Update(void)
 {
 	// ローカル変数
-	CMountain* pMountain = CGame::GetMountain();					// 山の取得
-	CBeach* pBeach = CGame::GetBeach();								// 砂浜の取得
-	D3DXVECTOR3 pos = CObject3D::GetPosition();
 	D3DXVECTOR3 rot = CObject3D::GetRotation();
-
-	float fHeightM = 0.0f;		// 山の地面の高さ
-	D3DXVECTOR2 polygonIdxM = { -1.0f,-1.0f };		// ポリゴン番号
-
-	float fHeightB = 0.0f;		// 砂浜の地面の高さ
-	D3DXVECTOR2 polygonIdxB = { -1.0f,-1.0f };		// ポリゴン番号
-
-	float fHeight = 0.0f;		// 地面の高さ
 
 	// オフセットの向きを抜いた値にする
 	rot -= m_rotOff;
@@ -176,31 +203,7 @@ void CGrass::Update(void)
 	// プレイヤーとの当たり判定
 	CollisionPlayer();
 
-	// 山のポリゴン番号を取得
-	polygonIdxM = pMountain->GetPolygonIdx(pos);
-
-	// 山の地面の高さを取得
-	fHeightM = pMountain->GetHeight(pos, polygonIdxM);
-
-	// 砂浜のポリゴン番号を取得
-	polygonIdxB = pMountain->GetPolygonIdx(pos);
-
-	// 砂浜の地面の高さを取得
-	fHeightB = pMountain->GetHeight(pos, polygonIdxB);
-
-	// 最終的な高さ
-	fHeight = (fHeightM >= fHeightB) ? fHeightM : fHeightB;
-
-	if (fHeight == ERROR_HEIGHT)
-	{// 無効な高さだったら
-		fHeight = 0.0f;
-	}
-
-	// 高さを代入
-	pos.y = fHeight;
-
 	// 位置/向きを適用
-	SetPosition(pos);
 	SetRotation(m_rotOff + rot);
 }
 

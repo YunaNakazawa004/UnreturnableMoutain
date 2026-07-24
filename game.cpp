@@ -171,24 +171,6 @@ HRESULT CGame::Init(void)
 		}
 	}
 
-	// マップオブジェクトの生成
-	if (SUCCEEDED(CManager::CreateInstance(&m_pMapObject)))
-	{// マップオブジェクトの生成に成功
-		// 初期化処理
-		if (FAILED(m_pMapObject->Init()))
-		{// 初期化処理が失敗した場合
-			OutputDebugStringA("! ! ! マップオブジェクトの初期化に失敗しました ! ! !\n");
-
-			return E_FAIL;
-		}
-
-		// マップオブジェクトのデータを読み込む
-		if (FAILED(m_pMapObject->ReadData("data\\map_object.bin")))
-		{// もし失敗したら
-			return E_FAIL;
-		}
-	}
-
 	// 山を生成
 	if (m_pMountain == NULL)
 	{// NULLチェック
@@ -244,6 +226,24 @@ HRESULT CGame::Init(void)
 
 		// ステージのデータを読み込む
 		if (FAILED(m_pWaterSurface->ReadData("data\\watersurface.bin")))
+		{// もし失敗したら
+			return E_FAIL;
+		}
+	}
+
+	// マップオブジェクトの生成
+	if (SUCCEEDED(CManager::CreateInstance(&m_pMapObject)))
+	{// マップオブジェクトの生成に成功
+		// 初期化処理
+		if (FAILED(m_pMapObject->Init()))
+		{// 初期化処理が失敗した場合
+			OutputDebugStringA("! ! ! マップオブジェクトの初期化に失敗しました ! ! !\n");
+
+			return E_FAIL;
+		}
+
+		// マップオブジェクトのデータを読み込む
+		if (FAILED(m_pMapObject->ReadData("data\\map_object.bin")))
 		{// もし失敗したら
 			return E_FAIL;
 		}

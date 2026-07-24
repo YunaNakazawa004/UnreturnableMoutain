@@ -154,6 +154,8 @@ void CMapObject::Update(void)
 	CDebugProc* pDebugProc = CManager::GetDebugProc();					// デバッグ表示の取得
 	CInputKeyboard* pInputKeyboard = CManager::GetInputKeyboard();		// キーボード入力の取得
 
+	static int nCounter = 0;
+
 	for (int nCnt = 0; nCnt < MAX_MAP_OBJECT; nCnt++)
 	{
 		if (m_aMapObject[nCnt].apObject != NULL)
@@ -162,14 +164,19 @@ void CMapObject::Update(void)
 			{// 収集アイテムだったら
 				D3DXVECTOR3 pos = m_aMapObject[nCnt].apObject->GetPosition();
 
-				CParticle3D::Create(pos, 1, 1, 4.0f, -0.01f, 0.00f,
-					CEffect3D::TYPE_BLENDADD, CParticle3D::TYPE_PIN, 1000, 0.3f, false, COLOR_ORANGE, 10.0f, true,
-					NULL, D3DXVECTOR3(pos.x, pos.y + 10000.0f, pos.z), 0.0001f);
+				if (nCounter % 3 == 0)
+				{// 一定間隔
+					CParticle3D::Create(pos, 1, 1, 4.0f, -0.01f, 0.00f,
+						CEffect3D::TYPE_BLENDADD, CParticle3D::TYPE_PIN, 400, 0.3f, false, COLOR_ORANGE, 10.0f, true,
+						NULL, D3DXVECTOR3(pos.x, pos.y + 10000.0f, pos.z), 0.0001f);
+				}
 
 				CollectCollision(m_aMapObject[nCnt].apObject->GetPosition(), nCnt);
 			}
 		}
 	}
+
+	nCounter++;
 
 #ifdef _DEBUG
 	if (pInputKeyboard->GetTrigger(DIK_DELETE) == true)

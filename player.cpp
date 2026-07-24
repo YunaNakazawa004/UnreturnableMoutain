@@ -252,7 +252,7 @@ void CPlayer::Update(void)
 	float fHeightW = 0.0f;		// 水面の地面の高さ
 	D3DXVECTOR2 polygonIdxW = { -1.0f,-1.0f };		// ポリゴン番号
 
-	float fHeight = 0.0f;		// 地面の高さ
+	static float fHeight = 0.0f;		// 地面の高さ
 	D3DXVECTOR2 polygonIdx = { -1.0f,-1.0f };		// ポリゴン番号
 	CMeshField* pMeshField = NULL;					// どちらに乗っているか
 
@@ -288,6 +288,7 @@ void CPlayer::Update(void)
 	{
 	case STATE_NONE:		// 状態なし
 		pDebugProc->Print("状態 : 状態なし\n");
+		fHeight = 0.0f;
 
 		break;
 
@@ -476,7 +477,8 @@ void CPlayer::Update(void)
 	// 角度を慣性ありで加算
 	rot.y += (m_rotDest.y - rot.y) * 0.1f;
 
-	if (m_state == STATE_NORMAL || m_state == STATE_APPEAR || m_state == STATE_DEATH)
+	if ((m_state == STATE_NORMAL && pos.x != m_posOld.x && pos.z != m_posOld.z) || 
+		m_state == STATE_APPEAR || m_state == STATE_DEATH)
 	{// 通常状態のみ
 		// 山のポリゴン番号を取得
 		polygonIdxM = pMountain->GetPolygonIdx(pos);
@@ -563,6 +565,13 @@ void CPlayer::Update(void)
 	{// チュートリアル中
 		fHeight = 0.0f;
 
+		if (pos.y <= fHeight)
+		{// 地面にめり込んだときだけ
+			pos.y = fHeight;
+		}
+	}
+	else if (pos.x == m_posOld.x && pos.z == m_posOld.z)
+	{// 止まっているとき
 		if (pos.y <= fHeight)
 		{// 地面にめり込んだときだけ
 			pos.y = fHeight;
