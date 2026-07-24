@@ -425,7 +425,19 @@ void CGame::Update(void)
 	}
 
 	// 画面遷移
-	if (pInputKeyboard->GetTrigger(DIK_RETURN) == true || isFade() == true)
+	if (isFade() == true)
+	{// ENTERが押された
+		if (pTransition != NULL)
+		{// NULLチェック
+			pTransition->SetTransition(MODE_RESULT);
+		}
+
+		return;
+	}	
+	
+#ifdef _DEBUG
+	// 画面遷移（デバッグ）
+	if (pInputKeyboard->GetTrigger(DIK_RETURN) == true)
 	{// ENTERが押された
 		if (pTransition != NULL)
 		{// NULLチェック
@@ -434,6 +446,7 @@ void CGame::Update(void)
 
 		return;
 	}
+#endif
 }
 
 //========================================================================

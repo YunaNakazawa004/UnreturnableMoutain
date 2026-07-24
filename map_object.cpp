@@ -160,8 +160,11 @@ void CMapObject::Update(void)
 		{// NULLチェック
 			if (m_aMapObject[nCnt].bCollect == true)
 			{// 収集アイテムだったら
-				CParticle3D::Create(m_aMapObject[nCnt].apObject->GetPosition(), 1, 1, 1.0f, 0.1f, 0.03f,
-					CEffect3D::TYPE_BLENDADD, CParticle3D::TYPE_NORMAL, 100, 0.3f, false);
+				D3DXVECTOR3 pos = m_aMapObject[nCnt].apObject->GetPosition();
+
+				CParticle3D::Create(pos, 1, 1, 4.0f, -0.01f, 0.00f,
+					CEffect3D::TYPE_BLENDADD, CParticle3D::TYPE_PIN, 1000, 0.3f, false, COLOR_ORANGE, 10.0f, true,
+					NULL, D3DXVECTOR3(pos.x, pos.y + 10000.0f, pos.z), 0.0001f);
 
 				CollectCollision(m_aMapObject[nCnt].apObject->GetPosition(), nCnt);
 			}
@@ -197,7 +200,7 @@ bool CMapObject::CollectCollision(const D3DXVECTOR3 pos, const int nIdx)
 
 		CParticle3D::Create(pos, 5, 10, 1.0f, 0.1f, 0.01f,
 			CEffect3D::TYPE_BLENDADD, CParticle3D::TYPE_NORMAL, 600, 0.3f, false,
-			COLOR_WHITE, 0.0f, true, CGame::GetPlayer(), 0.05f);
+			COLOR_WHITE, 0.0f, true, CGame::GetPlayer(), DEFAULT_VECTER3, 0.05f);
 
 		// アイテムをチェックする
 		pItemUI->Check(m_aMapObject[nIdx].nItemIdx);
