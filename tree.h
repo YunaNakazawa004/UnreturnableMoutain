@@ -27,7 +27,7 @@ class CMotion;
 class CTree : public CObject
 {
 public:
-	CTree(const int nPriority = PLAYER_PRIORITY);
+	CTree(const int nPriority = PRIORITY_3);
 	virtual ~CTree();
 
 	static CTree* Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot);

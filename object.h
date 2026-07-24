@@ -12,18 +12,18 @@
 //************************************************************************
 // マクロ定義
 //************************************************************************
-#define MAX_OBJECT			(1024)			// 最大オブジェクト数
-#define MAX_PRIORITY_NUM	(8)				// 最大優先順位数
-#define SCENE_PRIORITY		(0)				// デフォルトシーン優先順位
-#define BG_PRIORITY			(1)				// デフォルト背景優先順位
-#define BULLET_PRIORITY		(1)				// デフォルト弾優先順位
-#define OBJECT_PRIORITY		(2)				// デフォルトオブジェクト優先順位
-#define PLAYER_PRIORITY		(3)				// デフォルトプレイヤー優先順位
-#define FIELD_PRIORITY		(4)				// デフォルトフィールド優先順位
-#define EFFECT_PRIORITY		(2)				// デフォルトエフェクト優先順位
-#define FRAME_PRIORITY		(5)				// デフォルトUIフレーム優先順位
-#define UI_PRIORITY			(6)				// デフォルトUI優先順位
-#define FADE_PRIORITY		(7)				// デフォルトフェード優先順位
+//#define MAX_OBJECT			(1024)			// 最大オブジェクト数
+//#define MAX_PRIORITY_NUM	(8)				// 最大優先順位数
+//#define SCENE_PRIORITY		(0)				// デフォルトシーン優先順位
+//#define BG_PRIORITY			(1)				// デフォルト背景優先順位
+//#define BULLET_PRIORITY		(1)				// デフォルト弾優先順位
+//#define OBJECT_PRIORITY		(2)				// デフォルトオブジェクト優先順位
+//#define PLAYER_PRIORITY		(3)				// デフォルトプレイヤー優先順位
+//#define FIELD_PRIORITY		(4)				// デフォルトフィールド優先順位
+//#define EFFECT_PRIORITY		(2)				// デフォルトエフェクト優先順位
+//#define FRAME_PRIORITY		(5)				// デフォルトUIフレーム優先順位
+//#define UI_PRIORITY			(6)				// デフォルトUI優先順位
+//#define FADE_PRIORITY		(7)				// デフォルトフェード優先順位
 
 #define DEFAULT_VECTER3		(D3DXVECTOR3(0.0f,0.0f,0.0f))		// デフォルトのVec3座標
 #define DEFAULT_VECTER2		(D3DXVECTOR2(0.0f,0.0f))			// デフォルトのVec2座標
@@ -93,6 +93,20 @@ public:
 		TYPE_MAX
 	}TYPE;
 
+	// 優先順位
+	enum PRIORITY
+	{
+		PRIORITY_0 = 0,		// 優先順位0
+		PRIORITY_1,			// 優先順位1
+		PRIORITY_2,			// 優先順位2
+		PRIORITY_3,			// 優先順位3
+		PRIORITY_4,			// 優先順位4
+		PRIORITY_5,			// 優先順位5
+		PRIORITY_6,			// 優先順位6
+		PRIORITY_7,			// 優先順位7
+		PRIORITY_MAX,
+	};
+
 	CObject();
 	CObject(const int nPriority = 3);
 	virtual ~CObject();
@@ -129,14 +143,14 @@ protected:
 
 private:
 #ifdef LIST
-	static CObject* m_apTop[MAX_PRIORITY_NUM];			// 先頭のオブジェクトへのポインタ
-	static CObject* m_apCur[MAX_PRIORITY_NUM];			// 最後尾のオブジェクトへのポインタ
+	static CObject* m_apTop[PRIORITY_MAX];			// 先頭のオブジェクトへのポインタ
+	static CObject* m_apCur[PRIORITY_MAX];			// 最後尾のオブジェクトへのポインタ
 	CObject* m_pPrev;				// 前のオブジェクトへのポインタ
 	CObject* m_pNext;				// 次のオブジェクトへのポインタ
 	bool m_bDeath;					// 死亡フラグ
 
 #else
-	static CObject* m_apObject[MAX_PRIORITY_NUM][MAX_OBJECT];	// オブジェクトのインスタンス
+	static CObject* m_apObject[PRIORITY_MAX][MAX_OBJECT];	// オブジェクトのインスタンス
 	int m_nID;						// 自分自身のID
 
 #endif

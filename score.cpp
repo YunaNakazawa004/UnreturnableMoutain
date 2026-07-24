@@ -25,12 +25,14 @@
 CScore* CScore::Create(const D3DXVECTOR3 pos,
 	const float fWidth, const float fHeight)
 {
+#ifndef LIST
 	if (CObject::GetNumAll() >= MAX_OBJECT)
 	{// 最大数のオブジェクトが存在する
 		OutputDebugStringA("! ! ! オブジェクトの最大数に達しています ! ! !\n");
 
 		return NULL;
 	}
+#endif
 
 	CScore* pScore = NULL;
 

@@ -31,7 +31,7 @@ public:
 		FADE_MAX
 	};
 
-	CActionUI(const int nPriority = UI_PRIORITY);
+	CActionUI(const int nPriority = PRIORITY_6);
 	~CActionUI();
 
 	static HRESULT Load(void);

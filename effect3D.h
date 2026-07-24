@@ -33,7 +33,7 @@ public:
 		TYPE_MAX
 	}TYPE;
 
-	CEffect3D(const int nPriority = EFFECT_PRIORITY);
+	CEffect3D(const int nPriority = PRIORITY_2);
 	~CEffect3D();
 
 	static HRESULT Load(void);

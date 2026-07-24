@@ -23,7 +23,7 @@
 class CJumpMeterUI : public CObject2D
 {
 public:
-	CJumpMeterUI(const int nPriority = UI_PRIORITY);
+	CJumpMeterUI(const int nPriority = PRIORITY_6);
 	~CJumpMeterUI();
 
 	static HRESULT Load(void);

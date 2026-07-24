@@ -84,7 +84,7 @@ HRESULT CPause::Init(const MENU menu)
 	for (int nCnt = 0; nCnt < MENU_MAX; nCnt++)
 	{
 		m_apObject2D[nCnt] = CObject2D::Create(D3DXVECTOR3(640.0f, 260.0f + (nCnt * 100.0f), 0.0f), 160.0f, 30.0f,
-			CObject::TYPE_PAUSE, m_apFilename[nCnt], UI_PRIORITY);
+			CObject::TYPE_PAUSE, m_apFilename[nCnt], CObject::PRIORITY_6);
 
 		if (m_apObject2D[nCnt] != NULL)
 		{// NULLチェック

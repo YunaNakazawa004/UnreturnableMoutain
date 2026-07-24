@@ -22,7 +22,7 @@
 class CTitleLogo : public CObject2D
 {
 public:
-	CTitleLogo(const int nPriority = UI_PRIORITY);
+	CTitleLogo(const int nPriority = PRIORITY_6);
 	~CTitleLogo();
 
 	static HRESULT Load(void);

@@ -22,11 +22,11 @@
 class CMeshField : public CObject
 {
 public:
-	CMeshField(const int nPriority = OBJECT_PRIORITY);
+	CMeshField(const int nPriority = PRIORITY_2);
 	virtual ~CMeshField();
 
 	static CMeshField* Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot, const D3DXVECTOR2 block,
-		const D3DXVECTOR2 size, const CObject::TYPE type, const int nPriority = OBJECT_PRIORITY);
+		const D3DXVECTOR2 size, const CObject::TYPE type, const int nPriority = PRIORITY_2);
 	HRESULT Init(void) { return S_OK; }
 	HRESULT Init(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot,
 		const D3DXVECTOR2 block, const D3DXVECTOR2 size);

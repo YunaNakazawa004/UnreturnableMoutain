@@ -138,14 +138,14 @@ HRESULT CItemUI::Init(const D3DXVECTOR3 pos, const float fWidth, const float fHe
 		{// NULLチェック
 			m_Item[nCnt].pItem =
 				CObject2D::Create(D3DXVECTOR3(pos.x + 40.0f + nCnt * 70.0f, pos.y + (fHeight), 0.0f), 30.0f, 30.0f,
-					CObject::TYPE_ITEMUI, "data\\TEXTURE\\UI\\item000.png", UI_PRIORITY);
+					CObject::TYPE_ITEMUI, "data\\TEXTURE\\UI\\item000.png", PRIORITY_6);
 		}
 
 		if (m_Item[nCnt].pCheck == NULL)
 		{// NULLチェック
 			m_Item[nCnt].pCheck =
 				CObject2D::Create(D3DXVECTOR3(pos.x + 40.0f + nCnt * 70.0f, pos.y + (fHeight), 0.0f), 30.0f, 30.0f,
-					CObject::TYPE_ITEMUI, "data\\TEXTURE\\UI\\check.png", UI_PRIORITY);
+					CObject::TYPE_ITEMUI, "data\\TEXTURE\\UI\\check.png", PRIORITY_6);
 		}
 
 		if (m_Item[nCnt].pCheck != NULL)

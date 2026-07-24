@@ -16,7 +16,7 @@
 class CGrass : public CObject3D
 {
 public:
-	CGrass(const int nPriority = OBJECT_PRIORITY);
+	CGrass(const int nPriority = PRIORITY_2);
 	virtual ~CGrass();
 
 	static HRESULT Load(void);

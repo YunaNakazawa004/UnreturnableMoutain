@@ -37,7 +37,7 @@ public:
 		STATE_MAX
 	};
 
-	CEnergyUI(const int nPriority = UI_PRIORITY);
+	CEnergyUI(const int nPriority = PRIORITY_6);
 	~CEnergyUI();
 
 	static HRESULT Load(void);

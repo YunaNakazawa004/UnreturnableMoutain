@@ -14,11 +14,11 @@
 // 静的メンバ変数宣言
 //************************************************************************
 #ifdef LIST
-CObject* CObject::m_apTop[MAX_PRIORITY_NUM] = {};					// 先頭のオブジェクトへのポインタ
-CObject* CObject::m_apCur[MAX_PRIORITY_NUM] = {};					// 最後尾のオブジェクトへのポインタ
+CObject* CObject::m_apTop[PRIORITY_MAX] = {};					// 先頭のオブジェクトへのポインタ
+CObject* CObject::m_apCur[PRIORITY_MAX] = {};					// 最後尾のオブジェクトへのポインタ
 
 #else
-CObject* CObject::m_apObject[MAX_PRIORITY_NUM][MAX_OBJECT] = {};	// オブジェクトのインスタンス
+CObject* CObject::m_apObject[PRIORITY_MAX][MAX_OBJECT] = {};	// オブジェクトのインスタンス
 
 #endif
 
@@ -29,7 +29,7 @@ int CObject::m_nNumAll = 0;				// オブジェクトの総数
 //========================================================================
 CObject::CObject()
 {
-	for (int nCntPri = 0; nCntPri < MAX_PRIORITY_NUM; nCntPri++)
+	for (int nCntPri = 0; nCntPri < PRIORITY_MAX; nCntPri++)
 	{
 #ifdef LIST
 		// 自分自身の前のオブジェクトに、最後尾のオブジェクトを入れる
@@ -129,7 +129,7 @@ CObject::~CObject()
 //========================================================================
 void CObject::ReleaseAll(void)
 {
-	for (int nCntPri = 0; nCntPri < MAX_PRIORITY_NUM; nCntPri++)
+	for (int nCntPri = 0; nCntPri < PRIORITY_MAX; nCntPri++)
 	{
 #ifdef LIST
 		CObject* pObject = m_apTop[nCntPri];		// 先頭のオブジェクトを代入
@@ -158,7 +158,7 @@ void CObject::ReleaseAll(void)
 	}
 
 #ifdef LIST
-	for (int nCntPri = 0; nCntPri < MAX_PRIORITY_NUM; nCntPri++)
+	for (int nCntPri = 0; nCntPri < PRIORITY_MAX; nCntPri++)
 	{
 		CObject* pObject = m_apTop[nCntPri];		// 先頭のオブジェクトを代入
 
@@ -250,7 +250,7 @@ void CObject::Release(void)
 //========================================================================
 void CObject::UpdateAll(void)
 {
-	for (int nCntPri = 0; nCntPri < MAX_PRIORITY_NUM; nCntPri++)
+	for (int nCntPri = 0; nCntPri < PRIORITY_MAX; nCntPri++)
 	{
 #ifdef LIST
 		CObject* pObject = m_apTop[nCntPri];		// 先頭のオブジェクトを代入
@@ -279,7 +279,7 @@ void CObject::UpdateAll(void)
 	}
 
 #ifdef LIST
-	for (int nCntPri = 0; nCntPri < MAX_PRIORITY_NUM; nCntPri++)
+	for (int nCntPri = 0; nCntPri < PRIORITY_MAX; nCntPri++)
 	{
 		CObject* pObject = m_apTop[nCntPri];		// 先頭のオブジェクトを代入
 
@@ -352,7 +352,7 @@ void CObject::DrawAll(void)
 	// カメラを設定
 	pCamera->SetCamera();
 
-	for (int nCntPri = 0; nCntPri < MAX_PRIORITY_NUM; nCntPri++)
+	for (int nCntPri = 0; nCntPri < PRIORITY_MAX; nCntPri++)
 	{
 #ifdef LIST
 		CObject* pObject = m_apTop[nCntPri];		// 先頭のオブジェクトを代入

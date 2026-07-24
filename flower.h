@@ -23,7 +23,7 @@
 class CFlower : public CObjectX
 {
 public:
-	CFlower(const int nPriority = OBJECT_PRIORITY);
+	CFlower(const int nPriority = PRIORITY_2);
 	virtual ~CFlower();
 
 	static CFlower* Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot);

@@ -28,7 +28,7 @@ class CNumber;
 class CScore : public CObject
 {
 public:
-	CScore(const int nPriority = UI_PRIORITY);
+	CScore(const int nPriority = PRIORITY_6);
 	~CScore();
 
 	static CScore* Create(const D3DXVECTOR3 pos,

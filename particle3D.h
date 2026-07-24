@@ -33,7 +33,7 @@ public:
 		TYPE_MAX
 	}TYPE;
 
-	CParticle3D(const int nPriority = EFFECT_PRIORITY);
+	CParticle3D(const int nPriority = PRIORITY_2);
 	~CParticle3D();
 
 	static CParticle3D* Create(const D3DXVECTOR3 posP, const int nLifeP, const int nValue,

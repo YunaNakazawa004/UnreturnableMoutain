@@ -20,7 +20,7 @@ public:
 	virtual ~CObjectBillboard();
 
 	static CObjectBillboard* Create(const D3DXVECTOR3 pos, const float fWidth, const float fHeight,
-		const CObject::TYPE type, const char* pFilename, const int nPriority = BG_PRIORITY);
+		const CObject::TYPE type, const char* pFilename, const int nPriority = PRIORITY_2);
 	HRESULT Init(void) { return S_OK; }
 	HRESULT Init(const D3DXVECTOR3 pos, const float fWidth, const float fHeight);
 	void Uninit(void);

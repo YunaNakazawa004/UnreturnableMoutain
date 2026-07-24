@@ -31,7 +31,7 @@ public:
 		STATE_MAX
 	};
 
-	CEnterUI(const int nPriority = UI_PRIORITY);
+	CEnterUI(const int nPriority = PRIORITY_6);
 	~CEnterUI();
 
 	static HRESULT Load(void);

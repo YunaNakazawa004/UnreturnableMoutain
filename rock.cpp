@@ -161,7 +161,7 @@ void CRock::Draw(void)
 CRock* CRock::Collision(D3DXVECTOR3* pPos, D3DXVECTOR3* posOld, D3DXVECTOR3* move,
 	const float fRadius, const float fHeight, bool* pLand, bool* pHead)
 {
-	for (int nCntPri = 0; nCntPri < MAX_PRIORITY_NUM; nCntPri++)
+	for (int nCntPri = 0; nCntPri < PRIORITY_MAX; nCntPri++)
 	{
 #ifdef LIST
 		CObject* pObj = CObject::GetTop(nCntPri);

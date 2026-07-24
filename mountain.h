@@ -20,7 +20,7 @@
 class CMountain : public CMeshField
 {
 public:
-	CMountain(const int nPriority = OBJECT_PRIORITY);
+	CMountain(const int nPriority = PRIORITY_2);
 	~CMountain();
 
 	static HRESULT Load(void);

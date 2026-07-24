@@ -41,7 +41,7 @@ public:
 		int type;				// ƒAƒCƒeƒ€‚ÌŽí—Þ
 	}Item;
 
-	CItemUI(const int nPriority = UI_PRIORITY);
+	CItemUI(const int nPriority = PRIORITY_6);
 	~CItemUI();
 
 	static HRESULT Load(void);

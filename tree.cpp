@@ -298,7 +298,7 @@ bool CTree::Collision(D3DXVECTOR3* pPos, D3DXVECTOR3* posOld, D3DXVECTOR3* move,
 	// ƒ[ƒJƒ‹•Ï”
 	bool bColl = false;
 
-	for (int nCntPri = 0; nCntPri < MAX_PRIORITY_NUM; nCntPri++)
+	for (int nCntPri = 0; nCntPri < PRIORITY_MAX; nCntPri++)
 	{
 #ifdef LIST
 		CObject* pObj = CObject::GetTop(nCntPri);

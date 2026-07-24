@@ -189,7 +189,7 @@ CEnergyRock* CEnergyRock::Collision(D3DXVECTOR3* pPos, D3DXVECTOR3* posOld, D3DX
 	CActionUI* pActionUI = (CManager::GetMode() == CScene::MODE_GAME) ?
 		CGame::GetActionUI() : CTitle::GetActionUI();		// ƒAƒNƒVƒ‡ƒ“UI‚ðŽæ“¾
 
-	for (int nCntPri = 0; nCntPri < MAX_PRIORITY_NUM; nCntPri++)
+	for (int nCntPri = 0; nCntPri < PRIORITY_MAX; nCntPri++)
 	{
 #ifdef LIST
 		CObject* pObj = CObject::GetTop(nCntPri);

@@ -59,7 +59,7 @@
 #define MAX_JUMP		(1.0f)									// ジャンプ量の最大値
 #define GRAVITY			(-0.3f)									// 重力
 #define MAX_ENERGY		(100.0f)								// 最大所持エネルギー
-#define ONE_ENERGY		(5.0f)									// 鉱石ひとつあたりのエネルギー
+#define ONE_ENERGY		(10.0f)									// 鉱石ひとつあたりのエネルギー
 #define MINUS_ENERGY	(90)									// エネルギー減少の間隔
 #define UNCLIMB_SLOPE	(0.4f)									// 登れない傾斜の角度
 #define OUTMAP			(3000.0f)								// マップ外

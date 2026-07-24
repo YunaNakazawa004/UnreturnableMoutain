@@ -30,7 +30,7 @@ public:
 		TYPE_MAX
 	}TYPE;
 
-	CResultUI(const int nPriority = UI_PRIORITY);
+	CResultUI(const int nPriority = PRIORITY_6);
 	~CResultUI();
 
 	static HRESULT Load(void);
