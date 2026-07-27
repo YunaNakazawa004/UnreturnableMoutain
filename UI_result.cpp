@@ -12,6 +12,11 @@
 #include "debugproc.h"
 #include "texture.h"
 
+#include "result.h"
+#include "used_energy.h"
+#include "score.h"
+#include "collect_num.h"
+
 //************************************************************************
 // マクロ定義
 //************************************************************************
@@ -146,6 +151,41 @@ void CResultUI::Uninit(void)
 //========================================================================
 void CResultUI::Update(void)
 {
+	// ローカル変数
+	CUsedEnergy* pUsedEnergy = CResult::GetUsedEnergy();		// 使用エネルギー量の取得
+	CScore* pBaseScore = CResult::GetBaseScore();				// 基礎スコアの取得
+	CCollectNum* pCollectNum = CResult::GetCollectNum();		// 収集数の取得
+	CScore* pCollectScore = CResult::GetCollectScore();			// 収集スコアの取得
+	CScore* pClearScore = CResult::GetClearScore();				// クリアボーナスの取得
+	CScore* pFinalScore = CResult::GetFinalScore();				// 最終スコアの取得
+	D3DXVECTOR3 pos = GetPosition();
+
+	if (pos.y > 100.0f)
+	{// 指定の場所まで
+		pos.y -= 2.0f;
+	}
+
+	if (pos.y <= 100.0f)
+	{// 指定の場所にする
+		pos.y = 100.0f;
+
+		pBaseScore->SetDisp(true);
+		pUsedEnergy->SetDisp(true);
+		pCollectNum->SetDisp(true);
+		pCollectScore->SetDisp(true);
+
+		if (pClearScore != NULL)
+		{// NULLチェック
+			pClearScore->SetDisp(true);
+		}
+
+		pFinalScore->SetDisp(true);
+
+		CResult::SetFadeEnable();
+	}
+
+	// 位置を設定
+	SetPosition(pos);
 }
 
 //========================================================================

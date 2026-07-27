@@ -391,6 +391,7 @@ void CGame::Uninit(void)
 void CGame::Update(void)
 {
 	CInputKeyboard* pInputKeyboard = CManager::GetInputKeyboard();		// キーボード入力の取得
+	CInputJoypad* pInputJoypad = CManager::GetInputJoypad();			// ジョイパッド入力の取得
 	CFade* pFade = CManager::GetFade();									// フェードの取得
 	CTransition* pTransition = CManager::GetTransition();				// 画面遷移の取得
 
@@ -437,7 +438,9 @@ void CGame::Update(void)
 	
 #ifdef _DEBUG
 	// 画面遷移（デバッグ）
-	if (pInputKeyboard->GetTrigger(DIK_RETURN) == true)
+	if (pInputKeyboard->GetTrigger(DIK_RETURN) == true ||
+		pInputJoypad->GetTrigger(0, CInputJoypad::JOYKEY_A) == true ||
+		pInputJoypad->GetTrigger(0, CInputJoypad::JOYKEY_START) == true)
 	{// ENTERが押された
 		if (pTransition != NULL)
 		{// NULLチェック

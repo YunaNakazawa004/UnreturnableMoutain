@@ -36,6 +36,7 @@
 #include "UI_energy.h"
 #include "UI_jump_meter.h"
 #include "score.h"
+#include "used_energy.h"
 
 #include <iostream>
 #include <fstream>
@@ -773,6 +774,9 @@ void CPlayer::Update(void)
 
 		// ジャンプ量をUIに設定
 		pJumpMeterUI->SetJumpMeter(m_fJumpHigh);
+
+		// 使用エネルギー量を設定
+		CUsedEnergy::SetUsedEnergy((int)(m_fUsedEnergy * 1000.0f));
 	}
 
 	// 位置/向きを適用

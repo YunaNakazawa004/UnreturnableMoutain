@@ -21,6 +21,7 @@
 #include "energyrock.h"
 #include "UI_item.h"
 #include "score.h"
+#include "collect_num.h"
 
 #include "player.h"
 
@@ -38,6 +39,7 @@
 CMapObject::Map_Obj CMapObject::m_aMapObject[MAX_MAP_OBJECT] = {};	  	// 配置したオブジェクトの情報
 int CMapObject::m_nNumObject = 0;						  				// 現在オブジェクトの総数
 int CMapObject::m_nNumCollectObj = 0;					  				// 収集アイテムの総数
+int CMapObject::m_nMaxCollectObj = 0;					  				// 収集アイテムの初期総数
 
 //========================================================================
 // 生成処理
@@ -107,6 +109,7 @@ CMapObject::CMapObject()
 	memset(&m_aMapObject[0], NULL, sizeof(m_aMapObject));
 	m_nNumObject = 0;
 	m_nNumCollectObj = 0;
+	m_nMaxCollectObj = 0;
 }
 
 //========================================================================
@@ -125,6 +128,7 @@ HRESULT CMapObject::Init(void)
 	memset(&m_aMapObject[0], NULL, sizeof(m_aMapObject));
 	m_nNumObject = 0;
 	m_nNumCollectObj = 0;
+	m_nMaxCollectObj = 0;
 
 	return S_OK;
 }
@@ -184,6 +188,8 @@ void CMapObject::Update(void)
 		SkipCollectObj();
 	}
 #endif
+
+	CCollectNum::SetCollectNum(m_nMaxCollectObj - m_nNumCollectObj);
 
 	pDebugProc->Print("収集アイテムの総数 : %d\n", m_nNumCollectObj);
 }
@@ -324,6 +330,8 @@ HRESULT CMapObject::ReadData(const char* pFilename)
 		{// もし違ったら
 			OutputDebugStringA("! ! ! マップオブジェクトの読み込みに失敗しました ! ! !\n");
 		}
+
+		m_nMaxCollectObj = m_nNumCollectObj;
 
 		// ファイルを閉じる
 		file.close();

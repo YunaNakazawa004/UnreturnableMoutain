@@ -66,6 +66,7 @@ private:
 	static Map_Obj m_aMapObject[MAX_MAP_OBJECT];		// オブジェクトの保存情報
 	static int m_nNumObject;							// 現在オブジェクトの総数
 	static int m_nNumCollectObj;						// 収集アイテムの総数
+	static int m_nMaxCollectObj;						// 収集アイテムの初期総数
 };
 
 #endif

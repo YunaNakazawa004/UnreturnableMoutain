@@ -1,10 +1,10 @@
 //========================================================================
 // 
-// スコア [ score.cpp]
+// 収集数 [ collect_num.cpp]
 // Author : Nakazawa Yuna
 // 
 //========================================================================
-#include "score.h"
+#include "collect_num.h"
 
 #include "renderer.h"
 #include "input.h"
@@ -16,13 +16,18 @@
 //************************************************************************
 #define POWER				(10)									// 10の累乗
 #define TEXTURE_WIDTH		(10)									// テクスチャの幅
-#define MAX_SCORE			(99999999)								// 最大スコア
-#define MIN_SCORE			(0)										// 最小スコア
+#define MAX_SCORE			(9)										// 最大収集数
+#define MIN_SCORE			(0)										// 最小収集数
+
+//************************************************************************
+// 静的メンバ変数宣言
+//************************************************************************
+int CCollectNum::m_nCollectNum = 0;			// 収集数
 
 //========================================================================
-// スコアクラスの生成処理
+// 収集数クラスの生成処理
 //========================================================================
-CScore* CScore::Create(const D3DXVECTOR3 pos,
+CCollectNum* CCollectNum::Create(const D3DXVECTOR3 pos,
 	const float fWidth, const float fHeight)
 {
 #ifndef LIST
@@ -34,92 +39,89 @@ CScore* CScore::Create(const D3DXVECTOR3 pos,
 	}
 #endif
 
-	CScore* pScore = NULL;
+	CCollectNum* pCollectNum = NULL;
 
-	if (pScore == NULL)
+	if (pCollectNum == NULL)
 	{// NULLチェック
-		// スコアの生成
-		pScore = new CScore;
+		// 収集数の生成
+		pCollectNum = new CCollectNum;
 	}
 
-	if (pScore != NULL)
+	if (pCollectNum != NULL)
 	{// NULLチェック
 		// 初期化処理
-		if (FAILED(pScore->Init(pos, fWidth, fHeight)))
+		if (FAILED(pCollectNum->Init(pos, fWidth, fHeight)))
 		{// もし失敗した場合
-			OutputDebugStringA("! ! ! スコアの初期化に失敗しました ! ! !\n");
+			OutputDebugStringA("! ! ! 収集数の初期化に失敗しました ! ! !\n");
 
 			return NULL;
 		}
 
 		// オブジェクトの種類を設定
-		pScore->SetType(TYPE_SCORE);
+		pCollectNum->SetType(TYPE_SCORE);
 
-		return pScore;
+		return pCollectNum;
 	}
 
-	OutputDebugStringA("! ! ! スコアの生成に失敗しました ! ! !\n");
+	OutputDebugStringA("! ! ! 収集数の生成に失敗しました ! ! !\n");
 
 	return NULL;
 }
 
 //========================================================================
-// スコアクラスのコンストラクタ
+// 収集数クラスのコンストラクタ
 //========================================================================
-CScore::CScore(const int nPriority):CObject(nPriority)
+CCollectNum::CCollectNum(const int nPriority):CObject(nPriority)
 {
-	// スコアクラスの値をクリア
+	// 収集数クラスの値をクリア
 	memset(&m_apNumber[0], NULL, sizeof m_apNumber);
 	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	m_nScore = 0;
-	m_bDisp = true;
 }
 
 //========================================================================
-// スコアクラスのデストラクタ
+// 収集数クラスのデストラクタ
 //========================================================================
-CScore::~CScore()
+CCollectNum::~CCollectNum()
 {
 }
 
 //========================================================================
-// スコアクラスの初期化処理
+// 収集数クラスの初期化処理
 //========================================================================
-HRESULT CScore::Init(const D3DXVECTOR3 pos,
+HRESULT CCollectNum::Init(const D3DXVECTOR3 pos,
 	const float fWidth, const float fHeight)
 {
-	for (int nCntScore = 0; nCntScore < SCORE_NUMPLACE; nCntScore++)
+	for (int nCntCollectNum = 0; nCntCollectNum < COLLECT_NUM_NUMPLACE; nCntCollectNum++)
 	{
-		if (m_apNumber[nCntScore] == NULL)
+		if (m_apNumber[nCntCollectNum] == NULL)
 		{// NULLチェック
-			m_apNumber[nCntScore] = CNumber::Create(D3DXVECTOR3(pos.x + (nCntScore * fWidth), pos.y, pos.z), fWidth, fHeight);
+			m_apNumber[nCntCollectNum] = CNumber::Create(D3DXVECTOR3(pos.x + (nCntCollectNum * fWidth), pos.y, pos.z), fWidth, fHeight);
 		}
 	}
 
-	// スコアクラスの値を初期化
+	// 収集数クラスの値を初期化
 	m_pos = pos;
-	m_nScore = 0;
 
-	// スコアを設定
-	SetNum(m_nScore);
+	// 収集数を設定
+	SetNum(m_nCollectNum);
 
 	return S_OK;
 }
 
 //========================================================================
-// スコアクラスの終了処理
+// 収集数クラスの終了処理
 //========================================================================
-void CScore::Uninit(void)
+void CCollectNum::Uninit(void)
 {
-	for (int nCntScore = 0; nCntScore < SCORE_NUMPLACE; nCntScore++)
+	for (int nCntCollectNum = 0; nCntCollectNum < COLLECT_NUM_NUMPLACE; nCntCollectNum++)
 	{
-		if (m_apNumber[nCntScore] != NULL)
+		if (m_apNumber[nCntCollectNum] != NULL)
 		{// NULLチェック
 			// 終了処理
-			m_apNumber[nCntScore]->Uninit();
+			m_apNumber[nCntCollectNum]->Uninit();
 
-			delete m_apNumber[nCntScore];
-			m_apNumber[nCntScore] = NULL;
+			delete m_apNumber[nCntCollectNum];
+			m_apNumber[nCntCollectNum] = NULL;
 		}
 	}
 
@@ -128,14 +130,14 @@ void CScore::Uninit(void)
 }
 
 //========================================================================
-// スコアクラスの更新処理
+// 収集数クラスの更新処理
 //========================================================================
-void CScore::Update(void)
+void CCollectNum::Update(void)
 {
 #ifdef _DEBUG
 	CInputKeyboard* pInputKeyboard = CManager::GetInputKeyboard();		// キーボード入力の取得
 
-	// スコア上昇
+	// 収集数上昇
 	if (pInputKeyboard->GetPress(DIK_1) == true)
 	{
 		Add((int)pow(POWER, 7));
@@ -172,76 +174,77 @@ void CScore::Update(void)
 }
 
 //========================================================================
-// スコアクラスの描画処理
+// 収集数クラスの描画処理
 //========================================================================
-void CScore::Draw(void)
+void CCollectNum::Draw(void)
 {
 	if (m_bDisp == false)
 	{// 表示しない場合
 		return;
 	}
 
-	for (int nCntScore = 0; nCntScore < SCORE_NUMPLACE; nCntScore++)
+	for (int nCntCollectNum = 0; nCntCollectNum < COLLECT_NUM_NUMPLACE; nCntCollectNum++)
 	{
-		if (m_apNumber[nCntScore] != NULL)
+		if (m_apNumber[nCntCollectNum] != NULL)
 		{// NULLチェック
 			// 描画処理
-			m_apNumber[nCntScore]->Draw();
+			m_apNumber[nCntCollectNum]->Draw();
 		}
 	}
 }
 
 //========================================================================
-// スコア設定処理
+// 収集数設定処理
 //========================================================================
-void CScore::SetNum(const int nScore)
+void CCollectNum::SetNum(const int nCollectNum)
 {
 	// ローカル変数
-	int aTexU[SCORE_NUMPLACE];				// 各桁の数字を格納
+	int aTexU[COLLECT_NUM_NUMPLACE];				// 各桁の数字を格納
 
-	// スコアを保存
-	m_nScore = nScore;
+	// 収集数を保存
+	m_nCollectNum = nCollectNum;
 
-	for (int nCntScore = 0; nCntScore < SCORE_NUMPLACE; nCntScore++)
+	for (int nCntCollectNum = 0; nCntCollectNum < COLLECT_NUM_NUMPLACE; nCntCollectNum++)
 	{
 		// 各桁の数字を設定
-		aTexU[nCntScore] = m_nScore % (int)pow(POWER, SCORE_NUMPLACE - nCntScore) / (int)pow(POWER, SCORE_NUMPLACE - nCntScore - 1);
+		aTexU[nCntCollectNum] = m_nCollectNum % (int)pow(POWER, COLLECT_NUM_NUMPLACE - nCntCollectNum) / 
+			(int)pow(POWER, COLLECT_NUM_NUMPLACE - nCntCollectNum - 1);
 
 		// テクスチャ座標を設定
-		m_apNumber[nCntScore]->SetTexUV(aTexU[nCntScore], TEXTURE_WIDTH, 1);
+		m_apNumber[nCntCollectNum]->SetTexUV(aTexU[nCntCollectNum], TEXTURE_WIDTH, 1);
 	}
 }
 
 //========================================================================
-// スコア加算処理
+// 収集数加算処理
 //========================================================================
-void CScore::Add(const int nAdd)
+void CCollectNum::Add(const int nAdd)
 {
-	// スコアを加算
-	m_nScore += nAdd;
+	// 収集数を加算
+	m_nCollectNum += nAdd;
 
-	if (m_nScore > MAX_SCORE)
-	{// スコアの最大値
-		m_nScore = MAX_SCORE;
+	if (m_nCollectNum > MAX_SCORE)
+	{// 収集数の最大値
+		m_nCollectNum = MAX_SCORE;
 	}
 
-	// スコアを設定
-	SetNum(m_nScore);
+	// 収集数を設定
+	SetNum(m_nCollectNum);
 }
 
 //========================================================================
-// スコア減算処理
+// 収集数減算処理
 //========================================================================
-void CScore::Minus(const int nMinus)
+void CCollectNum::Minus(const int nMinus)
 {
-	// スコアを減算
-	m_nScore -= nMinus;
+	// 収集数を減算
+	m_nCollectNum -= nMinus;
 
-	if (m_nScore < MIN_SCORE)
-	{// スコアの最低値
-		m_nScore = MIN_SCORE;
+	if (m_nCollectNum < MIN_SCORE)
+	{// 収集数の最低値
+		m_nCollectNum = MIN_SCORE;
 	}
 
-	// スコアを設定
-	SetNum(m_nScore);
+	// 収集数を設定
+	SetNum(m_nCollectNum);
 }

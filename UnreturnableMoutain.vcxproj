@@ -147,6 +147,7 @@
   <ItemGroup>
     <ClCompile Include="beach.cpp" />
     <ClCompile Include="camera.cpp" />
+    <ClCompile Include="collect_num.cpp" />
     <ClCompile Include="debugproc.cpp" />
     <ClCompile Include="effect2D.cpp" />
     <ClCompile Include="effect3D.cpp" />
@@ -197,11 +198,13 @@
     <ClCompile Include="UI_jump_meter.cpp" />
     <ClCompile Include="UI_result.cpp" />
     <ClCompile Include="UI_title_logo.cpp" />
+    <ClCompile Include="used_energy.cpp" />
     <ClCompile Include="watersurface.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="beach.h" />
     <ClInclude Include="camera.h" />
+    <ClInclude Include="collect_num.h" />
     <ClInclude Include="debugproc.h" />
     <ClInclude Include="effect2D.h" />
     <ClInclude Include="effect3D.h" />
@@ -252,6 +255,7 @@
     <ClInclude Include="UI_jump_meter.h" />
     <ClInclude Include="UI_result.h" />
     <ClInclude Include="UI_title_logo.h" />
+    <ClInclude Include="used_energy.h" />
     <ClInclude Include="watersurface.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
