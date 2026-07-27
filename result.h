@@ -13,8 +13,9 @@
 //************************************************************************
 // 前方宣言
 //************************************************************************
-class CObject2D;
 class CResultUI;
+class CShip;
+class CLab;
 
 //************************************************************************
 // リザルト画面クラス
@@ -30,14 +31,16 @@ public:
 	void Update(void);
 	void Draw(void);
 
-	static CObject2D* GetObject2D(void) { return m_pObject2D; }
 	static CResultUI* GetResultUI(void) { return m_pResultUI; }
+	static CShip* GetShip(void) { return m_pShip; }
+	static CLab* GetLab(void) { return m_pLab; }
 	
 	static void SetClear(const bool bClear) { m_bClear = bClear; }
 
 private:
-	static CObject2D* m_pObject2D;						// 背景のインスタンス
-	static CResultUI* m_pResultUI;						// リザルトUIのインスタンス
+	static CResultUI* m_pResultUI;					// リザルトUIのインスタンス
+	static CShip* m_pShip;							// 船のインスタンス
+	static CLab* m_pLab;							// 研究所のインスタンス
 
 	static bool m_bClear;			// クリアフラグ
 };

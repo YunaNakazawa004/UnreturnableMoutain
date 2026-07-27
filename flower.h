@@ -32,8 +32,12 @@ public:
 	void Update(void);
 	void Draw(void);
 
+	void CollisionPlayer(void);
+
 private:
 	static const char* m_aFilename[FLOWER_NUM];			// 花のファイル名
+	D3DXVECTOR3 m_rotOff;				// 向きオフセット
+	float m_fShake;						// 揺れ具合;
 };
 
 #endif

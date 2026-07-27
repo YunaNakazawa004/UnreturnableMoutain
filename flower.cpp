@@ -12,10 +12,14 @@
 
 #include "mountain.h"
 #include "beach.h"
+#include "player.h"
 
 //************************************************************************
 // マクロ定義
 //************************************************************************
+#define SHAKE_SPEED			(0.005f)			// 揺れるスピード
+#define SHAKE_VALUE			(0.0005f)			// どれくらい揺れるか
+#define PLAYER_DIST			(25.0f)				// プレイヤーとの最長距離(これより小さいときに傾く)
 
 //************************************************************************
 // 静的メンバ変数宣言
@@ -78,6 +82,8 @@ CFlower* CFlower::Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot)
 CFlower::CFlower(const int nPriority) :CObjectX(nPriority)
 {
 	// 花クラスの値をクリア
+	m_rotOff = DEFAULT_VECTER3;
+	m_fShake = 0.0f;
 }
 
 //========================================================================
@@ -98,6 +104,10 @@ HRESULT CFlower::Init(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot)
 	// 位置/向きを設定
 	CObjectX::SetPosition(pos);
 	CObjectX::SetRotation(rot);
+
+	// 角度を設定
+	m_rotOff = rot;
+	m_fShake = 0.0f;
 
 	CMountain* pMountain = CGame::GetMountain();					// 山の取得
 	CBeach* pBeach = CGame::GetBeach();								// 砂浜の取得
@@ -154,6 +164,21 @@ void CFlower::Uninit(void)
 //========================================================================
 void CFlower::Update(void)
 {
+	// ローカル変数
+	D3DXVECTOR3 rot = CObjectX::GetRotation();
+
+	// オフセットの向きを抜いた値にする
+	rot -= m_rotOff;
+
+	// ゆらゆら
+	m_fShake += SHAKE_SPEED;
+	rot.x += cosf(m_fShake) * SHAKE_VALUE;
+
+	// プレイヤーとの当たり判定
+	CollisionPlayer();
+
+	// 位置/向きを適用
+	SetRotation(m_rotOff + rot);
 }
 
 //========================================================================
@@ -163,4 +188,52 @@ void CFlower::Draw(void)
 {
 	// 描画処理
 	CObjectX::Draw();
+}
+
+//========================================================================
+// プレイヤーとの当たり判定(距離によって傾く)
+//========================================================================
+void CFlower::CollisionPlayer(void)
+{
+	// ローカル変数
+	CPlayer* pPlayer = CGame::GetPlayer();				// プレイヤーの取得
+	D3DXVECTOR3 posPlayer = pPlayer->GetPosition();		// プレイヤーの位置
+	D3DXVECTOR3 pos = GetPosition();					// 自分の位置
+	D3DXVECTOR3 rot = GetRotation();					// 自分の向き
+	D3DXVECTOR3 rotDest;		// 目的の向き
+	D3DXVECTOR3 dist;			// 距離
+	float fDist;				// 距離
+
+	// 距離を計算
+	dist = pos - posPlayer;
+	fDist = D3DXVec3Length(&dist);
+
+	if (fDist < PLAYER_DIST)
+	{// 距離が近い
+		D3DXVec3Normalize(&dist, &dist);
+
+		// 向きのオフセットに代入
+		rotDest.x = sinf(dist.z) * cosf(rot.y) * ((PLAYER_DIST - fDist) * 0.05f);
+		rotDest.z = sinf(dist.x) * cosf(rot.y + D3DX_PI) * ((PLAYER_DIST - fDist) * 0.05f);
+	}
+	else
+	{// 近くなくなった
+		rotDest.x = 0.0f;
+		rotDest.z = 0.0f;
+	}
+
+	// X向きを調整
+	CorrectAngle(&rotDest.x, rotDest.x);
+
+	// Z向きを調整
+	CorrectAngle(&rotDest.z, rotDest.z);
+
+	m_rotOff.x += (rotDest.x - m_rotOff.x) * 0.1f;
+	m_rotOff.z += (rotDest.z - m_rotOff.z) * 0.1f;
+
+	// X向きを調整
+	CorrectAngle(&m_rotOff.x, m_rotOff.x);
+
+	// Z向きを調整
+	CorrectAngle(&m_rotOff.z, m_rotOff.z);
 }

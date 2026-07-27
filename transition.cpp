@@ -242,6 +242,8 @@ void CTransition::Uninit(void)
 //=============================================================================
 void CTransition::Update(void)
 {
+	CCamera* pCamera = CManager::GetCamera();				// カメラへのポインタ
+
 	if (m_fade != FADE_NONE)
 	{
 		if (m_fade == FADE_IN)
@@ -263,6 +265,9 @@ void CTransition::Update(void)
 				m_col.a = 1.0f;
 
 				m_pos.x += 3.0f;
+
+				// カメラを変更
+				pCamera->SetPosition(D3DXVECTOR3(0.0f, 0.0f, -300.0f), DEFAULT_VECTER3, DEFAULT_VECTER3, CCamera::TYPE_STOP);
 
 				if (m_pos.x > 200.0f)
 				{// 一定の距離を進んだ
@@ -310,7 +315,6 @@ void CTransition::Draw(void)
 	CRenderer* pRenderer = CManager::GetRenderer();			// レンダラーへのポインタ
 	LPDIRECT3DDEVICE9 pDevice = pRenderer->GetDevice();		// デバイスへのポインタ
 	CTexture* pTexture = CManager::GetTexture();			// テクスチャへのポインタ
-	CCamera* pCamera = CManager::GetCamera();				// カメラへのポインタ
 	D3DXMATRIX mtxRot, mtxTrans;				// 計算用マトリックス
 	D3DMATERIAL9 matDef;						// 現在のマテリアル保存用
 	D3DXMATERIAL* pMat;							// マテリアルデータへのポインタ
@@ -331,9 +335,6 @@ void CTransition::Draw(void)
 
 	if (m_col.a == 1.0f)
 	{// 画面遷移中
-		// カメラを変更
-		pCamera->SetPosition(D3DXVECTOR3(0.0f, 0.0f, -300.0f), DEFAULT_VECTER3, DEFAULT_VECTER3, CCamera::TYPE_STOP);
-
 		// Zテストを無効にする
 		pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_ALWAYS);
 		pDevice->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
@@ -377,11 +378,6 @@ void CTransition::Draw(void)
 		// Zテストを有効にする
 		pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
 		pDevice->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
-	}
-	else if(CManager::GetMode() == CScene::MODE_GAME)
-	{// 画面遷移中ではない
-		// カメラを設定
-		pCamera->SetType(CCamera::TYPE_PLAYER);
 	}
 }
 

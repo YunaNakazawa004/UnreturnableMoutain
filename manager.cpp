@@ -225,7 +225,7 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	if (m_pFade == NULL)
 	{// NULLチェック
 #ifdef _DEBUG
-		m_pFade = CFade::Create(CScene::MODE_GAME);
+		m_pFade = CFade::Create(CScene::MODE_RESULT);
 #else
 		m_pFade = CFade::Create(CScene::MODE_TITLE);
 #endif

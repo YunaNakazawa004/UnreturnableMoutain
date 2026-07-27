@@ -67,7 +67,7 @@ HRESULT CTitle::Init(void)
 {
 	// カメラの設定
 	CCamera* pCamera = CManager::GetCamera();
-	pCamera->SetPosition(D3DXVECTOR3(0.0f,30.0f,-200.0f), DEFAULT_VECTER3, DEFAULT_VECTER3, CCamera::TYPE_STOP);
+	pCamera->SetPosition(D3DXVECTOR3(0.0f, 30.0f, -200.0f), DEFAULT_VECTER3, DEFAULT_VECTER3, CCamera::TYPE_STOP);
 
 	// テクスチャを読み込み
 	CTitleLogo::Load();
@@ -181,7 +181,7 @@ HRESULT CTitle::Init(void)
 
 		m_pShip->SetState(CShip::STATE_WAIT);
 	}
-	
+
 	// 研究所を生成
 	if (m_pLab == NULL)
 	{// NULLチェック
@@ -189,7 +189,7 @@ HRESULT CTitle::Init(void)
 
 		if (m_pLab == NULL)
 		{// NULLチェック
-			OutputDebugStringA("! ! ! 船の生成に失敗しました ! ! !\n");
+			OutputDebugStringA("! ! ! 研究所の生成に失敗しました ! ! !\n");
 
 			return E_FAIL;
 		}
@@ -215,7 +215,7 @@ void CTitle::Uninit(void)
 	{// NULLチェック
 		m_pLab = NULL;
 	}
-	
+
 	// 船の破棄
 	if (m_pShip != NULL)
 	{// NULLチェック
@@ -238,7 +238,7 @@ void CTitle::Uninit(void)
 	if (m_pJumpMeterUI != NULL)
 	{// NULLチェック
 		m_pJumpMeterUI = NULL;
-}
+	}
 
 	// エネルギーUIの破棄
 	if (m_pEnergyUI != NULL)

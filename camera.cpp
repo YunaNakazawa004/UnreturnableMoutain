@@ -649,6 +649,13 @@ void CCamera::SetPosition(D3DXVECTOR3 posV, D3DXVECTOR3 posR, D3DXVECTOR3 rot, T
 	m_posRDest = posR;
 	m_rot = rot;
 	m_type = type;
+
+	D3DXVECTOR3 dist = m_posV - m_posR;
+	D3DXVECTOR2 distXZ = D3DXVECTOR2(dist.x, dist.z);
+	float fDistXZ = D3DXVec2Length(&distXZ);
+
+	m_fAngle = atan2f(dist.y, fDistXZ);
+	m_fDistance = D3DXVec3Length(&dist);
 }
 
 //=============================================================================
