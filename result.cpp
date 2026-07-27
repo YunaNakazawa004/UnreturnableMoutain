@@ -14,6 +14,7 @@
 #include "fade.h"
 
 #include "UI_result.h"
+#include "UI_result_list.h"
 #include "ship.h"
 #include "lab.h"
 #include "used_energy.h"
@@ -24,6 +25,7 @@
 // 静的メンバ変数宣言
 //************************************************************************
 CResultUI* CResult::m_pResultUI = NULL;						// リザルトUIのインスタンス
+CListUI* CResult::m_pListUI = NULL;							// リザルト内訳UIのインスタンス
 CShip* CResult::m_pShip = NULL;								// 船のインスタンス
 CLab* CResult::m_pLab = NULL;								// 研究所のインスタンス
 CUsedEnergy* CResult::m_pUsedEnergy = NULL;					// 使用エネルギー量のインスタンス
@@ -41,6 +43,7 @@ CResult::CResult() : CScene(CScene::MODE_RESULT)
 {
 	// 値をクリア
 	m_pResultUI = NULL;
+	m_pListUI = NULL;
 	m_pShip = NULL;
 	m_pLab = NULL;
 	m_pUsedEnergy = NULL;
@@ -83,11 +86,26 @@ HRESULT CResult::Init(void)
 			return E_FAIL;
 		}
 	}
+	
+	// リザルト内訳UIを生成
+	if (m_pListUI == NULL)
+	{// NULLチェック
+		m_pListUI = CListUI::Create();
+
+		if (m_pListUI == NULL)
+		{// NULLチェック
+			OutputDebugStringA("! ! ! リザルト内訳UIの生成に失敗しました ! ! !\n");
+
+			return E_FAIL;
+		}
+
+		m_pListUI->SetDispAll(false);
+	}
 
 	// 最終スコアを生成
 	if (m_pFinalScore == NULL)
 	{// NULLチェック
-		m_pFinalScore = CScore::Create(D3DXVECTOR3(440.0f, 540.0f, 0.0f), 50.0f, 100.0f);
+		m_pFinalScore = CScore::Create(D3DXVECTOR3(640.0f, 540.0f, 0.0f), 50.0f, 100.0f);
 
 		if (m_pFinalScore == NULL)
 		{// NULLチェック
@@ -136,7 +154,7 @@ HRESULT CResult::Init(void)
 	// 収集数を生成
 	if (m_pCollectNum == NULL)
 	{// NULLチェック
-		m_pCollectNum = CCollectNum::Create(D3DXVECTOR3(520.0f, 320.0f, 0.0f), 36.0f, 72.0f);
+		m_pCollectNum = CCollectNum::Create(D3DXVECTOR3(560.0f, 320.0f, 0.0f), 36.0f, 72.0f);
 
 		if (m_pCollectNum == NULL)
 		{// NULLチェック
@@ -270,6 +288,12 @@ void CResult::Uninit(void)
 	if (m_pFinalScore != NULL)
 	{// NULLチェック
 		m_pFinalScore = NULL;
+	}
+	
+	// リザルト内訳UIの破棄
+	if (m_pListUI != NULL)
+	{// NULLチェック
+		m_pListUI = NULL;
 	}
 	
 	// リザルトUIの破棄

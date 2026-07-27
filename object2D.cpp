@@ -42,7 +42,7 @@ CObject2D* CObject2D::Create(const D3DXVECTOR3 pos, const float fWidth, const fl
 	if (pObject2D != NULL)
 	{// NULLチェック
 		// 初期化処理
-		if (FAILED(pObject2D->Init(pos, fWidth, fHeight)))
+		if (FAILED(pObject2D->Init(pos, fWidth, fHeight, posType)))
 		{// もし失敗した場合
 			OutputDebugStringA("! ! ! オブジェクト2Dの初期化に失敗しました ! ! !\n");
 

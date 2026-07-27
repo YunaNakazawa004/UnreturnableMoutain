@@ -16,6 +16,7 @@
 #include "used_energy.h"
 #include "score.h"
 #include "collect_num.h"
+#include "UI_result_list.h"
 
 //************************************************************************
 // マクロ定義
@@ -158,6 +159,7 @@ void CResultUI::Update(void)
 	CScore* pCollectScore = CResult::GetCollectScore();			// 収集スコアの取得
 	CScore* pClearScore = CResult::GetClearScore();				// クリアボーナスの取得
 	CScore* pFinalScore = CResult::GetFinalScore();				// 最終スコアの取得
+	CListUI* pListUI = CResult::GetListUI();					// リザルト内訳UIの取得
 	D3DXVECTOR3 pos = GetPosition();
 
 	if (pos.y > 100.0f)
@@ -170,16 +172,23 @@ void CResultUI::Update(void)
 		pos.y = 100.0f;
 
 		pBaseScore->SetDisp(true);
+		pListUI->SetDisp(0, true);
+
 		pUsedEnergy->SetDisp(true);
+		pListUI->SetDisp(1, true);
+
 		pCollectNum->SetDisp(true);
 		pCollectScore->SetDisp(true);
+		pListUI->SetDisp(2, true);
 
 		if (pClearScore != NULL)
 		{// NULLチェック
 			pClearScore->SetDisp(true);
+			pListUI->SetDisp(3, true);
 		}
 
 		pFinalScore->SetDisp(true);
+		pListUI->SetDisp(4, true);
 
 		CResult::SetFadeEnable();
 	}

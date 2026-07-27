@@ -14,6 +14,7 @@
 // 前方宣言
 //************************************************************************
 class CResultUI;
+class CListUI;
 class CShip;
 class CLab;
 class CUsedEnergy;
@@ -35,6 +36,7 @@ public:
 	void Draw(void);
 
 	static CResultUI* GetResultUI(void) { return m_pResultUI; }
+	static CListUI* GetListUI(void) { return m_pListUI; }
 	static CShip* GetShip(void) { return m_pShip; }
 	static CLab* GetLab(void) { return m_pLab; }
 	static CUsedEnergy* GetUsedEnergy(void) { return m_pUsedEnergy; }
@@ -48,6 +50,7 @@ public:
 
 private:
 	static CResultUI* m_pResultUI;					// リザルトUIのインスタンス
+	static CListUI* m_pListUI;						// リザルト内訳UIのインスタンス
 	static CShip* m_pShip;							// 船のインスタンス
 	static CLab* m_pLab;							// 研究所のインスタンス
 	static CUsedEnergy* m_pUsedEnergy;				// 使用エネルギー量のインスタンス

@@ -197,6 +197,7 @@
     <ClCompile Include="UI_item.cpp" />
     <ClCompile Include="UI_jump_meter.cpp" />
     <ClCompile Include="UI_result.cpp" />
+    <ClCompile Include="UI_result_list.cpp" />
     <ClCompile Include="UI_title_logo.cpp" />
     <ClCompile Include="used_energy.cpp" />
     <ClCompile Include="watersurface.cpp" />
@@ -254,6 +255,7 @@
     <ClInclude Include="UI_item.h" />
     <ClInclude Include="UI_jump_meter.h" />
     <ClInclude Include="UI_result.h" />
+    <ClInclude Include="UI_result_list.h" />
     <ClInclude Include="UI_title_logo.h" />
     <ClInclude Include="used_energy.h" />
     <ClInclude Include="watersurface.h" />

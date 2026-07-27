@@ -73,6 +73,7 @@ public:
 		TYPE_TITLELOGO,			// タイトルロゴ
 		TYPE_ENTERUI,			// エンターUI
 		TYPE_RESULTUI,			// リザルトUI
+		TYPE_LISTUI,			// リザルト内訳UI
 		TYPE_JUMPUI,			// ジャンプUI
 		TYPE_ITEMUI,			// アイテムUI
 		TYPE_SCORE,				// スコア
