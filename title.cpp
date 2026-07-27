@@ -94,7 +94,7 @@ HRESULT CTitle::Init(void)
 	// エンターUIを生成
 	if (m_pEnterUI == NULL)
 	{// NULLチェック
-		m_pEnterUI = CEnterUI::Create(D3DXVECTOR3(640.0f, 480.0f, 0.0f), 300.0f, 50.0f);
+		m_pEnterUI = CEnterUI::Create(D3DXVECTOR3(640.0f, 480.0f, 0.0f), 450.0f, 50.0f);
 
 		if (m_pEnterUI == NULL)
 		{// NULLチェック

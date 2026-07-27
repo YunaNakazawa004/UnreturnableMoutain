@@ -18,7 +18,7 @@
 //************************************************************************
 // マクロ定義
 //************************************************************************
-#define WAIT_COUNT			(25)			// 待機状態のカウント
+#define WAIT_COUNT			(30)			// 待機状態のカウント
 #define BLINK_COUNT			(5)				// 点滅状態のカウント
 #define FADE_COUNT			(50)			// 画面遷移までのカウント
 
@@ -36,7 +36,7 @@ HRESULT CEnterUI::Load(void)
 	CTexture* pTexture = CManager::GetTexture();			// テクスチャへのポインタ
 
 	// テクスチャの設定
-	m_nIdxTexture = pTexture->Register("data\\TEXTURE\\UI\\enter.png");
+	m_nIdxTexture = pTexture->Register("data\\TEXTURE\\UI\\press_enter.png");
 
 	if (m_nIdxTexture == -1)
 	{// テクスチャが設定できていない
