@@ -22,7 +22,7 @@
 class CRock : public CObjectX
 {
 public:
-	CRock(const int nPriority = PRIORITY_2);
+	CRock(const int nPriority = PRIORITY_3);
 	virtual ~CRock();
 
 	static CRock* Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot);

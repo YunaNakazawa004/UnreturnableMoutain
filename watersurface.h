@@ -20,7 +20,7 @@
 class CWaterSurface : public CMeshField
 {
 public:
-	CWaterSurface(const int nPriority = PRIORITY_4);
+	CWaterSurface(const int nPriority = PRIORITY_3);
 	~CWaterSurface();
 
 	static HRESULT Load(void);

@@ -26,7 +26,7 @@ class CModel;
 class CLab : public CObject
 {
 public:
-	CLab(const int nPriority = PRIORITY_2);
+	CLab(const int nPriority = PRIORITY_3);
 	virtual ~CLab();
 
 	static CLab* Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot);

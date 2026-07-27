@@ -56,7 +56,7 @@ public:
 		STATE_MAX
 	}STATE;
 
-	CPlayer(const int nPriority = PRIORITY_3);
+	CPlayer(const int nPriority = PRIORITY_2);
 	virtual ~CPlayer();
 
 	static CPlayer* Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot, const float fEnergy);

@@ -12,19 +12,6 @@
 //************************************************************************
 // マクロ定義
 //************************************************************************
-//#define MAX_OBJECT			(1024)			// 最大オブジェクト数
-//#define MAX_PRIORITY_NUM	(8)				// 最大優先順位数
-//#define SCENE_PRIORITY		(0)				// デフォルトシーン優先順位
-//#define BG_PRIORITY			(1)				// デフォルト背景優先順位
-//#define BULLET_PRIORITY		(1)				// デフォルト弾優先順位
-//#define OBJECT_PRIORITY		(2)				// デフォルトオブジェクト優先順位
-//#define PLAYER_PRIORITY		(3)				// デフォルトプレイヤー優先順位
-//#define FIELD_PRIORITY		(4)				// デフォルトフィールド優先順位
-//#define EFFECT_PRIORITY		(2)				// デフォルトエフェクト優先順位
-//#define FRAME_PRIORITY		(5)				// デフォルトUIフレーム優先順位
-//#define UI_PRIORITY			(6)				// デフォルトUI優先順位
-//#define FADE_PRIORITY		(7)				// デフォルトフェード優先順位
-
 #define DEFAULT_VECTER3		(D3DXVECTOR3(0.0f,0.0f,0.0f))		// デフォルトのVec3座標
 #define DEFAULT_VECTER2		(D3DXVECTOR2(0.0f,0.0f))			// デフォルトのVec2座標
 

@@ -22,7 +22,7 @@
 class CEnergyRock : public CObjectX
 {
 public:
-	CEnergyRock(const int nPriority = PRIORITY_2);
+	CEnergyRock(const int nPriority = PRIORITY_3);
 	virtual ~CEnergyRock();
 
 	static CEnergyRock* Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot);

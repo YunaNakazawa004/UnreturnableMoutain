@@ -37,7 +37,7 @@ public:
 		STATE_MAX
 	}STATE;
 
-	CShip(const int nPriority = PRIORITY_2);
+	CShip(const int nPriority = PRIORITY_3);
 	virtual ~CShip();
 
 	static CShip* Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot);

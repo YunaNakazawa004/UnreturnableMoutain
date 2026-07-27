@@ -23,7 +23,7 @@
 class CSpray : public CObjectBillboard
 {
 public:
-	CSpray(const int nPriority = 4);
+	CSpray(const int nPriority = PRIORITY_4);
 	~CSpray();
 
 	static HRESULT Load(void);

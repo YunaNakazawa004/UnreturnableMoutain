@@ -20,7 +20,7 @@
 class CBeach : public CMeshField
 {
 public:
-	CBeach(const int nPriority = PRIORITY_2);
+	CBeach(const int nPriority = PRIORITY_3);
 	~CBeach();
 
 	static HRESULT Load(void);
