@@ -30,7 +30,7 @@ HRESULT CJumpMeterUI::Load(void)
 	CTexture* pTexture = CManager::GetTexture();			// テクスチャへのポインタ
 
 	// テクスチャの設定
-	m_nIdxTexture = pTexture->Register("data\\TEXTURE\\UI\\jump.png");
+	m_nIdxTexture = pTexture->Register("data\\TEXTURE\\UI\\jumpmeter001.png");
 
 	if (m_nIdxTexture == -1)
 	{// テクスチャが設定できていない
@@ -48,7 +48,7 @@ HRESULT CJumpMeterUI::Load(void)
 void CJumpMeterUI::Unload(void)
 {
 	// テクスチャのインデックスを削除
-	m_nIdxTexture = -1;
+	memset(&m_nIdxTexture, -1, sizeof m_nIdxTexture);
 }
 
 //========================================================================
@@ -103,6 +103,7 @@ CJumpMeterUI* CJumpMeterUI::Create(const D3DXVECTOR3 pos, const float fWidth, co
 CJumpMeterUI::CJumpMeterUI(const int nPriority) :CObject2D(nPriority)
 {
 	// ジャンプメーターUIクラスの値をクリア
+	m_pFrame = NULL;
 	m_fJump = 0.0f;
 	m_fWidth = 0.0f;
 	m_fHeight = 0.0f;
@@ -132,6 +133,9 @@ HRESULT CJumpMeterUI::Init(const D3DXVECTOR3 pos, const float fWidth, const floa
 	m_fWidth = fWidth;
 	m_fHeight = fHeight;
 
+	m_pFrame = CObject2D::Create(pos, fWidth, fHeight, TYPE_JUMPUI, 
+		"data\\TEXTURE\\UI\\jumpmeter000.png", PRIORITY_5, CObject2D::POS_MID_BOTTOM);
+
 	return S_OK;
 }
 
@@ -140,6 +144,11 @@ HRESULT CJumpMeterUI::Init(const D3DXVECTOR3 pos, const float fWidth, const floa
 //========================================================================
 void CJumpMeterUI::Uninit(void)
 {
+	if (m_pFrame != NULL)
+	{// NULLチェック
+		m_pFrame = NULL;
+	}
+
 	// 終了処理
 	CObject2D::Uninit();
 }

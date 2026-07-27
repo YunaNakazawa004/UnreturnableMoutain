@@ -15,7 +15,6 @@
 //************************************************************************
 #define JUMPMETERUI_WIDTH		(150.0f)				// ジャンプメーターUIの幅
 #define JUMPMETERUI_HEIGHT		(150.0f)				// ジャンプメーターUIの高さ
-#define JUMPMETERUI_NUMPLACE	(3)						// UIの数値の桁数
 
 //************************************************************************
 // ジャンプメーターUIクラス
@@ -39,6 +38,7 @@ public:
 
 private:
 	static int m_nIdxTexture;					// テクスチャのインデックス
+	CObject2D* m_pFrame;		// 枠
 	float m_fJump;				// ジャンプ量
 	float m_fWidth;				// 既定の幅
 	float m_fHeight;			// 既定の高さ

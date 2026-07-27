@@ -120,7 +120,7 @@ HRESULT CGame::Init(void)
 	// ジャンプメーターUIを生成
 	if (m_pJumpMeterUI == NULL)
 	{// NULLチェック
-		m_pJumpMeterUI = CJumpMeterUI::Create(D3DXVECTOR3(680.0f, 340.0f, 0.0f), 5.0f, 30.0f, 100.0f);
+		m_pJumpMeterUI = CJumpMeterUI::Create(D3DXVECTOR3(200.0f, 400.0f, 0.0f), 200.0f, 200.0f, 100.0f);
 
 		if (m_pJumpMeterUI == NULL)
 		{// NULLチェック
