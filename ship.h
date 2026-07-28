@@ -65,7 +65,7 @@ public:
 	bool Collision(D3DXVECTOR3* pos, D3DXVECTOR3* posOld, D3DXVECTOR3* move,
 		const float fRadius, const float fHeight, bool* pLand);
 
-	void SetState(const STATE state) { m_state = state; };
+	void SetState(const STATE state) { m_state = state; }
 
 private:
 	HRESULT SetModel(const char* pFilename);

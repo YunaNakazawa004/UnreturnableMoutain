@@ -382,7 +382,7 @@ void CShip::Update(void)
 			pos.y += (fHeight - pos.y) * 0.005f;
 
 			// ƒJƒƒ‰Ý’è
-			pCamera->SetPosition(D3DXVECTOR3(pos.x, fHeight + 100.0f, pos.z - 400.0f), pos, pCamera->GetRotation(), CCamera::TYPE_STOP);
+			pCamera->SetPosition(D3DXVECTOR3(pos.x, fHeight + 100.0f, pos.z - 300.0f), pos, pCamera->GetRotation(), CCamera::TYPE_STOP);
 
 			CParticle3D::Create(pos, 1, 3, 10.0f, 0.2f, 0.01f, CEffect3D::TYPE_BLENDADD, CParticle3D::TYPE_HOMING, 30, 2.0f,
 				1.0f, COLOR_ORANGE, 10.0f, true, NULL, D3DXVECTOR3(pos.x, pos.y - 100.0f, pos.z), 0.1f);

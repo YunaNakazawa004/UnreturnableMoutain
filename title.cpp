@@ -22,6 +22,7 @@
 #include "UI_energy.h"
 #include "UI_jump_meter.h"
 #include "UI_action.h"
+#include "tutorial_jump.h"
 
 //************************************************************************
 // 静的メンバ変数宣言
@@ -34,7 +35,10 @@ CLab* CTitle::m_pLab = NULL;						// 研究所のインスタンス
 CEnergyUI* CTitle::m_pEnergyUI = NULL;				// エネルギーUIのインスタンス
 CJumpMeterUI* CTitle::m_pJumpMeterUI = NULL;		// ジャンプメーターUIのインスタンス
 CActionUI* CTitle::m_pActionUI = NULL;				// アクションUIのインスタンス
+CTutorialJump* CTitle::m_pTutorialJumpL = NULL;		// ジャンプバーのインスタンス
+CTutorialJump* CTitle::m_pTutorialJumpR = NULL;		// ジャンプバーのインスタンス
 bool CTitle::m_bTutorial = false;					// チュートリアル中かどうかのフラグ
+bool CTitle::m_bReady = false;						// チュートリアル完了フラグ
 
 //========================================================================
 // タイトル画面クラスのコンストラクタ
@@ -50,7 +54,10 @@ CTitle::CTitle() : CScene(CScene::MODE_TITLE)
 	m_pEnergyUI = NULL;
 	m_pJumpMeterUI = NULL;
 	m_pActionUI = NULL;
+	m_pTutorialJumpL = NULL;
+	m_pTutorialJumpR = NULL;
 	m_bTutorial = false;
+	m_bReady = false;
 }
 
 //========================================================================
@@ -194,6 +201,32 @@ HRESULT CTitle::Init(void)
 			return E_FAIL;
 		}
 	}
+	
+	// ジャンプバーを生成
+	if (m_pTutorialJumpL == NULL)
+	{// NULLチェック
+		m_pTutorialJumpL = CTutorialJump::Create(D3DXVECTOR3(-235.0f, 25.0f, -120.0f), DEFAULT_VECTER3);
+
+		if (m_pTutorialJumpL == NULL)
+		{// NULLチェック
+			OutputDebugStringA("! ! ! ジャンプバーの生成に失敗しました ! ! !\n");
+
+			return E_FAIL;
+		}
+	}
+	
+	// ジャンプバーを生成
+	if (m_pTutorialJumpR == NULL)
+	{// NULLチェック
+		m_pTutorialJumpR = CTutorialJump::Create(D3DXVECTOR3(235.0f, 40.0f, -120.0f), DEFAULT_VECTER3);
+
+		if (m_pTutorialJumpR == NULL)
+		{// NULLチェック
+			OutputDebugStringA("! ! ! ジャンプバーの生成に失敗しました ! ! !\n");
+
+			return E_FAIL;
+		}
+	}
 
 	return S_OK;
 }
@@ -210,6 +243,18 @@ void CTitle::Uninit(void)
 	CEnterUI::Unload();
 	CTitleLogo::Unload();
 
+	// ジャンプバーの破棄
+	if (m_pTutorialJumpR != NULL)
+	{// NULLチェック
+		m_pTutorialJumpR = NULL;
+	}
+
+	// ジャンプバーの破棄
+	if (m_pTutorialJumpL != NULL)
+	{// NULLチェック
+		m_pTutorialJumpL = NULL;
+	}
+	
 	// 研究所の破棄
 	if (m_pLab != NULL)
 	{// NULLチェック
@@ -282,10 +327,17 @@ void CTitle::Update(void)
 		m_pTitleLogo->SetDisp(false);
 		m_pActionUI->SetDisp(true);
 		pCamera->SetType(CCamera::TYPE_PLAYER);
-		m_pShip->SetState(CShip::STATE_READY);
 
 		// フラグON
 		m_bTutorial = true;
+	}
+
+	if (m_pTutorialJumpL->GetClear() == true && m_pTutorialJumpR->GetClear() == true &&
+		m_pPlayer->GetEnergy() > 40.0f && m_bReady == false)
+	{// チュートリアルクリア
+		m_pShip->SetState(CShip::STATE_READY);
+
+		m_bReady = true;
 	}
 
 	// 画面遷移

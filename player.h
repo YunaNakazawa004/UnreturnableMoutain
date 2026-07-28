@@ -82,6 +82,8 @@ public:
 	bool IsNear(const D3DXVECTOR3 pos, const float fRadius);
 
 	bool Movement(const D3DXVECTOR3 rot);
+	float GetHeight(void) { return m_fHeight; }
+	float GetEnergy(void) { return m_fEnergy; }
 
 private:
 	HRESULT SetModel(const char* pFilename);

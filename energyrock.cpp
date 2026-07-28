@@ -222,14 +222,13 @@ CEnergyRock* CEnergyRock::Collision(D3DXVECTOR3* pPos, D3DXVECTOR3* posOld, D3DX
 
 					return dynamic_cast<CEnergyRock*>(pObj);
 				}
-
-				pActionUI->NearEnergyrock(false);
-				pActionUI->SetFade(CActionUI::FADE_IN);
 			}
 
 			pObj = pObjNext;			// 次のオブジェクトを代入
 		}
 
+		pActionUI->NearEnergyrock(false);
+		pActionUI->SetFade(CActionUI::FADE_IN);
 #else
 		for (int nCntObj = 0; nCntObj < MAX_OBJECT; nCntObj++)
 		{

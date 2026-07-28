@@ -21,6 +21,7 @@ class CLab;
 class CEnergyUI;
 class CJumpMeterUI;
 class CActionUI;
+class CTutorialJump;
 
 //************************************************************************
 // タイトル画面クラス
@@ -44,6 +45,8 @@ public:
 	static CEnergyUI* GetEnergyUI(void) { return m_pEnergyUI; }
 	static CJumpMeterUI* GetJumpMeterUI(void) { return m_pJumpMeterUI; }
 	static CActionUI* GetActionUI(void) { return m_pActionUI; }
+	static CTutorialJump* GetTutorialJumpL(void) { return m_pTutorialJumpL; }
+	static CTutorialJump* GetTutorialJumpR(void) { return m_pTutorialJumpR; }
 
 private:
 	static CTitleLogo* m_pTitleLogo;				// タイトルロゴのインスタンス
@@ -54,8 +57,11 @@ private:
 	static CEnergyUI* m_pEnergyUI;					// エネルギーUIのインスタンス
 	static CJumpMeterUI* m_pJumpMeterUI;			// ジャンプメーターUIのインスタンス
 	static CActionUI* m_pActionUI;					// アクションUIのインスタンス
+	static CTutorialJump* m_pTutorialJumpL;			// ジャンプバーのインスタンス
+	static CTutorialJump* m_pTutorialJumpR;			// ジャンプバーのインスタンス
 
 	static bool m_bTutorial;		// チュートリアル中かどうかのフラグ
+	static bool m_bReady;			// チュートリアル完了フラグ
 };
 
 #endif
