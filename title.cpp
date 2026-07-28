@@ -134,7 +134,7 @@ HRESULT CTitle::Init(void)
 			return E_FAIL;
 		}
 
-		m_pJumpMeterUI->SetDisp(false);
+		m_pJumpMeterUI->SetDispAll(false);
 	}
 
 	// アクションUIを生成
@@ -278,7 +278,7 @@ void CTitle::Update(void)
 		// チュートリアル状態に設定
 		m_pEnergyUI->SetDisp(true);
 		m_pEnterUI->SetDisp(false);
-		m_pJumpMeterUI->SetDisp(true);
+		m_pJumpMeterUI->SetDispAll(true);
 		m_pTitleLogo->SetDisp(false);
 		m_pActionUI->SetDisp(true);
 		pCamera->SetType(CCamera::TYPE_PLAYER);

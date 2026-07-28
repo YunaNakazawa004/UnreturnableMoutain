@@ -18,11 +18,17 @@
 #include "camera.h"
 #include "model.h"
 
+#include "particle3D.h"
+#include "explosion.h"
 #include "map_object.h"
 #include "mountain.h"
 #include "beach.h"
 #include "player.h"
 #include "UI_action.h"
+#include "UI_jump_meter.h"
+#include "UI_energy.h"
+#include "UI_item.h"
+#include "score.h"
 
 #include <iostream>
 #include <fstream>
@@ -125,51 +131,6 @@ HRESULT CShip::Init(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot)
 		return E_FAIL;
 	}
 
-	CMountain* pMountain = NULL;							// 山の取得
-	CBeach* pBeach = NULL;									// 砂浜の取得
-	D3DXVECTOR3 posC = GetPosition();
-
-	float fHeightM = 0.0f;		// 山の地面の高さ
-	D3DXVECTOR2 polygonIdxM = { -1.0f,-1.0f };		// ポリゴン番号
-
-	float fHeightB = 0.0f;		// 砂浜の地面の高さ
-	D3DXVECTOR2 polygonIdxB = { -1.0f,-1.0f };		// ポリゴン番号
-
-	float fHeight = 0.0f;		// 地面の高さ
-
-	// ローカル変数
-	pMountain = CGame::GetMountain();			// 山の取得
-	pBeach = CGame::GetBeach();					// 砂浜の取得
-
-	if (pMountain != NULL && pBeach != NULL)
-	{// NULLチェック
-		// 山のポリゴン番号を取得
-		polygonIdxM = pMountain->GetPolygonIdx(posC);
-
-		// 山の地面の高さを取得
-		fHeightM = pMountain->GetHeight(posC, polygonIdxM);
-
-		// 砂浜のポリゴン番号を取得
-		polygonIdxB = pBeach->GetPolygonIdx(posC);
-
-		// 砂浜の地面の高さを取得
-		fHeightB = pBeach->GetHeight(posC, polygonIdxB);
-	}
-
-	// 最終的な高さ
-	fHeight = (fHeightM >= fHeightB) ? fHeightM : fHeightB;
-
-	if (fHeight == ERROR_HEIGHT)
-	{// 無効な高さだったら
-		fHeight = 0.0f;
-	}
-
-	// 高さを代入
-	posC.y = fHeight;
-
-	// 位置を適用
-	SetPosition(posC);
-
 	return S_OK;
 }
 
@@ -207,12 +168,23 @@ void CShip::Update(void)
 	// ローカル変数
 	CInputKeyboard* pInputKeyboard = CManager::GetInputKeyboard();		// キーボード入力の取得
 	CInputJoypad* pInputJoypad = CManager::GetInputJoypad();			// ジョイパッド入力の取得
+	CCamera* pCamera = CManager::GetCamera();							// カメラの取得
 	CDebugProc* pDebugProc = CManager::GetDebugProc();		// デバッグ表示の取得
 	CMapObject* pMapObj = NULL;								// マップオブジェクトの取得
 	CPlayer* pPlayer = (CManager::GetMode() == CScene::MODE_GAME) ?
 		CGame::GetPlayer() : CTitle::GetPlayer();			// プレイヤーの取得
 	CActionUI* pActionUI = (CManager::GetMode() == CScene::MODE_GAME) ?
 		CGame::GetActionUI() : CTitle::GetActionUI();		// アクションUIの取得
+	CJumpMeterUI* pJumpMeterUI = (CManager::GetMode() == CScene::MODE_GAME) ?
+		CGame::GetJumpMeterUI() : CTitle::GetJumpMeterUI();	// ジャンプUIの取得
+	CEnergyUI* pEnergyUI = (CManager::GetMode() == CScene::MODE_GAME) ?
+		CGame::GetEnergyUI() : CTitle::GetEnergyUI();		// エネルギーUIの取得
+	CItemUI* pItemUI = CGame::GetItemUI();					// アイテムUIの取得
+	CScore* pScore = CGame::GetScore();						// スコアの取得
+
+	D3DXVECTOR3 pos = GetPosition();
+	D3DXVECTOR3 move = DEFAULT_VECTER3;
+	D3DXVECTOR3 DoorRot = m_apModel[5]->GetRotation();
 
 	pDebugProc->Print("\n*** 船 ***\n");
 
@@ -268,19 +240,7 @@ void CShip::Update(void)
 
 			if (pInputKeyboard->GetTrigger(DIK_E) == true || pInputJoypad->GetTrigger(0, CInputJoypad::JOYKEY_B) == true)
 			{// ボタンを押した
-				if (CManager::GetMode() == CScene::MODE_GAME)
-				{// ゲーム中
-					// 遷移フラグをON
-					CGame::SetFadeEnable();
-
-					// クリアフラグを立てる
-					CResult::SetClear(true);
-				}
-				else if (CManager::GetMode() == CScene::MODE_TITLE)
-				{// タイトル
-					// 遷移フラグをON
-					CTitle::SetFadeEnable();
-				}
+				m_state = STATE_CLOSE;
 
 				return;
 			}
@@ -292,7 +252,171 @@ void CShip::Update(void)
 		}
 
 		break;
+
+	case STATE_OPEN:		// 開く状態
+		pDebugProc->Print("状態 : 開く状態\n");
+
+		DoorRot.x += (m_apModel[5]->GetRotOffC().x - DoorRot.x) * 0.02f;
+
+		m_apModel[5]->SetRotation(DoorRot);
+
+		if (DoorRot.x >= m_apModel[5]->GetRotOffC().x - 0.01f && DoorRot.x <= m_apModel[5]->GetRotOffC().x + 0.01f)
+		{// 目的の角度になった
+			DoorRot.x = m_apModel[5]->GetRotOffC().x;
+
+			m_state = STATE_NORMAL;
+		}
+
+		break;
+
+	case STATE_CLOSE:		// 閉じる状態
+		pDebugProc->Print("状態 : 閉じる状態\n");
+
+		DoorRot.x += (0.0f - DoorRot.x) * 0.02f;
+
+		m_apModel[5]->SetRotation(DoorRot);
+
+		if (DoorRot.x >= -0.01f && DoorRot.x <= 0.01f)
+		{// 目的の角度になった
+			DoorRot.x = 0.0f;
+
+			m_state = STATE_UP;
+			pPlayer->SetDisp(false);
+			pPlayer->SetState(CPlayer::STATE_NONE);
+			pActionUI->SetDisp(false);
+			pJumpMeterUI->SetDispAll(false);
+			pEnergyUI->SetDisp(false);
+			pEnergyUI->SetState(0);
+
+			if (pItemUI != NULL && pScore != NULL)
+			{// NULLチェック
+				pItemUI->SetDispAll(false);
+				pScore->SetDisp(false);
+			}
+		}
+
+		break;
+
+	case STATE_UP:			// 上昇状態
+		pDebugProc->Print("状態 : 上昇状態\n");
+
+		move.y += 0.7f;
+		pos.y += move.y;
+
+		// 位置を適用
+		SetPosition(pos);
+
+		if (pos.y > ((CManager::GetMode() == CScene::MODE_TITLE) ? 150.0f : 500.0f))
+		{// ある程度高くなったら
+			if (CManager::GetMode() == CScene::MODE_GAME)
+			{// ゲーム中
+				// 遷移フラグをON
+				CGame::SetFadeEnable();
+
+				// クリアフラグを立てる
+				CResult::SetClear(true);
+			}
+			else if (CManager::GetMode() == CScene::MODE_TITLE)
+			{// タイトル
+				// 遷移フラグをON
+				CTitle::SetFadeEnable();
+			}
+		}
+		else
+		{// 船を追う
+			// カメラ設定
+			pCamera->SetPosition(D3DXVECTOR3(pos.x, pCamera->GetPositionV().y, pos.z - 400.0f), pos, pCamera->GetRotation(), CCamera::TYPE_STOP);
+		}
+
+		CParticle3D::Create(pos, 1, 3, 10.0f, 0.2f, 0.01f, CEffect3D::TYPE_BLENDADD, CParticle3D::TYPE_HOMING, 300, 2.0f,
+			1.0f, COLOR_ORANGE, 10.0f, true, NULL, D3DXVECTOR3(pos.x, pos.y - 100.0f, pos.z), 0.1f);
+
+		break;
+
+	case STATE_DOWN:		// 下降状態
+		pDebugProc->Print("状態 : 下降状態\n");
+
+		CMountain* pMountain = NULL;							// 山の取得
+		CBeach* pBeach = NULL;									// 砂浜の取得
+
+		float fHeightM = 0.0f;		// 山の地面の高さ
+		D3DXVECTOR2 polygonIdxM = { -1.0f,-1.0f };		// ポリゴン番号
+
+		float fHeightB = 0.0f;		// 砂浜の地面の高さ
+		D3DXVECTOR2 polygonIdxB = { -1.0f,-1.0f };		// ポリゴン番号
+
+		float fHeight = 0.0f;		// 地面の高さ
+
+		// ローカル変数
+		pMountain = CGame::GetMountain();			// 山の取得
+		pBeach = CGame::GetBeach();					// 砂浜の取得
+
+		DoorRot.x = 0.0f;
+		m_apModel[5]->SetRotation(DoorRot);
+
+		if (pMountain != NULL && pBeach != NULL)
+		{// NULLチェック
+			// 山のポリゴン番号を取得
+			polygonIdxM = pMountain->GetPolygonIdx(pos);
+
+			// 山の地面の高さを取得
+			fHeightM = pMountain->GetHeight(pos, polygonIdxM);
+
+			// 砂浜のポリゴン番号を取得
+			polygonIdxB = pBeach->GetPolygonIdx(pos);
+
+			// 砂浜の地面の高さを取得
+			fHeightB = pBeach->GetHeight(pos, polygonIdxB);
+		}
+
+		// 最終的な高さ
+		fHeight = (fHeightM >= fHeightB) ? fHeightM : fHeightB;
+
+		if (fHeight == ERROR_HEIGHT)
+		{// 無効な高さだったら
+			fHeight = 0.0f;
+		}
+
+		if (pos.y > fHeight + 10.0f)
+		{// 落ちる
+			pos.y += (fHeight - pos.y) * 0.005f;
+
+			// カメラ設定
+			pCamera->SetPosition(D3DXVECTOR3(pos.x, fHeight + 100.0f, pos.z - 400.0f), pos, pCamera->GetRotation(), CCamera::TYPE_STOP);
+
+			CParticle3D::Create(pos, 1, 3, 10.0f, 0.2f, 0.01f, CEffect3D::TYPE_BLENDADD, CParticle3D::TYPE_HOMING, 30, 2.0f,
+				1.0f, COLOR_ORANGE, 10.0f, true, NULL, D3DXVECTOR3(pos.x, pos.y - 100.0f, pos.z), 0.1f);
+		}
+		else
+		{// 止まる
+			// カメラ設定
+			pCamera->SetType(CCamera::TYPE_PLAYER);
+
+			pos.y = fHeight;
+			m_state = STATE_OPEN;
+
+			CExplosion::Ray(pos, 20.0f, 2, 2.0f, COLOR_DARKGRAY);
+
+			if (CManager::GetMode() == CScene::MODE_GAME)
+			{// ゲーム中なら
+				pPlayer->SetState(CPlayer::STATE_APPEAR);
+				pPlayer->SetPosition(D3DXVECTOR3(pos.x, pos.y + 7.0f, pos.z));
+				pPlayer->SetDisp(true);
+				pActionUI->SetDisp(true);
+				pJumpMeterUI->SetDispAll(true);
+				pEnergyUI->SetDisp(true);
+				pItemUI->SetDispAll(true);
+				pScore->SetDisp(true);
+			}
+		}
+
+		// 位置を適用
+		SetPosition(pos);
+
+		break;
 	}
+
+	pDebugProc->Print("位置 : %f %f %f\n", pos.x, pos.y, pos.z);
 }
 
 //========================================================================
@@ -410,17 +534,19 @@ bool CShip::Collision(D3DXVECTOR3* pos, D3DXVECTOR3* posOld, D3DXVECTOR3* move,
 		// 各パーツの当たり判定
 		for (int nCntPart = 0; nCntPart < m_nNumModel; nCntPart++)
 		{
-			if (nCntPart != 5)
-			{// 当たり判定するものだけ
-				D3DXVECTOR3 posPart =
-					D3DXVECTOR3(m_apModel[nCntPart]->GetMtxWorld()._41, m_apModel[nCntPart]->GetMtxWorld()._42, m_apModel[nCntPart]->GetMtxWorld()._43);
+			if (nCntPart == 5 && m_state != STATE_CLOSE)
+			{// 当たり判定しないもの
+				continue;
+			}
 
-				CorrectAngle(&m_rot.y, m_rot.y);
+			D3DXVECTOR3 posPart =
+				D3DXVECTOR3(m_apModel[nCntPart]->GetMtxWorld()._41, m_apModel[nCntPart]->GetMtxWorld()._42, m_apModel[nCntPart]->GetMtxWorld()._43);
 
-				if (m_apModel[nCntPart]->Collision(posPart, m_rot, m_scale, pos, posOld, move, fRadius, fHeight) == true)
-				{// 当たっている
-					*pLand = true;
-				}
+			CorrectAngle(&m_rot.y, m_rot.y);
+
+			if (m_apModel[nCntPart]->Collision(posPart, m_rot, m_scale, pos, posOld, move, fRadius, fHeight) == true)
+			{// 当たっている
+				*pLand = true;
 			}
 		}
 

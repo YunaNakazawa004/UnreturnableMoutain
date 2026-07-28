@@ -182,3 +182,18 @@ void CJumpMeterUI::SetJumpMeter(const float fJump)
 	// テクスチャ座標を設定
 	SetTexUV(0.0f, 1.0f, 1.0f - fJump, 1.0f);
 }
+
+//========================================================================
+// 表示設定
+//========================================================================
+void CJumpMeterUI::SetDispAll(const bool bDisp)
+{
+	// 自分の設定
+	SetDisp(bDisp);
+
+	// 枠の設定
+	if (m_pFrame != NULL)
+	{// NULLチェック
+		m_pFrame->SetDisp(bDisp);
+	}
+}

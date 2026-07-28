@@ -34,6 +34,10 @@ public:
 		STATE_APPEAR,		// oŒ»ó‘Ô
 		STATE_NORMAL,		// ’Êíó‘Ô
 		STATE_READY,		// €”õŠ®—¹ó‘Ô
+		STATE_OPEN,			// ŠJ‚­ó‘Ô
+		STATE_CLOSE,		// •Â‚¶‚éó‘Ô
+		STATE_UP,			// ã¸ó‘Ô
+		STATE_DOWN,			// ‰º~ó‘Ô
 		STATE_MAX
 	}STATE;
 

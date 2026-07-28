@@ -35,6 +35,7 @@ public:
 	void Draw(void);
 
 	void SetJumpMeter(const float fJump);
+	void SetDispAll(const bool bDisp);
 
 private:
 	static int m_nIdxTexture;					// テクスチャのインデックス

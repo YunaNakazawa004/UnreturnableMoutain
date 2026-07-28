@@ -55,6 +55,7 @@ public:
 
 	int SetItem(const int Item);
 	void Check(const int nIdx);
+	void SetDispAll(const bool bDisp);
 
 private:
 	static int m_aIdxTexture[TYPE_MAX + 1];		// テクスチャのインデックス

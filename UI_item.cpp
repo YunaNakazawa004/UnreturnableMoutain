@@ -244,3 +244,21 @@ void CItemUI::Check(const int nIdx)
 		m_Item[nIdx].pCheck->SetDisp(true);
 	}
 }
+
+//========================================================================
+// 表示設定
+//========================================================================
+void CItemUI::SetDispAll(const bool bDisp)
+{
+	// 自分の設定
+	SetDisp(bDisp);
+
+	// アイテムの設定
+	for (int nCnt = 0; nCnt < ITEMUI_NUM; nCnt++)
+	{
+		if (m_Item[nCnt].pItem != NULL)
+		{// NULLチェック
+			m_Item[nCnt].pItem->SetDisp(bDisp);
+		}
+	}
+}

@@ -79,7 +79,6 @@ HRESULT CGame::Init(void)
 {
 	// カメラの設定
 	CCamera* pCamera = CManager::GetCamera();
-	pCamera->SetType(CCamera::TYPE_PLAYER);
 
 	// テクスチャを読み込み
 	CEnergyUI::Load();
@@ -115,6 +114,9 @@ HRESULT CGame::Init(void)
 
 			return E_FAIL;
 		}
+
+		m_pEnergyUI->SetState(0);
+		m_pEnergyUI->SetDisp(false);
 	}
 
 	// ジャンプメーターUIを生成
@@ -128,6 +130,8 @@ HRESULT CGame::Init(void)
 
 			return E_FAIL;
 		}
+
+		m_pJumpMeterUI->SetDispAll(false);
 	}
 
 	// アイテムUIを生成
@@ -141,8 +145,10 @@ HRESULT CGame::Init(void)
 
 			return E_FAIL;
 		}
+
+		m_pItemUI->SetDispAll(false);
 	}
-	
+
 	// スコアを生成
 	if (m_pScore == NULL)
 	{// NULLチェック
@@ -156,8 +162,9 @@ HRESULT CGame::Init(void)
 		}
 
 		m_pScore->SetNum(1000000);
+		m_pScore->SetDisp(false);
 	}
-	
+
 	// アクションUIを生成
 	if (m_pActionUI == NULL)
 	{// NULLチェック
@@ -169,6 +176,8 @@ HRESULT CGame::Init(void)
 
 			return E_FAIL;
 		}
+
+		m_pActionUI->SetDisp(false);
 	}
 
 	// 山を生成
@@ -269,12 +278,15 @@ HRESULT CGame::Init(void)
 
 			return E_FAIL;
 		}
+
+		m_pPlayer->SetState(CPlayer::STATE_NONE);
+		m_pPlayer->SetDisp(false);
 	}
 
 	// 船を生成
 	if (m_pShip == NULL)
 	{// NULLチェック
-		m_pShip = CShip::Create(pos, rot);
+		m_pShip = CShip::Create(D3DXVECTOR3(pos.x, pos.y + 1000.0f, pos.z), rot);
 
 		if (m_pShip == NULL)
 		{// NULLチェック
@@ -282,6 +294,10 @@ HRESULT CGame::Init(void)
 
 			return E_FAIL;
 		}
+
+		m_pShip->SetState(CShip::STATE_DOWN);
+
+		pCamera->SetPosition(D3DXVECTOR3(pos.x, pos.y + 5000.0f, pos.z - 400.0f), D3DXVECTOR3(pos.x, pos.y + 200.0f, pos.z), rot, CCamera::TYPE_STOP);
 	}
 
 	return S_OK;
@@ -307,13 +323,13 @@ void CGame::Uninit(void)
 	{// NULLチェック
 		m_pActionUI = NULL;
 	}
-	
+
 	// スコアの破棄
 	if (m_pScore != NULL)
 	{// NULLチェック
 		m_pScore = NULL;
 	}
-	
+
 	// アイテムUIの破棄
 	if (m_pItemUI != NULL)
 	{// NULLチェック
@@ -383,7 +399,7 @@ void CGame::Uninit(void)
 	// 自分自身を破棄
 	CObject::Release();
 #endif
-}
+	}
 
 //========================================================================
 // ゲーム画面クラスの更新処理
@@ -434,8 +450,8 @@ void CGame::Update(void)
 		}
 
 		return;
-	}	
-	
+	}
+
 #ifdef _DEBUG
 	// 画面遷移（デバッグ）
 	if (pInputKeyboard->GetTrigger(DIK_RETURN) == true ||
