@@ -455,7 +455,6 @@ void CGame::Update(void)
 #ifdef _DEBUG
 	// 画面遷移（デバッグ）
 	if (pInputKeyboard->GetTrigger(DIK_RETURN) == true ||
-		pInputJoypad->GetTrigger(0, CInputJoypad::JOYKEY_A) == true ||
 		pInputJoypad->GetTrigger(0, CInputJoypad::JOYKEY_START) == true)
 	{// ENTERが押された
 		if (pTransition != NULL)

@@ -335,6 +335,8 @@ void CShip::Update(void)
 		}
 		else
 		{// ‘D‚ð’Ç‚¤
+			pInputJoypad->SetVibration(0, 20000, 20000, 10);
+
 			// ƒJƒƒ‰Ý’è
 			pCamera->SetPosition(D3DXVECTOR3(pos.x, pCamera->GetPositionV().y, pos.z - 400.0f), pos, pCamera->GetRotation(), CCamera::TYPE_STOP);
 		}
@@ -391,6 +393,8 @@ void CShip::Update(void)
 		if (pos.y > fHeight + 10.0f)
 		{// —Ž‚¿‚é
 			pos.y += (fHeight - pos.y) * 0.005f;
+
+			pInputJoypad->SetVibration(0, 20000, 20000, 10);
 
 			// ƒJƒƒ‰Ý’è
 			pCamera->SetPosition(D3DXVECTOR3(pos.x, fHeight + 100.0f, pos.z - 300.0f), pos, pCamera->GetRotation(), CCamera::TYPE_STOP);

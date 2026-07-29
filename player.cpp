@@ -61,7 +61,7 @@
 #define GRAVITY			(-0.3f)									// d—Í
 #define MAX_ENERGY		(100.0f)								// Å‘åŠŽƒGƒlƒ‹ƒM[
 #define ONE_ENERGY		(10.0f)									// zÎ‚Ð‚Æ‚Â‚ ‚½‚è‚ÌƒGƒlƒ‹ƒM[
-#define MINUS_ENERGY	(90)									// ƒGƒlƒ‹ƒM[Œ¸­‚ÌŠÔŠu
+#define MINUS_ENERGY	(200)									// ƒGƒlƒ‹ƒM[Œ¸­‚ÌŠÔŠu
 #define UNCLIMB_SLOPE	(0.4f)									// “o‚ê‚È‚¢ŒXŽÎ‚ÌŠp“x
 #define OUTMAP			(3000.0f)								// ƒ}ƒbƒvŠO
 
@@ -341,6 +341,15 @@ void CPlayer::Update(void)
 			{// ƒWƒƒƒ“ƒv‚µ‚Ä‚¢‚È‚¢
 				// ƒ‚[ƒVƒ‡ƒ“‚ðÝ’è
 				m_pMotion->Set(MOTIONTYPE_MOVE, true, 20);
+
+				if (m_nCounter % 8 == 0)
+				{// ˆê’èŠÔŠu
+					pInputJoypad->SetVibration(0, 0, 256, 1);
+				}
+				else if (m_nCounter % 8 == 4)
+				{// ˆê’èŠÔŠu
+					pInputJoypad->SetVibration(0, 256, 0, 1);
+				}
 			}
 
 			if (m_state == STATE_NORMAL)
@@ -594,11 +603,16 @@ void CPlayer::Update(void)
 
 	if (pos.y <= fHeight || bLand == true)
 	{// ’n–Ê‚Æ‚Ì“–‚½‚è”»’è
-		if (m_bJump == true && m_state == STATE_NORMAL)
+		static STATE stateOld;
+
+		if (m_bJump == true && (m_state == STATE_NORMAL || m_state == STATE_TUTORIAL))
 		{// ’…’n
 			// ƒ‚[ƒVƒ‡ƒ“‚ðÝ’è
 			m_pMotion->Set(MOTIONTYPE_LANDING, true, 20);
 			m_bLand = true;
+			stateOld = m_state;
+
+			pInputJoypad->SetVibration(0, 10000, 10000, 10);
 
 			// “yšº
 			CExplosion::Ray(pos, 1.0f, 2, 0.5f, D3DXCOLOR(COLOR_DARKGRAY.r, COLOR_DARKGRAY.g, COLOR_DARKGRAY.b, 0.5f));
@@ -617,7 +631,7 @@ void CPlayer::Update(void)
 			m_bLand = false;
 			m_bAct = false;
 
-			m_state = STATE_NORMAL;
+			m_state = stateOld;
 		}
 	}
 	else if (pos.y > fHeight + 5.0f && bLand == false && m_state == STATE_NORMAL)
@@ -637,8 +651,6 @@ void CPlayer::Update(void)
 		// …–Ê‚æ‚è‰º‚É‚¢‚½‚ç…‚µ‚Ô‚«
 		if (fHeightW > fHeight && D3DXVec2Length(&move) >= 0.6f)
 		{// …–Ê‚æ‚è‰º
-			m_nCounter++;
-
 			if (m_nCounter % 10 == 0)
 			{// ˆê’èŠÔŠu
 				CSpray::Create(D3DXVECTOR3(pos.x, fHeightW + 1.0f, pos.z), D3DXVECTOR3(0.0f, 0.0f, 0.0f), 5.0f);
@@ -684,8 +696,6 @@ void CPlayer::Update(void)
 		if (D3DXVec2Length(&move) >= 0.4f)
 		{// ˆÚ“®‚µ‚Ä‚¢‚é
 			CParticle3D::Create(pos, 1, 3, 1.0f, -0.2f, 0.1f, CEffect3D::TYPE_NORMAL_NULL, CParticle3D::TYPE_NORMAL, 2, 2.0f, true, COLOR_BROWN);
-		
-			pInputJoypad->SetVibration(0, 256, 256, 1);
 		}
 	}
 
@@ -788,6 +798,8 @@ void CPlayer::Update(void)
 
 	// ƒ‚[ƒVƒ‡ƒ“‚ÌXV
 	m_pMotion->Update();
+
+	m_nCounter++;
 }
 
 //========================================================================

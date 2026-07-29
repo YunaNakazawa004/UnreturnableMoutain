@@ -422,6 +422,9 @@ void CInputJoypad::Uninit(void)
 {
 	// Xinputのステートを設定(無効にする)
 	XInputEnable(false);
+
+	// 振動の終了処理
+	UninitVibration();
 }
 
 //=============================================================================
@@ -470,6 +473,9 @@ void CInputJoypad::Update(void)
 			m_joyStickSlowCount[nCntJoypad]++;
 		}
 	}
+
+	// 振動の更新
+	UpdateVibration();
 }
 
 //=============================================================================
@@ -682,7 +688,7 @@ void CInputJoypad::UpdateVibration(void)
 		if (m_bUseVib[nCntJoypad] == true && m_EndVib[nCntJoypad] < 0)
 		{// 振動を終わる時になった
 			// 振動を止める
-			m_joykeyVibration[nCntJoypad] = {};
+			m_joykeyVibration[nCntJoypad] = {0};
 			XInputSetState(nCntJoypad, &m_joykeyVibration[nCntJoypad]);
 			m_bUseVib[nCntJoypad] = false;
 		}

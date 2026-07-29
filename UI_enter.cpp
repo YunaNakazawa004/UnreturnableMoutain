@@ -185,6 +185,8 @@ void CEnterUI::Update(void)
 		{// スタート
 			m_state = STATE_BLINK;
 			m_nCounterState = 0;
+
+			pInputJoypad->SetVibration(0, 500, 500, 20);
 		}
 
 		break;
