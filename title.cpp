@@ -23,6 +23,7 @@
 #include "UI_jump_meter.h"
 #include "UI_action.h"
 #include "tutorial_jump.h"
+#include "tutorial_txt.h"
 
 //************************************************************************
 // Ã“Iƒƒ“ƒo•Ï”éŒ¾
@@ -37,6 +38,7 @@ CJumpMeterUI* CTitle::m_pJumpMeterUI = NULL;		// ƒWƒƒƒ“ƒvƒ[ƒ^[UI‚ÌƒCƒ“ƒXƒ^ƒ“ƒ
 CActionUI* CTitle::m_pActionUI = NULL;				// ƒAƒNƒVƒ‡ƒ“UI‚ÌƒCƒ“ƒXƒ^ƒ“ƒX
 CTutorialJump* CTitle::m_pTutorialJumpL = NULL;		// ƒWƒƒƒ“ƒvƒo[‚ÌƒCƒ“ƒXƒ^ƒ“ƒX
 CTutorialJump* CTitle::m_pTutorialJumpR = NULL;		// ƒWƒƒƒ“ƒvƒo[‚ÌƒCƒ“ƒXƒ^ƒ“ƒX
+CTutorialTxt* CTitle::m_apTutorialTxt[NUM_TUTORIALTXT] = {};		// ƒ`ƒ…[ƒgƒŠƒAƒ‹•¶‚ÌƒCƒ“ƒXƒ^ƒ“ƒX
 bool CTitle::m_bTutorial = false;					// ƒ`ƒ…[ƒgƒŠƒAƒ‹’†‚©‚Ç‚¤‚©‚Ìƒtƒ‰ƒO
 bool CTitle::m_bReady = false;						// ƒ`ƒ…[ƒgƒŠƒAƒ‹Š®—¹ƒtƒ‰ƒO
 
@@ -56,6 +58,7 @@ CTitle::CTitle() : CScene(CScene::MODE_TITLE)
 	m_pActionUI = NULL;
 	m_pTutorialJumpL = NULL;
 	m_pTutorialJumpR = NULL;
+	memset(&m_apTutorialTxt[0], NULL, sizeof m_apTutorialTxt);
 	m_bTutorial = false;
 	m_bReady = false;
 }
@@ -82,6 +85,7 @@ HRESULT CTitle::Init(void)
 	CEnergyUI::Load();
 	CJumpMeterUI::Load();
 	CActionUI::Load();
+	CTutorialTxt::Load();
 
 	// ƒ^ƒCƒgƒ‹ƒƒS‚ğ¶¬
 	if (m_pTitleLogo == NULL)
@@ -227,6 +231,22 @@ HRESULT CTitle::Init(void)
 			return E_FAIL;
 		}
 	}
+	
+	// ƒ`ƒ…[ƒgƒŠƒAƒ‹•¶‚ğ¶¬
+	if (m_apTutorialTxt[0] == NULL && m_apTutorialTxt[1] == NULL && m_apTutorialTxt[2] == NULL && m_apTutorialTxt[3] == NULL)
+	{// NULLƒ`ƒFƒbƒN
+		m_apTutorialTxt[0] = CTutorialTxt::Create(D3DXVECTOR3(0.0f, 50.0f, -85.0f), D3DXVECTOR3(0.0f, D3DX_PI, 0.0f), 0);
+		m_apTutorialTxt[1] = CTutorialTxt::Create(D3DXVECTOR3(-240.0f, 50.0f, -120.0f), D3DXVECTOR3(0.0f, D3DX_PI * 1.5f, 0.0f), 1);
+		m_apTutorialTxt[2] = CTutorialTxt::Create(D3DXVECTOR3(0.0f, 50.0f, 110.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), 2);
+		m_apTutorialTxt[3] = CTutorialTxt::Create(D3DXVECTOR3(0.0f, 50.0f, -370.0f), D3DXVECTOR3(0.0f, D3DX_PI, 0.0f), 3);
+
+		if (m_apTutorialTxt[0] == NULL || m_apTutorialTxt[1] == NULL || m_apTutorialTxt[2] == NULL || m_apTutorialTxt[3] == NULL)
+		{// NULLƒ`ƒFƒbƒN
+			OutputDebugStringA("! ! ! ƒ`ƒ…[ƒgƒŠƒAƒ‹•¶‚Ì¶¬‚É¸”s‚µ‚Ü‚µ‚½ ! ! !\n");
+
+			return E_FAIL;
+		}
+	}
 
 	return S_OK;
 }
@@ -237,12 +257,19 @@ HRESULT CTitle::Init(void)
 void CTitle::Uninit(void)
 {
 	// ƒeƒNƒXƒ`ƒƒ‚ğ”jŠü
+	CTutorialTxt::Unload();
 	CActionUI::Unload();
 	CJumpMeterUI::Unload();
 	CEnergyUI::Unload();
 	CEnterUI::Unload();
 	CTitleLogo::Unload();
 
+	// ƒ`ƒ…[ƒgƒŠƒAƒ‹•¶‚Ì”jŠü
+	if (m_apTutorialTxt[0] != NULL || m_apTutorialTxt[1] != NULL || m_apTutorialTxt[2] != NULL || m_apTutorialTxt[3] != NULL)
+	{// NULLƒ`ƒFƒbƒN
+		memset(&m_apTutorialTxt[0], NULL, sizeof m_apTutorialTxt);
+	}
+	
 	// ƒWƒƒƒ“ƒvƒo[‚Ì”jŠü
 	if (m_pTutorialJumpR != NULL)
 	{// NULLƒ`ƒFƒbƒN

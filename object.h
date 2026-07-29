@@ -76,6 +76,7 @@ public:
 		TYPE_LAB,				// 研究所
 		TYPE_ENERGYROCK,		// エネルギー鉱物
 		TYPE_JUMP,				// ジャンプバー
+		TYPE_TUTORIAL_TXT,		// チュートリアル文
 		TYPE_GRASS,				// 草
 		TYPE_TREE,				// 木
 		TYPE_ROCK,				// 岩

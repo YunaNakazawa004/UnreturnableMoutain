@@ -22,6 +22,12 @@ class CEnergyUI;
 class CJumpMeterUI;
 class CActionUI;
 class CTutorialJump;
+class CTutorialTxt;
+
+//************************************************************************
+// マクロ定義
+//************************************************************************
+#define NUM_TUTORIALTXT		(4)		// チュートリアル文の数
 
 //************************************************************************
 // タイトル画面クラス
@@ -47,6 +53,7 @@ public:
 	static CActionUI* GetActionUI(void) { return m_pActionUI; }
 	static CTutorialJump* GetTutorialJumpL(void) { return m_pTutorialJumpL; }
 	static CTutorialJump* GetTutorialJumpR(void) { return m_pTutorialJumpR; }
+	static CTutorialTxt* GetTutorialTxt(const int nIdx) { return m_apTutorialTxt[nIdx]; }
 
 private:
 	static CTitleLogo* m_pTitleLogo;				// タイトルロゴのインスタンス
@@ -59,6 +66,7 @@ private:
 	static CActionUI* m_pActionUI;					// アクションUIのインスタンス
 	static CTutorialJump* m_pTutorialJumpL;			// ジャンプバーのインスタンス
 	static CTutorialJump* m_pTutorialJumpR;			// ジャンプバーのインスタンス
+	static CTutorialTxt* m_apTutorialTxt[NUM_TUTORIALTXT];			// チュートリアル文のインスタンス
 
 	static bool m_bTutorial;		// チュートリアル中かどうかのフラグ
 	static bool m_bReady;			// チュートリアル完了フラグ

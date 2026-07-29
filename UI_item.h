@@ -55,6 +55,7 @@ public:
 
 	int SetItem(const int Item);
 	void Check(const int nIdx);
+	void SetDispWOCheck(const bool bDisp);
 	void SetDispAll(const bool bDisp);
 
 private:
