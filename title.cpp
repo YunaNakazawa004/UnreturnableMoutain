@@ -9,6 +9,7 @@
 #include "renderer.h"
 #include "manager.h"
 #include "input.h"
+#include "sound.h"
 #include "debugproc.h"
 #include "camera.h"
 #include "fade.h"

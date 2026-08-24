@@ -9,6 +9,7 @@
 #include "manager.h"
 #include "debugproc.h"
 #include "input.h"
+#include "sound.h"
 
 #include "object.h"
 #include "particle3D.h"
@@ -201,6 +202,7 @@ bool CMapObject::CollectCollision(const D3DXVECTOR3 pos, const int nIdx)
 {
 	CItemUI* pItemUI = CGame::GetItemUI();		// アイテムUIを取得
 	CScore* pScore = CGame::GetScore();			// スコアを取得
+	CSound* pSound = CManager::GetSound();		// サウンドを取得
 	D3DXVECTOR3 posPlayer = CGame::GetPlayer()->GetPosition();
 	D3DXVECTOR3 dist;
 
@@ -220,6 +222,8 @@ bool CMapObject::CollectCollision(const D3DXVECTOR3 pos, const int nIdx)
 
 		// スコア加算
 		pScore->Add(20000);
+
+		pSound->PlaySound(CSound::SE_COLLECT);
 
 		// 総数を減らす
 		m_nNumCollectObj--;

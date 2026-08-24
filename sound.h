@@ -18,16 +18,22 @@ public:
 	// サウンド一覧
 	typedef enum
 	{
-		SOUND_BGM_GAME,						// ゲームBGM
-		SOUND_SE_SHOT,						// ショット
-		SOUND_SE_HIT,						// ヒット
-		SOUND_SE_BURST,						// バースト
-		SOUND_SE_ENTER,						// 選択
-		SOUND_SE_CANCEL,					// キャンセル
-		SOUND_SE_CLEAR,						// クリア
-		SOUND_SE_FAIL,						// 失敗
-		SOUND_SE_CURSOR,					// カーソル
-		SOUND_SE_PAUSE,						// ポーズ
+		BGM_TITLE,					// タイトルBGM
+		BGM_GAME,					// ゲームBGM
+		SE_COLLECT,					// 収集
+		SE_ROBOT_ENERGY,			// エネルギー収集時のロボットアーム
+		SE_ENERGY,					// エネルギー回収
+		SE_ENTER,					// 選択
+		SE_JUMPCLEAR,				// チュートリアルのジャンプクリア
+		SE_LEAVE,					// 出発ボタン選択
+		SE_OPENCLOSE,				// 開閉
+		SE_CURSOR,					// カーソル
+		SE_PAUSE,					// ポーズ
+		SE_ROCKET,					// ロケット発射
+		SE_SEA,						// 海
+		SE_TIRE,					// タイヤ
+		SE_WIND,					// 風
+		SE_DECISION,				// 判定
 		SOUND_MAX,
 	} SOUND_LABEL;
 

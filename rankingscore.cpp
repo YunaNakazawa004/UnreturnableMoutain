@@ -142,6 +142,7 @@ void CRankingScore::Update(void)
 	// ローカル変数
 	CInputKeyboard* pInputKeyboard = CManager::GetInputKeyboard();		// キーボード入力の取得
 	CInputJoypad* pInputJoypad = CManager::GetInputJoypad();			// ジョイパッド入力の取得
+	CSound* pSound = CManager::GetSound();								// サウンドを取得
 	static int nUpdateCounter = 0;
 	nUpdateCounter++;
 
@@ -160,6 +161,7 @@ void CRankingScore::Update(void)
 					pInputJoypad->GetTrigger(0, CInputJoypad::JOYKEY_START) == true)
 				{// 途中でキーを押すとスキップ
 					pos.x = SCORE_POS_X;
+					pSound->PlaySound(CSound::SE_ENTER);
 
 					// 振動
 					pInputJoypad->SetVibration(0, 2000, 3000, 10);

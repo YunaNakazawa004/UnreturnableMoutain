@@ -9,6 +9,7 @@
 #include "renderer.h"
 #include "manager.h"
 #include "input.h"
+#include "sound.h"
 #include "debugproc.h"
 #include "texture.h"
 
@@ -160,6 +161,7 @@ void CEnterUI::Update(void)
 	CInputKeyboard* pInputKeyboard = CManager::GetInputKeyboard();		// キーボード入力の取得
 	CInputJoypad* pInputJoypad = CManager::GetInputJoypad();			// ジョイパッド入力の取得
 	CInputMouse* pInputMouse = CManager::GetInputMouse();				// マウス入力の取得
+	CSound* pSound = CManager::GetSound();								// サウンドを取得
 	CPlayer* pPlayer = CTitle::GetPlayer();
 	D3DXCOLOR col = GetColor();
 
@@ -186,6 +188,7 @@ void CEnterUI::Update(void)
 			m_state = STATE_BLINK;
 			m_nCounterState = 0;
 
+			pSound->PlaySound(CSound::SE_ENTER);
 			pInputJoypad->SetVibration(0, 500, 500, 20);
 		}
 

@@ -10,6 +10,8 @@
 #include "game.h"
 #include "result.h"
 #include "ranking.h"
+#include "manager.h"
+#include "sound.h"
 
 //************************************************************************
 // 静的メンバ変数宣言
@@ -44,6 +46,7 @@ CScene::~CScene()
 //========================================================================
 CScene* CScene::Create(const CScene::MODE mode)
 {
+	CSound* pSound = CManager::GetSound();
 	CScene* pScene = NULL;
 
 	if (pScene == NULL)
@@ -53,21 +56,25 @@ CScene* CScene::Create(const CScene::MODE mode)
 		{
 		case MODE_TITLE:		// タイトル
 			pScene = new CTitle;
+			pSound->PlaySound(CSound::BGM_TITLE);
 
 			break;
 
 		case MODE_GAME:			// ゲーム
 			pScene = new CGame;
+			pSound->PlaySound(CSound::BGM_GAME);
 
 			break;
 
 		case MODE_RESULT:		// リザルト
 			pScene = new CResult;
+			pSound->PlaySound(CSound::BGM_GAME);
 
 			break;
 
 		case MODE_RANKING:		// ランキング
 			pScene = new CRanking;
+			pSound->PlaySound(CSound::BGM_TITLE);
 
 			break;
 		}

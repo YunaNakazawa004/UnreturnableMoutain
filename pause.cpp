@@ -9,6 +9,7 @@
 #include "renderer.h"
 #include "manager.h"
 #include "input.h"
+#include "sound.h"
 #include "fade.h"
 #include "transition.h"
 
@@ -119,6 +120,7 @@ void CPause::Update(void)
 	CInputJoypad* pInputJoypad = CManager::GetInputJoypad();			// ジョイパッド入力の取得
 	CFade* pFade = CManager::GetFade();									// フェードの取得
 	CTransition* pTransition = CManager::GetTransition();				// 画面遷移の取得
+	CSound* pSound = CManager::GetSound();								// サウンドを取得
 
 	for (int nCnt = 0; nCnt < MENU_MAX; nCnt++)
 	{
@@ -147,7 +149,7 @@ void CPause::Update(void)
 			CManager::SetPause(false);
 
 			// サウンドの再生
-			//PlaySound(SOUND_LABEL_SE_CONTINUE);
+			pSound->PlaySound(CSound::SE_PAUSE);
 
 			break;
 
@@ -160,7 +162,7 @@ void CPause::Update(void)
 			}
 
 			// サウンドの再生
-			//PlaySound(SOUND_LABEL_SE_RETRY);
+			pSound->PlaySound(CSound::SE_ENTER);
 
 			break;
 
@@ -173,7 +175,7 @@ void CPause::Update(void)
 			}
 
 			// サウンドの再生
-			//PlaySound(SOUND_LABEL_SE_QUIT);
+			pSound->PlaySound(CSound::SE_ENTER);
 
 			break;
 		}
@@ -192,7 +194,7 @@ void CPause::Update(void)
 			m_nMenu = (m_nMenu + MENU_MAX - 1) % MENU_MAX;
 
 			// サウンドの再生
-			//PlaySound(SOUND_LABEL_SE_CURSOR);
+			pSound->PlaySound(CSound::SE_CURSOR);
 		}
 
 		else if (pInputKeyboard->GetRepeat(DIK_S) == true || pInputJoypad->GetRepeat(0, CInputJoypad::JOYKEY_DOWN) == true || 
@@ -201,7 +203,7 @@ void CPause::Update(void)
 			m_nMenu = (m_nMenu + 1) % MENU_MAX;
 
 			// サウンドの再生
-			//PlaySound(SOUND_LABEL_SE_CURSOR);
+			pSound->PlaySound(CSound::SE_CURSOR);
 		}
 	}
 }

@@ -18,16 +18,22 @@ DWORD CSound::m_aSizeAudio[SOUND_MAX] = {};							// オーディオデータサイズ
 // サウンドの情報
 CSound::SOUNDINFO CSound::m_aSoundInfo[SOUND_MAX] =
 {
-	{"data/BGM/bgm000.wav",-1},				// ゲームBGM
-	{"data/SE/shot000.wav",0},				// ショット
-	{"data/SE/hit000.wav",0},				// ヒット
-	{"data/SE/burst000.wav",0},				// バースト
-	{"data/SE/enter000.wav",0},				// 選択
-	{"data/SE/cancel000.wav",0},			// キャンセル
-	{"data/SE/clear000.wav",0},				// クリア
-	{"data/SE/fail000.wav",0},				// 失敗
-	{"data/SE/cursor000.wav",0},			// カーソル
-	{"data/SE/pause000.wav",0},				// ポーズ
+	{"data/BGM/title.wav",-1},				// タイトルBGM
+	{"data/BGM/game.wav",-1},				// ゲームBGM
+	{"data/SE/collect.wav",0},				// 収集
+	{"data/SE/robot_energy.wav",0},			// エネルギー収集時のロボットアーム
+	{"data/SE/energy.wav",0},				// エネルギー回収
+	{"data/SE/enter.wav",0},				// 選択
+	{"data/SE/jumpclear.wav",0},			// チュートリアルのジャンプクリア
+	{"data/SE/leave.wav",0},				// 出発ボタン選択
+	{"data/SE/openclose.wav",0},			// 開閉
+	{"data/SE/cursor.wav",0},				// カーソル
+	{"data/SE/pause.wav",0},				// ポーズ
+	{"data/SE/rocket.wav",0},				// ロケット発射
+	{"data/SE/sea.wav",0},					// 海
+	{"data/SE/tire.wav",0},					// タイヤ
+	{"data/SE/wind.wav",0},					// 風
+	{"data/SE/decision.wav",0},				// 判定
 };
 
 //=============================================================================

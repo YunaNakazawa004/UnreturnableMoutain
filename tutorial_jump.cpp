@@ -8,6 +8,7 @@
 
 #include "renderer.h"
 #include "manager.h"
+#include "sound.h"
 #include "texture.h"
 
 #include "title.h"
@@ -185,6 +186,7 @@ void CTutorialJump::Draw(void)
 void CTutorialJump::CollisionPlayer(void)
 {
 	CPlayer* pPlayer = CTitle::GetPlayer();
+	CSound* pSound = CManager::GetSound();		// ƒTƒEƒ“ƒh‚ðŽæ“¾
 	D3DXVECTOR3 pos = GetPosition();
 	D3DXVECTOR3 posP = pPlayer->GetPosition();
 	float fHeight = pPlayer->GetHeight();
@@ -197,6 +199,11 @@ void CTutorialJump::CollisionPlayer(void)
 		if (pos.y < posP.y + fHeight)
 		{// G‚Á‚½
 			SetColor(COLOR_GREEN);
+
+			if (m_bClear == false)
+			{// ˆê‰ñ‚¾‚¯
+				pSound->PlaySound(CSound::SE_JUMPCLEAR);
+			}
 
 			m_bClear = true;
 		}

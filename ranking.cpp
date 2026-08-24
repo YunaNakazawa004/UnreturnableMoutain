@@ -65,14 +65,6 @@ CRanking::~CRanking()
 //=============================================================================
 HRESULT CRanking::Init(void)
 {
-	CSound* pSound = CManager::GetSound();
-
-	// サウンドの停止
-	pSound->StopSound();
-
-	// サウンドの開始
-	pSound->PlaySound(CSound::SOUND_BGM_GAME);
-
 	// カメラの設定
 	CCamera* pCamera = CManager::GetCamera();
 	pCamera->SetPosition(D3DXVECTOR3(0.0f, 30.0f, -400.0f), DEFAULT_VECTER3, DEFAULT_VECTER3, CCamera::TYPE_STOP);
@@ -196,6 +188,7 @@ void CRanking::Update(void)
 	CInputKeyboard* pInputKeyboard = CManager::GetInputKeyboard();		// キーボード入力の取得
 	CInputJoypad* pInputJoypad = CManager::GetInputJoypad();			// ジョイパッド入力の取得
 	CFade* pFade = CManager::GetFade();									// フェードの取得
+	CSound* pSound = CManager::GetSound();								// サウンドを取得
 
 	m_nModeCounter++;
 
@@ -205,6 +198,7 @@ void CRanking::Update(void)
 		pInputJoypad->GetTrigger(0, CInputJoypad::JOYKEY_START) == true || 
 		m_nModeCounter >= TITLE_COUNT) && isFade() == true)
 	{// ENTERが押された
+		pSound->PlaySound(CSound::SE_ENTER);
 		m_nModeCounter = 0;
 
 		if (pFade != NULL)

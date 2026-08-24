@@ -9,6 +9,7 @@
 #include "renderer.h"
 #include "manager.h"
 #include "input.h"
+#include "sound.h"
 #include "debugproc.h"
 #include "camera.h"
 #include "fade.h"
@@ -320,6 +321,7 @@ void CResult::Update(void)
 	CInputKeyboard* pInputKeyboard = CManager::GetInputKeyboard();		// キーボード入力の取得
 	CInputJoypad* pInputJoypad = CManager::GetInputJoypad();			// ジョイパッド入力の取得
 	CFade* pFade = CManager::GetFade();									// フェードの取得
+	CSound* pSound = CManager::GetSound();								// サウンドを取得
 
 	// 画面遷移
 	if ((pInputKeyboard->GetTrigger(DIK_RETURN) == true ||
@@ -329,6 +331,7 @@ void CResult::Update(void)
 		if (pFade != NULL)
 		{// NULLチェック
 			CRanking::SetUserScore(m_pFinalScore->GetScore());
+			pSound->PlaySound(CSound::SE_ENTER);
 
 			pFade->SetFade(MODE_RANKING);
 		}

@@ -10,6 +10,7 @@
 #include "manager.h"
 #include "debugproc.h"
 #include "input.h"
+#include "sound.h"
 #include "texture.h"
 
 #include "game.h"
@@ -226,6 +227,7 @@ void CPlayer::Update(void)
 	CInputKeyboard* pInputKeyboard = CManager::GetInputKeyboard();		// キーボード入力の取得
 	CInputJoypad* pInputJoypad = CManager::GetInputJoypad();			// ジョイパッド入力の取得
 	CDebugProc* pDebugProc = CManager::GetDebugProc();					// デバッグ表示の取得
+	CSound* pSound = CManager::GetSound();								// サウンドを取得
 	CMountain* pMountain = CGame::GetMountain();						// 山の取得
 	CBeach* pBeach = CGame::GetBeach();									// 砂浜の取得
 	CWaterSurface* pWaterSurface = CGame::GetWaterSurface();			// 水面の取得
@@ -345,6 +347,8 @@ void CPlayer::Update(void)
 				if (m_nCounter % 8 == 0)
 				{// 一定間隔
 					pInputJoypad->SetVibration(0, 0, 256, 1);
+
+					pSound->PlaySound(CSound::SE_TIRE);
 				}
 				else if (m_nCounter % 8 == 4)
 				{// 一定間隔
@@ -654,6 +658,7 @@ void CPlayer::Update(void)
 			if (m_nCounter % 10 == 0)
 			{// 一定間隔
 				CSpray::Create(D3DXVECTOR3(pos.x, fHeightW + 1.0f, pos.z), D3DXVECTOR3(0.0f, 0.0f, 0.0f), 5.0f);
+				pSound->PlaySound(CSound::SE_SEA);
 			}
 
 			// エネルギーを消費する
@@ -706,6 +711,7 @@ void CPlayer::Update(void)
 		{// 回収するキーを押した
 			// モーションを設定
 			m_pMotion->Set(MOTIONTYPE_ACTION, true, 20);
+			pSound->PlaySound(CSound::SE_ROBOT_ENERGY);
 
 			m_bAct = true;
 			m_bLand = false;
@@ -718,6 +724,7 @@ void CPlayer::Update(void)
 
 		// とる
 		pEnergyRock->Minus(1);
+		pSound->PlaySound(CSound::SE_ENERGY);
 
 		// エネルギー回収
 		m_fEnergy += ONE_ENERGY;
@@ -787,6 +794,19 @@ void CPlayer::Update(void)
 
 		// 使用エネルギー量を設定
 		CUsedEnergy::SetUsedEnergy((int)(m_fUsedEnergy * 1000.0f));
+	}
+
+	if (CManager::GetMode() == CScene::MODE_GAME)
+	{// ゲーム中
+		if (m_nCounter % 1800 == 0)
+		{// 環境音
+			pSound->PlaySound(CSound::SE_WIND);
+		}
+
+		if (pos.y < 200.0f && m_nCounter % 1800 == 0)
+		{// 海の音
+			pSound->PlaySound(CSound::SE_SEA);
+		}
 	}
 
 	// 位置/向きを適用

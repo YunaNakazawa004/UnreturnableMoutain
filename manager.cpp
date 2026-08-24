@@ -146,8 +146,6 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 
 			return E_FAIL;
 		}
-
-		m_pSound->PlaySoundA(CSound::SOUND_BGM_GAME);
 	}
 
 	// カメラの生成
@@ -484,7 +482,7 @@ void CManager::Update(void)
 		{// ポーズ切り替え
 			m_bPause = m_bPause ? false : true;
 
-			m_pSound->PlaySoundA(CSound::SOUND_SE_PAUSE);
+			m_pSound->PlaySoundA(CSound::SE_PAUSE);
 		}
 
 		if (m_pInputKeyboard->GetTrigger(DIK_F8) == true)

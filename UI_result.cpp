@@ -9,6 +9,7 @@
 #include "renderer.h"
 #include "manager.h"
 #include "input.h"
+#include "sound.h"
 #include "debugproc.h"
 #include "texture.h"
 
@@ -172,6 +173,7 @@ void CResultUI::Update(void)
 	// ローカル変数
 	CInputKeyboard* pInputKeyboard = CManager::GetInputKeyboard();		// キーボード入力の取得
 	CInputJoypad* pInputJoypad = CManager::GetInputJoypad();			// ジョイパッド入力の取得
+	CSound* pSound = CManager::GetSound();								// サウンドを取得
 	CUsedEnergy* pUsedEnergy = CResult::GetUsedEnergy();		// 使用エネルギー量の取得
 	CScore* pBaseScore = CResult::GetBaseScore();				// 基礎スコアの取得
 	CCollectNum* pCollectNum = CResult::GetCollectNum();		// 収集数の取得
@@ -214,6 +216,7 @@ void CResultUI::Update(void)
 			pInputJoypad->GetTrigger(0, CInputJoypad::JOYKEY_START) == true)
 		{// キーが押された
 			m_pDecision->SetDisp(true);
+			pSound->PlaySound(CSound::SE_DECISION);
 
 			CResult::SetFadeEnable();
 		}

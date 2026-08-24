@@ -10,6 +10,7 @@
 #include "manager.h"
 #include "debugproc.h"
 #include "input.h"
+#include "sound.h"
 #include "texture.h"
 
 #include "game.h"
@@ -170,6 +171,7 @@ void CShip::Update(void)
 	CInputKeyboard* pInputKeyboard = CManager::GetInputKeyboard();		// キーボード入力の取得
 	CInputJoypad* pInputJoypad = CManager::GetInputJoypad();			// ジョイパッド入力の取得
 	CCamera* pCamera = CManager::GetCamera();							// カメラの取得
+	CSound* pSound = CManager::GetSound();								// サウンドを取得
 	CDebugProc* pDebugProc = CManager::GetDebugProc();		// デバッグ表示の取得
 	CMapObject* pMapObj = NULL;								// マップオブジェクトの取得
 	CPlayer* pPlayer = (CManager::GetMode() == CScene::MODE_GAME) ?
@@ -242,7 +244,10 @@ void CShip::Update(void)
 
 			if (pInputKeyboard->GetTrigger(DIK_E) == true || pInputJoypad->GetTrigger(0, CInputJoypad::JOYKEY_B) == true)
 			{// ボタンを押した
+				pSound->PlaySound(CSound::SE_LEAVE);
+
 				m_state = STATE_CLOSE;
+				pSound->PlaySound(CSound::SE_OPENCLOSE);
 
 				return;
 			}
@@ -287,6 +292,8 @@ void CShip::Update(void)
 			DoorRot.x = 0.0f;
 
 			m_state = STATE_UP;
+			pSound->PlaySound(CSound::SE_ROCKET);
+
 			pPlayer->SetDisp(false);
 			pPlayer->SetState(CPlayer::STATE_NONE);
 			pActionUI->SetDisp(false);
@@ -413,6 +420,7 @@ void CShip::Update(void)
 
 			pos.y = fHeight;
 			m_state = STATE_OPEN;
+			pSound->PlaySound(CSound::SE_OPENCLOSE);
 
 			CExplosion::Ray(pos, 20.0f, 2, 2.0f, COLOR_DARKGRAY);
 

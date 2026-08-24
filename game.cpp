@@ -9,6 +9,7 @@
 #include "renderer.h"
 #include "manager.h"
 #include "input.h"
+#include "sound.h"
 #include "debugproc.h"
 #include "camera.h"
 #include "pause.h"
@@ -80,6 +81,8 @@ HRESULT CGame::Init(void)
 {
 	// カメラの設定
 	CCamera* pCamera = CManager::GetCamera();
+
+	CSound* pSound = CManager::GetSound();		// サウンドを取得
 
 	// テクスチャを読み込み
 	CEnergyUI::Load();
@@ -300,6 +303,7 @@ HRESULT CGame::Init(void)
 		}
 
 		m_pShip->SetState(CShip::STATE_DOWN);
+		pSound->PlaySound(CSound::SE_ROCKET);
 
 		pCamera->SetPosition(D3DXVECTOR3(pos.x, pos.y + 5000.0f, pos.z - 400.0f), D3DXVECTOR3(pos.x, pos.y + 200.0f, pos.z), rot, CCamera::TYPE_STOP);
 	}
