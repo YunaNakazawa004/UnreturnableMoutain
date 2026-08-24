@@ -72,6 +72,7 @@ public:
 		TYPE_MOUNTAIN,			// 山
 		TYPE_BEACH,				// 砂浜
 		TYPE_WATERSURFACE,		// 海
+		TYPE_CLOUD,				// 雲
 		TYPE_PLAYER,			// プレイヤー
 		TYPE_SHIP,				// 船
 		TYPE_LAB,				// 研究所

@@ -15,6 +15,7 @@
 #include "fade.h"
 #include "transition.h"
 
+#include "cloud.h"
 #include "mountain.h"
 #include "beach.h"
 #include "watersurface.h"
@@ -89,6 +90,7 @@ HRESULT CGame::Init(void)
 	CWaterSurface::Load();
 	CGrass::Load();
 	CActionUI::Load();
+	CCloud::Load();
 
 	// ポーズを生成
 	if (m_pPause == NULL)
@@ -179,6 +181,8 @@ HRESULT CGame::Init(void)
 
 		m_pActionUI->SetDisp(false);
 	}
+
+	CCloud::Create(DEFAULT_VECTER3, DEFAULT_VECTER3, D3DXVECTOR2(16.0f, 8.0f), 10000.0f);
 
 	// 山を生成
 	if (m_pMountain == NULL)
@@ -309,6 +313,7 @@ HRESULT CGame::Init(void)
 void CGame::Uninit(void)
 {
 	// テクスチャを破棄
+	CCloud::Unload();
 	CActionUI::Unload();
 	CGrass::Unload();
 	CWaterSurface::Unload();

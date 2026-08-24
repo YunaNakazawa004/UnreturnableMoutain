@@ -18,6 +18,7 @@ class CLab;
 class CUsedEnergy;
 class CScore;
 class CRankingScore;
+class CRankingUI;
 
 //*****************************************************************************
 // ランキングクラス
@@ -36,6 +37,7 @@ public:
 	static CShip* GetShip(void) { return m_pShip; }
 	static CLab* GetLab(void) { return m_pLab; }
 	static CRankingScore* GetRankingScore(void) { return m_pRankingScore; }
+	static CRankingUI* GetRankingUI(void) { return m_pRankingUI; }
 
 	static void SetUserScore(const int nScore) { m_nUserScore = nScore; }
 
@@ -43,6 +45,7 @@ private:
 	static CShip* m_pShip;							// 船のインスタンス
 	static CLab* m_pLab;							// 研究所のインスタンス
 	static CRankingScore* m_pRankingScore;			// ランキングスコアのインスタンス
+	static CRankingUI* m_pRankingUI;				// ランキングUIのインスタンス
 
 	static int m_nUserScore;						// 現在プレイヤーのスコア
 	static int m_nModeCounter;						// 自動画面遷移のカウント

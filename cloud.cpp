@@ -1,10 +1,10 @@
 //========================================================================
 // 
-// 山 [ mountain.cpp ]
+// 雲 [ cloud.cpp ]
 // Author : Nakazawa Yuna
 // 
 //========================================================================
-#include "mountain.h"
+#include "cloud.h"
 
 #include "renderer.h"
 #include "manager.h"
@@ -19,21 +19,20 @@
 //************************************************************************
 // 静的メンバ変数宣言
 //************************************************************************
-int CMountain::m_aIdxTexture[FIELD_TEXTURE_NUM] = {};				// テクスチャのインデックス
+int CCloud::m_nIdxTexture = {};				// テクスチャのインデックス
 
 //========================================================================
 // テクスチャの生成
 //========================================================================
-HRESULT CMountain::Load(void)
+HRESULT CCloud::Load(void)
 {
 	// ローカル変数宣言
 	CTexture* pTexture = CManager::GetTexture();			// テクスチャへのポインタ
 
 	// テクスチャの設定
-	m_aIdxTexture[0] = pTexture->Register("data\\TEXTURE\\field002.jpg");
-	m_aIdxTexture[1] = pTexture->Register("data\\TEXTURE\\rock.jpg");
+	m_nIdxTexture = pTexture->Register("data\\TEXTURE\\sky001.png");
 
-	if (m_aIdxTexture[0] == -1 || m_aIdxTexture[1] == -1)
+	if (m_nIdxTexture == -1)
 	{// テクスチャが設定できていない
 		OutputDebugStringA("! ! ! テクスチャの設定に失敗しました ! ! !\n");
 
@@ -46,17 +45,17 @@ HRESULT CMountain::Load(void)
 //========================================================================
 // テクスチャの破棄
 //========================================================================
-void CMountain::Unload(void)
+void CCloud::Unload(void)
 {
 	// テクスチャのインデックスを削除
-	memset(&m_aIdxTexture[0], -1, sizeof m_aIdxTexture);
+	memset(&m_nIdxTexture, -1, sizeof m_nIdxTexture);
 }
 
 //========================================================================
-// 山クラスの生成処理
+// 雲クラスの生成処理
 //========================================================================
-CMountain* CMountain::Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot, const D3DXVECTOR2 block,
-	const D3DXVECTOR2 size)
+CCloud* CCloud::Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot, const D3DXVECTOR2 block,
+	const float fRadius)
 {
 #ifndef LIST
 	if (CObject::GetNumAll() >= MAX_OBJECT)
@@ -67,110 +66,100 @@ CMountain* CMountain::Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot, const
 	}
 #endif
 
-	CMountain* pMountain = NULL;
+	CCloud* pCloud = NULL;
 
-	if (pMountain == NULL)
+	if (pCloud == NULL)
 	{// NULLチェック
-		// 山の生成
-		pMountain = new CMountain;
+		// 雲の生成
+		pCloud = new CCloud;
 	}
 
-	if (pMountain != NULL)
+	if (pCloud != NULL)
 	{// NULLチェック
 		// 初期化処理
-		if (FAILED(pMountain->Init(pos, rot, block, size)))
+		if (FAILED(pCloud->Init(pos, rot, block, fRadius)))
 		{// もし失敗した場合
-			OutputDebugStringA("! ! ! 山の初期化に失敗しました ! ! !\n");
+			OutputDebugStringA("! ! ! 雲の初期化に失敗しました ! ! !\n");
 
 			return NULL;
 		}
 
 		// 種類を設定
-		pMountain->SetType(TYPE_MOUNTAIN);
+		pCloud->SetType(TYPE_CLOUD);
 
 		// テクスチャを設定
-		pMountain->BindTexture(&m_aIdxTexture[0]);
+		pCloud->BindTexture(m_nIdxTexture);
 
-		return pMountain;
+		return pCloud;
 	}
 
-	OutputDebugStringA("! ! ! 山の生成に失敗しました ! ! !\n");
+	OutputDebugStringA("! ! ! 雲の生成に失敗しました ! ! !\n");
 
 	return NULL;
 }
 
 //========================================================================
-// 山クラスのコンストラクタ
+// 雲クラスのコンストラクタ
 //========================================================================
-CMountain::CMountain(const int nPriority) :CMeshField(nPriority)
+CCloud::CCloud(const int nPriority) :CMeshDome(nPriority)
 {
-	// 山クラスの値をクリア
+	// 雲クラスの値をクリア
 }
 
 //========================================================================
-// 山クラスのデストラクタ
+// 雲クラスのデストラクタ
 //========================================================================
-CMountain::~CMountain()
+CCloud::~CCloud()
 {
 }
 
 //========================================================================
-// 山クラスの初期化処理(オーバーロード)
+// 雲クラスの初期化処理(オーバーロード)
 //========================================================================
-HRESULT CMountain::Init(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot,
-	const D3DXVECTOR2 block, const D3DXVECTOR2 size)
+HRESULT CCloud::Init(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot,
+	const D3DXVECTOR2 block, const float fRadius)
 {
 	// 初期化処理
-	CMeshField::Init(pos, rot, block, size);
+	CMeshDome::Init(pos, rot, block, fRadius);
 
 	return S_OK;
 }
 
 //========================================================================
-// 山クラスの終了処理
+// 雲クラスの終了処理
 //========================================================================
-void CMountain::Uninit(void)
+void CCloud::Uninit(void)
 {
 	// 終了処理
-	CMeshField::Uninit();
+	CMeshDome::Uninit();
 }
 
 //========================================================================
-// 山クラスの更新処理
+// 雲クラスの更新処理
 //========================================================================
-void CMountain::Update(void)
+void CCloud::Update(void)
 {
+	for (int nCount = 0; nCount < GetNumVtx(); nCount++)
+	{
+		SetTexScroll(nCount, 0.0001f, 0.0f);
+	}
 }
 
 //========================================================================
-// 山クラスの描画処理
+// 雲クラスの描画処理
 //========================================================================
-void CMountain::Draw(void)
+void CCloud::Draw(void)
 {
 	// ローカル変数宣言
 	CRenderer* pRenderer = CManager::GetRenderer();			// レンダラーへのポインタ
 	LPDIRECT3DDEVICE9 pDevice = pRenderer->GetDevice();		// デバイスへのポインタ
 
-	// テクスチャステージステート0の設定
-	pDevice->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
-	pDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
-	pDevice->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_DIFFUSE);
-
-	// テクスチャステージステート1の設定
-	pDevice->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_BLENDCURRENTALPHA);
-	pDevice->SetTextureStageState(1, D3DTSS_COLORARG1, D3DTA_TEXTURE);
-	pDevice->SetTextureStageState(1, D3DTSS_COLORARG2, D3DTA_CURRENT);
-	pDevice->SetTextureStageState(1, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
-	pDevice->SetTextureStageState(1, D3DTSS_ALPHAARG1, D3DTA_TFACTOR);
+	// ライティングオフ
+	pDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
 
 	// 描画処理
-	CMeshField::Draw();
+	CMeshDome::Draw();
 
-	// テクスチャステージステートの設定
-	pDevice->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
-
-	// テクスチャステージステートの設定
-	pDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
-	pDevice->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
-	pDevice->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_CURRENT);
+	// ライティングオン
+	pDevice->SetRenderState(D3DRS_LIGHTING, TRUE);
 }

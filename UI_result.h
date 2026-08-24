@@ -27,6 +27,7 @@ public:
 	{
 		TYPE_CLEAR = 0,		// クリア
 		TYPE_GAMEOVER,		// ゲームオーバー
+		TYPE_REPORT,		// 報告書
 		TYPE_MAX
 	}TYPE;
 
@@ -43,7 +44,9 @@ public:
 	void Draw(void);
 
 private:
-	static int m_aIdxTexture[TYPE_MAX];		// テクスチャのインデックス
+	static int m_nIdxTexture;						// テクスチャのインデックス
+	static const char* m_pFilename[TYPE_MAX];		// テクスチャファイル名
+	CObject2D* m_pDecision;			// 評価
 	TYPE m_type;		// 種類
 };
 

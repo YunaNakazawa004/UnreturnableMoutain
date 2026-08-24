@@ -18,6 +18,7 @@
 #include "lab.h"
 #include "score.h"
 #include "rankingscore.h"
+#include "UI_ranking.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -35,6 +36,7 @@
 CShip* CRanking::m_pShip = NULL;								// 船のインスタンス
 CLab* CRanking::m_pLab = NULL;									// 研究所のインスタンス
 CRankingScore* CRanking::m_pRankingScore = NULL;				// ランキングスコアのインスタンス
+CRankingUI* CRanking::m_pRankingUI = NULL;						// ランキングUIのインスタンス
 int CRanking::m_nUserScore = 0;									// 現在プレイヤーのスコア
 int CRanking::m_nModeCounter = 0;								// 自動画面遷移のカウント
 
@@ -47,6 +49,7 @@ CRanking::CRanking() : CScene(CScene::MODE_RANKING)
 	m_pShip = NULL;
 	m_pLab = NULL;
 	m_pRankingScore = NULL;
+	m_pRankingUI = NULL;
 	m_nModeCounter = 0;
 }
 
@@ -74,6 +77,9 @@ HRESULT CRanking::Init(void)
 	CCamera* pCamera = CManager::GetCamera();
 	pCamera->SetPosition(D3DXVECTOR3(0.0f, 30.0f, -400.0f), DEFAULT_VECTER3, DEFAULT_VECTER3, CCamera::TYPE_STOP);
 
+	// テクスチャ読み込み
+	CRankingUI::Load();
+
 	// ランキングスコアを生成
 	if (m_pRankingScore == NULL)
 	{// NULLチェック
@@ -94,6 +100,19 @@ HRESULT CRanking::Init(void)
 		}
 
 		m_pRankingScore->SetScore();
+	}
+	
+	// ランキングUIを生成
+	if (m_pRankingUI == NULL)
+	{// NULLチェック
+		m_pRankingUI = CRankingUI::Create(D3DXVECTOR3(640.0f, 80.0f, 0.0f), 300.0f, 60.0f);
+
+		if (m_pRankingUI == NULL)
+		{// NULLチェック
+			OutputDebugStringA("! ! ! ランキングUIの生成に失敗しました ! ! !\n");
+
+			return E_FAIL;
+		}
 	}
 	
 	// 船を生成
@@ -137,6 +156,7 @@ void CRanking::Uninit(void)
 	pSound->StopSound();
 
 	// テクスチャを破棄
+	CRankingUI::Unload();
 
 	// 研究所の破棄
 	if (m_pLab != NULL)
@@ -148,6 +168,12 @@ void CRanking::Uninit(void)
 	if (m_pShip != NULL)
 	{// NULLチェック
 		m_pShip = NULL;
+	}
+	
+	// ランキングUIの破棄
+	if (m_pRankingUI != NULL)
+	{// NULLチェック
+		m_pRankingUI = NULL;
 	}
 	
 	// ランキングスコアの破棄

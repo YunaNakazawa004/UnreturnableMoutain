@@ -25,7 +25,12 @@
 //************************************************************************
 // 静的メンバ変数宣言
 //************************************************************************
-int CResultUI::m_aIdxTexture[TYPE_MAX] = { -1 };				// テクスチャのインデックス
+int CResultUI::m_nIdxTexture = -1;						// テクスチャのインデックス
+const char* CResultUI::m_pFilename[TYPE_MAX] = {		// テクスチャファイル名
+	"data\\TEXTURE\\UI\\decision000.png",
+	"data\\TEXTURE\\UI\\decision001.png",
+	"data\\TEXTURE\\UI\\result.png"
+};
 
 //========================================================================
 // テクスチャの生成
@@ -36,10 +41,9 @@ HRESULT CResultUI::Load(void)
 	CTexture* pTexture = CManager::GetTexture();			// テクスチャへのポインタ
 
 	// テクスチャの設定
-	m_aIdxTexture[0] = pTexture->Register("data\\TEXTURE\\UI\\result000.png");
-	m_aIdxTexture[1] = pTexture->Register("data\\TEXTURE\\UI\\result001.png");
+	m_nIdxTexture = pTexture->Register("data\\TEXTURE\\UI\\result.png");
 
-	if (m_aIdxTexture[0] == -1 || m_aIdxTexture[1] == -1)
+	if (m_nIdxTexture == -1)
 	{// テクスチャが設定できていない
 		OutputDebugStringA("! ! ! テクスチャの設定に失敗しました ! ! !\n");
 
@@ -55,7 +59,7 @@ HRESULT CResultUI::Load(void)
 void CResultUI::Unload(void)
 {
 	// テクスチャのインデックスを削除
-	memset(&m_aIdxTexture[0], -1, sizeof m_aIdxTexture);
+	memset(&m_nIdxTexture, -1, sizeof m_nIdxTexture);
 }
 
 //========================================================================
@@ -94,7 +98,7 @@ CResultUI* CResultUI::Create(const D3DXVECTOR3 pos, const float fWidth, const fl
 		pResultUI->SetType(TYPE_RESULTUI);
 
 		// テクスチャの割り当て
-		pResultUI->BindTexture(m_aIdxTexture[type]);
+		pResultUI->BindTexture(m_nIdxTexture);
 
 		return pResultUI;
 	}
@@ -135,6 +139,19 @@ HRESULT CResultUI::Init(const D3DXVECTOR3 pos, const float fWidth, const float f
 	// リザルトUIクラスの値を初期化
 	m_type = type;
 
+	if (m_pDecision == NULL)
+	{// NULLチェック
+		m_pDecision = CObject2D::Create(D3DXVECTOR3(640.0f, 360.0f, 0.0f), 400.0f, 200.0f,
+			TYPE_RESULTUI, m_pFilename[m_type], PRIORITY_7);
+
+		if (m_pDecision != NULL)
+		{// NULLチェック
+			m_pDecision->SetRotation(D3DXVECTOR3(0.0f, 0.0f, D3DX_PI * 0.1f));
+
+			m_pDecision->SetDisp(false);
+		}
+	}
+
 	return S_OK;
 }
 
@@ -153,6 +170,8 @@ void CResultUI::Uninit(void)
 void CResultUI::Update(void)
 {
 	// ローカル変数
+	CInputKeyboard* pInputKeyboard = CManager::GetInputKeyboard();		// キーボード入力の取得
+	CInputJoypad* pInputJoypad = CManager::GetInputJoypad();			// ジョイパッド入力の取得
 	CUsedEnergy* pUsedEnergy = CResult::GetUsedEnergy();		// 使用エネルギー量の取得
 	CScore* pBaseScore = CResult::GetBaseScore();				// 基礎スコアの取得
 	CCollectNum* pCollectNum = CResult::GetCollectNum();		// 収集数の取得
@@ -190,7 +209,14 @@ void CResultUI::Update(void)
 		pFinalScore->SetDisp(true);
 		pListUI->SetDisp(4, true);
 
-		CResult::SetFadeEnable();
+		if (pInputKeyboard->GetTrigger(DIK_RETURN) == true ||
+			pInputJoypad->GetTrigger(0, CInputJoypad::JOYKEY_A) == true ||
+			pInputJoypad->GetTrigger(0, CInputJoypad::JOYKEY_START) == true)
+		{// キーが押された
+			m_pDecision->SetDisp(true);
+
+			CResult::SetFadeEnable();
+		}
 	}
 
 	// 位置を設定
