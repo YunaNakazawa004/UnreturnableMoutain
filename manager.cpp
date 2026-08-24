@@ -421,7 +421,8 @@ void CManager::Update(void)
 		// 現在のシーン名を表示
 		m_pDebugProc->Print("現在のシーン : %s\n",
 			(m_pScene->GetMode() == CScene::MODE_TITLE) ? "タイトル画面" :
-			(m_pScene->GetMode() == CScene::MODE_GAME) ? "ゲーム画面" : "リザルト画面");
+			(m_pScene->GetMode() == CScene::MODE_GAME) ? "ゲーム画面" :
+			(m_pScene->GetMode() == CScene::MODE_RESULT) ? "リザルト画面" : "ランキング画面");
 
 		// オブジェクトの総数を表示
 		m_pDebugProc->Print("オブジェクトの総数 : %d\n", CObject::GetNumAll());

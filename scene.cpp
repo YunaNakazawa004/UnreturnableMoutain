@@ -9,6 +9,7 @@
 #include "title.h"
 #include "game.h"
 #include "result.h"
+#include "ranking.h"
 
 //************************************************************************
 // 静的メンバ変数宣言
@@ -62,6 +63,11 @@ CScene* CScene::Create(const CScene::MODE mode)
 
 		case MODE_RESULT:		// リザルト
 			pScene = new CResult;
+
+			break;
+
+		case MODE_RANKING:		// ランキング
+			pScene = new CRanking;
 
 			break;
 		}

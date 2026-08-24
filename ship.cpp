@@ -253,6 +253,10 @@ void CShip::Update(void)
 			pActionUI->SetFade(CActionUI::FADE_IN);
 		}
 
+		CParticle3D::Create(pos, 1, 1, 4.0f, -0.01f, 0.00f,
+			CEffect3D::TYPE_BLENDADD, CParticle3D::TYPE_PIN, 400, 0.3f, false, COLOR_ORANGE, 10.0f, true,
+			NULL, D3DXVECTOR3(pos.x, pos.y + 10000.0f, pos.z), 0.0001f);
+
 		break;
 
 	case STATE_OPEN:		// äJÇ≠èÛë‘

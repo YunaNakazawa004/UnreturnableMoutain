@@ -29,6 +29,7 @@ public:
 
 	void SetPosition(const D3DXVECTOR3 pos);
 	D3DXVECTOR3 GetPosition(void) { return m_pos; }
+	float GetWidth(void) { return m_fWidth; }
 	void SetColor(const D3DXCOLOR col);
 	void SetTexUV(const int nNumber, const int nTexWidth, const int nTexHeight);
 

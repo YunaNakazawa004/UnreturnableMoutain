@@ -13,6 +13,7 @@
 #include "camera.h"
 #include "fade.h"
 
+#include "ranking.h"
 #include "UI_result.h"
 #include "UI_result_list.h"
 #include "ship.h"
@@ -327,7 +328,9 @@ void CResult::Update(void)
 	{// ENTERが押された
 		if (pFade != NULL)
 		{// NULLチェック
-			pFade->SetFade(MODE_TITLE);
+			CRanking::SetUserScore(m_pFinalScore->GetScore());
+
+			pFade->SetFade(MODE_RANKING);
 		}
 	}
 }

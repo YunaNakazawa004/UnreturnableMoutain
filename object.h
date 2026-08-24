@@ -64,6 +64,7 @@ public:
 		TYPE_JUMPUI,			// ジャンプUI
 		TYPE_ITEMUI,			// アイテムUI
 		TYPE_SCORE,				// スコア
+		TYPE_RANKINGSCORE,		// ランキングスコア
 		TYPE_USED_ENERGY,		// 使用エネルギー量
 		TYPE_LINE,				// 線
 		TYPE_OBJECTX,			// オブジェクトX

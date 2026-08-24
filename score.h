@@ -41,7 +41,9 @@ public:
 	void Draw(void);
 
 	D3DXVECTOR3 GetPosition(void) { return m_pos; }
+	void SetPosition(D3DXVECTOR3 pos);
 	D3DXVECTOR3 GetRotation(void) { return DEFAULT_VECTER3; }
+	void SetColor(D3DXCOLOR col);
 	int GetScore(void) { return m_nScore; }
 	void SetNum(const int nScore);
 	void Add(const int nAdd);

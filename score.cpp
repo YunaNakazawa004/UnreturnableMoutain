@@ -192,6 +192,34 @@ void CScore::Draw(void)
 }
 
 //========================================================================
+// スコアの位置設定
+//========================================================================
+void CScore::SetPosition(D3DXVECTOR3 pos)
+{
+	m_pos = pos;
+
+	for (int nCntScore = 0; nCntScore < SCORE_NUMPLACE; nCntScore++)
+	{
+		float fWidth = m_apNumber[nCntScore]->GetWidth();
+
+		// テクスチャ座標を設定
+		m_apNumber[nCntScore]->SetPosition(D3DXVECTOR3(pos.x + (nCntScore * fWidth), pos.y, pos.z));
+	}
+}
+
+//========================================================================
+// スコアの色設定
+//========================================================================
+void CScore::SetColor(D3DXCOLOR col)
+{
+	for (int nCntScore = 0; nCntScore < SCORE_NUMPLACE; nCntScore++)
+	{
+		// テクスチャ座標を設定
+		m_apNumber[nCntScore]->SetColor(col);
+	}
+}
+
+//========================================================================
 // スコア設定処理
 //========================================================================
 void CScore::SetNum(const int nScore)
