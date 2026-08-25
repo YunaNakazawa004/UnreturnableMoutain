@@ -15,7 +15,7 @@
 // マクロ定義
 //************************************************************************
 #define POWER				(10)									// 10の累乗
-#define TEXTURE_WIDTH		(10)									// テクスチャの幅
+#define TEXTURE_HEIGHT		(10)									// テクスチャの高さ
 #define MAX_SCORE			(999999)								// 最大使用エネルギー量
 #define MIN_SCORE			(0)										// 最小使用エネルギー量
 
@@ -175,7 +175,7 @@ void CUsedEnergy::SetNum(const int nUsedEnergy)
 			(int)pow(POWER, USED_ENERGY_NUMPLACE - nCntUsedEnergy - 1);
 
 		// テクスチャ座標を設定
-		m_apNumber[nCntUsedEnergy]->SetTexUV(aTexU[nCntUsedEnergy], TEXTURE_WIDTH, 1);
+		m_apNumber[nCntUsedEnergy]->SetTexUV(aTexU[nCntUsedEnergy], 1, TEXTURE_HEIGHT);
 	}
 }
 

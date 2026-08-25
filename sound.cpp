@@ -34,6 +34,7 @@ CSound::SOUNDINFO CSound::m_aSoundInfo[SOUND_MAX] =
 	{"data/SE/tire.wav",0},					// タイヤ
 	{"data/SE/wind.wav",0},					// 風
 	{"data/SE/decision.wav",0},				// 判定
+	{"data/SE/down.wav",0},					// ゲームオーバー
 };
 
 //=============================================================================

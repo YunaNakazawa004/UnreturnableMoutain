@@ -49,6 +49,7 @@ public:
 	MODE GetMode(void) { return m_mode; }
 
 	static void SetFadeEnable(void) { m_bFade = true; }
+	static void SetFadeDisable(void) { m_bFade = false; }
 	static bool isFade(void) { return m_bFade; }
 
 #ifdef ENABLE_INHERITANCE_COBJECT

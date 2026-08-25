@@ -15,7 +15,7 @@
 // マクロ定義
 //************************************************************************
 #define POWER				(10)									// 10の累乗
-#define TEXTURE_WIDTH		(10)									// テクスチャの幅
+#define TEXTURE_HEIGHT		(10)									// テクスチャの高さ
 #define MAX_SCORE			(9)										// 最大収集数
 #define MIN_SCORE			(0)										// 最小収集数
 
@@ -211,7 +211,7 @@ void CCollectNum::SetNum(const int nCollectNum)
 			(int)pow(POWER, COLLECT_NUM_NUMPLACE - nCntCollectNum - 1);
 
 		// テクスチャ座標を設定
-		m_apNumber[nCntCollectNum]->SetTexUV(aTexU[nCntCollectNum], TEXTURE_WIDTH, 1);
+		m_apNumber[nCntCollectNum]->SetTexUV(aTexU[nCntCollectNum], 1, TEXTURE_HEIGHT);
 	}
 }
 

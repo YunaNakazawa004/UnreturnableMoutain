@@ -34,6 +34,7 @@ public:
 		SE_TIRE,					// タイヤ
 		SE_WIND,					// 風
 		SE_DECISION,				// 判定
+		SE_GAMEOVER,				// ゲームオーバー
 		SOUND_MAX,
 	} SOUND_LABEL;
 

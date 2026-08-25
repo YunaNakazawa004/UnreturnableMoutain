@@ -13,7 +13,7 @@
 //************************************************************************
 // マクロ定義
 //************************************************************************
-#define MAX_MODEL		(16)		// プレイヤーの最大
+#define MAX_MODEL_PLAYER		(16)		// プレイヤーの最大
 
 #define ENABLE_EXPLANATION			// 操作説明の表示
 #undef ENABLE_EXPLANATION
@@ -88,8 +88,8 @@ public:
 private:
 	HRESULT SetModel(const char* pFilename);
 
-	const char* m_apFileName[MAX_MODEL];		// プレイヤーXファイルの名前
-	CModel* m_apModel[MAX_MODEL];				// モデル（パーツ）へのポインタ
+	const char* m_apFileName[MAX_MODEL_PLAYER];	// プレイヤーXファイルの名前
+	CModel* m_apModel[MAX_MODEL_PLAYER];		// モデル（パーツ）へのポインタ
 	int m_nNumModel;							// モデル（パーツ）の総数
 	CMotion* m_pMotion;							// モーションへのポインタ
 

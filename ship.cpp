@@ -121,7 +121,7 @@ HRESULT CShip::Init(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot)
 	// 船の情報の初期化
 	m_pos = pos;
 	m_rot = rot;
-	m_scale = D3DXVECTOR3(3.0f, 3.0f, 3.0f);
+	m_scale = D3DXVECTOR3(1.0f, 1.0f, 1.0f);
 	m_col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 	m_state = STATE_APPEAR;
 
@@ -141,7 +141,7 @@ HRESULT CShip::Init(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot)
 //========================================================================
 void CShip::Uninit(void)
 {
-	for (int nCntModel = 0; nCntModel < MAX_MODEL; nCntModel++)
+	for (int nCntModel = 0; nCntModel < MAX_MODEL_SHIP; nCntModel++)
 	{
 		if (m_apModel[nCntModel] != NULL)
 		{// NULLチェック
@@ -188,7 +188,7 @@ void CShip::Update(void)
 
 	D3DXVECTOR3 pos = GetPosition();
 	D3DXVECTOR3 move = DEFAULT_VECTER3;
-	D3DXVECTOR3 DoorRot = m_apModel[5]->GetRotation();
+	D3DXVECTOR3 DoorPos = m_apModel[4]->GetPosition();
 
 	pDebugProc->Print("\n*** 船 ***\n");
 
@@ -267,13 +267,13 @@ void CShip::Update(void)
 	case STATE_OPEN:		// 開く状態
 		pDebugProc->Print("状態 : 開く状態\n");
 
-		DoorRot.x += (m_apModel[5]->GetRotOffC().x - DoorRot.x) * 0.02f;
+		DoorPos.y += (m_apModel[4]->GetPosOffC().y - DoorPos.y) * 0.02f;
 
-		m_apModel[5]->SetRotation(DoorRot);
+		m_apModel[4]->SetPosition(DoorPos);
 
-		if (DoorRot.x >= m_apModel[5]->GetRotOffC().x - 0.01f && DoorRot.x <= m_apModel[5]->GetRotOffC().x + 0.01f)
-		{// 目的の角度になった
-			DoorRot.x = m_apModel[5]->GetRotOffC().x;
+		if (DoorPos.y >= m_apModel[4]->GetPosOffC().y - 0.01f && DoorPos.y <= m_apModel[4]->GetPosOffC().y + 0.01f)
+		{// 目的の位置になった
+			DoorPos.y = m_apModel[4]->GetPosOffC().y;
 
 			m_state = STATE_NORMAL;
 		}
@@ -283,13 +283,13 @@ void CShip::Update(void)
 	case STATE_CLOSE:		// 閉じる状態
 		pDebugProc->Print("状態 : 閉じる状態\n");
 
-		DoorRot.x += (0.0f - DoorRot.x) * 0.02f;
+		DoorPos.y += (0.0f - DoorPos.y) * 0.02f;
 
-		m_apModel[5]->SetRotation(DoorRot);
+		m_apModel[4]->SetPosition(DoorPos);
 
-		if (DoorRot.x >= -0.01f && DoorRot.x <= 0.01f)
+		if (DoorPos.y >= -0.01f && DoorPos.y <= 0.01f)
 		{// 目的の角度になった
-			DoorRot.x = 0.0f;
+			DoorPos.y = 0.0f;
 
 			m_state = STATE_UP;
 			pSound->PlaySound(CSound::SE_ROCKET);
@@ -375,8 +375,8 @@ void CShip::Update(void)
 		pMountain = CGame::GetMountain();			// 山の取得
 		pBeach = CGame::GetBeach();					// 砂浜の取得
 
-		DoorRot.x = 0.0f;
-		m_apModel[5]->SetRotation(DoorRot);
+		DoorPos.y = 0.0f;
+		m_apModel[4]->SetPosition(DoorPos);
 
 		if (pMountain != NULL && pBeach != NULL)
 		{// NULLチェック
@@ -561,7 +561,7 @@ bool CShip::Collision(D3DXVECTOR3* pos, D3DXVECTOR3* posOld, D3DXVECTOR3* move,
 		// 各パーツの当たり判定
 		for (int nCntPart = 0; nCntPart < m_nNumModel; nCntPart++)
 		{
-			if (nCntPart == 5 && m_state != STATE_CLOSE)
+			if ((nCntPart == 4 && m_state != STATE_CLOSE) || nCntPart > 10)
 			{// 当たり判定しないもの
 				continue;
 			}
@@ -868,7 +868,7 @@ HRESULT CShip::SetModel(const char* pFilename)
 					// モデルの生成
 					m_apModel[nCntParts] = CModel::Create(pos, rot, m_apFileName[nIdx]);
 
-					if (nIdxParent < 0 || nIdxParent >= MAX_MODEL)
+					if (nIdxParent < 0 || nIdxParent >= MAX_MODEL_SHIP)
 					{// 範囲外の親インデックス
 						// 親がない場合の設定
 						m_apModel[nCntParts]->SetParent(NULL);

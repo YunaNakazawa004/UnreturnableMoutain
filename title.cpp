@@ -236,7 +236,7 @@ HRESULT CTitle::Init(void)
 	// チュートリアル文を生成
 	if (m_apTutorialTxt[0] == NULL && m_apTutorialTxt[1] == NULL && m_apTutorialTxt[2] == NULL && m_apTutorialTxt[3] == NULL)
 	{// NULLチェック
-		m_apTutorialTxt[0] = CTutorialTxt::Create(D3DXVECTOR3(0.0f, 50.0f, -85.0f), D3DXVECTOR3(0.0f, D3DX_PI, 0.0f), 0);
+		m_apTutorialTxt[0] = CTutorialTxt::Create(D3DXVECTOR3(0.0f, 50.0f, -65.0f), D3DXVECTOR3(0.0f, D3DX_PI, 0.0f), 0);
 		m_apTutorialTxt[1] = CTutorialTxt::Create(D3DXVECTOR3(-240.0f, 50.0f, -120.0f), D3DXVECTOR3(0.0f, D3DX_PI * 1.5f, 0.0f), 1);
 		m_apTutorialTxt[2] = CTutorialTxt::Create(D3DXVECTOR3(0.0f, 50.0f, 110.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), 2);
 		m_apTutorialTxt[3] = CTutorialTxt::Create(D3DXVECTOR3(0.0f, 50.0f, -370.0f), D3DXVECTOR3(0.0f, D3DX_PI, 0.0f), 3);

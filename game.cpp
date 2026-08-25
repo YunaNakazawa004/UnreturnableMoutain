@@ -15,6 +15,7 @@
 #include "pause.h"
 #include "fade.h"
 #include "transition.h"
+#include "result.h"
 
 #include "cloud.h"
 #include "mountain.h"
@@ -419,6 +420,7 @@ void CGame::Update(void)
 	CInputJoypad* pInputJoypad = CManager::GetInputJoypad();			// ジョイパッド入力の取得
 	CFade* pFade = CManager::GetFade();									// フェードの取得
 	CTransition* pTransition = CManager::GetTransition();				// 画面遷移の取得
+	CSound* pSound = CManager::GetSound();								// サウンドを取得
 
 	if (m_pPause != NULL)
 	{// NULLチェック
@@ -455,8 +457,20 @@ void CGame::Update(void)
 	{// ENTERが押された
 		if (pTransition != NULL)
 		{// NULLチェック
-			pTransition->SetTransition(MODE_RESULT);
+			if (CResult::GetClear() == true)
+			{// クリア
+				pTransition->SetTransition(MODE_RESULT);
+			}
+			else
+			{// ゲームオーバー
+				pTransition->SetTransition(MODE_RESULT, CTransition::TYPE_GAMEOVER);
+				
+				pSound->StopSound();
+				pSound->PlaySound(CSound::SE_GAMEOVER);
+			}
 		}
+
+		SetFadeDisable();
 
 		return;
 	}
@@ -468,7 +482,10 @@ void CGame::Update(void)
 	{// ENTERが押された
 		if (pTransition != NULL)
 		{// NULLチェック
-			pTransition->SetTransition(MODE_RESULT);
+			pTransition->SetTransition(MODE_RESULT, CTransition::TYPE_GAMEOVER);
+
+			pSound->StopSound();
+			pSound->PlaySound(CSound::SE_GAMEOVER);
 		}
 
 		return;

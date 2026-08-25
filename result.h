@@ -47,6 +47,7 @@ public:
 	static CScore* GetFinalScore(void) { return m_pFinalScore; }
 	
 	static void SetClear(const bool bClear) { m_bClear = bClear; }
+	static bool GetClear(void) { return m_bClear; }
 
 private:
 	static CResultUI* m_pResultUI;					// リザルトUIのインスタンス

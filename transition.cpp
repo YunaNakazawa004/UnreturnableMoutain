@@ -23,7 +23,7 @@
 //*****************************************************************************
 // 静的メンバ変数宣言
 //*****************************************************************************
-int CTransition::m_nIdxTexture = -1;				// テクスチャのインデックス
+int CTransition::m_aIdxTexture[TYPE_MAX] = { -1 };				// テクスチャのインデックス
 
 //========================================================================
 // テクスチャの生成
@@ -34,9 +34,10 @@ HRESULT CTransition::Load(void)
 	CTexture* pTexture = CManager::GetTexture();			// テクスチャへのポインタ
 
 	// テクスチャの設定
-	m_nIdxTexture = pTexture->Register("data\\TEXTURE\\UI\\bg.png");
+	m_aIdxTexture[0] = pTexture->Register("data\\TEXTURE\\UI\\bg.png");
+	m_aIdxTexture[1] = pTexture->Register("data\\TEXTURE\\UI\\gameover.png");
 
-	if (m_nIdxTexture == -1)
+	if (m_aIdxTexture[0] == -1 || m_aIdxTexture[1] == -1)
 	{// テクスチャが設定できていない
 		OutputDebugStringA("! ! ! テクスチャの設定に失敗しました ! ! !\n");
 
@@ -52,7 +53,7 @@ HRESULT CTransition::Load(void)
 void CTransition::Unload(void)
 {
 	// テクスチャのインデックスを削除
-	m_nIdxTexture = -1;
+	memset(&m_aIdxTexture[0], -1, sizeof m_aIdxTexture);
 }
 
 //=============================================================================
@@ -94,8 +95,11 @@ CTransition::CTransition()
 	// 値をクリア
 	m_pVtxBuff = NULL;
 	m_fade = FADE_NONE;
+	m_type = TYPE_NORMAL;
 	m_modeNext = CScene::MODE_TITLE;
 	m_col = COLOR_WHITE;
+	m_nPatternAnim = 0;
+	m_nCounterAnim = 0;
 	m_pMesh = NULL;
 	m_pBuffMat = NULL;
 	memset(&m_apTexture[0], -1, sizeof m_apTexture);
@@ -254,6 +258,9 @@ void CTransition::Update(void)
 			{// 透明になった
 				m_col.a = 0.0f;
 				m_fade = FADE_NONE;			// 何もしていない状態にする
+
+				m_nPatternAnim = 0;
+				m_nCounterAnim = 0;
 			}
 		}
 		else if (m_fade == FADE_OUT)
@@ -264,17 +271,20 @@ void CTransition::Update(void)
 			{// 不透明になった
 				m_col.a = 1.0f;
 
-				m_pos.x += 3.0f;
+				if (m_type == TYPE_NORMAL)
+				{// 通常
+					m_pos.x += 3.0f;
 
-				// カメラを変更
-				pCamera->SetPosition(D3DXVECTOR3(0.0f, 0.0f, -300.0f), DEFAULT_VECTER3, DEFAULT_VECTER3, CCamera::TYPE_STOP);
+					// カメラを変更
+					pCamera->SetPosition(D3DXVECTOR3(0.0f, 0.0f, -300.0f), DEFAULT_VECTER3, DEFAULT_VECTER3, CCamera::TYPE_STOP);
 
-				if (m_pos.x > 200.0f)
-				{// 一定の距離を進んだ
-					m_fade = FADE_IN;			// フェードイン状態にする
+					if (m_pos.x > 200.0f)
+					{// 一定の距離を進んだ
+						m_fade = FADE_IN;			// フェードイン状態にする
 
-					// モードの設定
-					CManager::SetMode(m_modeNext);
+						// モードの設定
+						CManager::SetMode(m_modeNext);
+					}
 				}
 			}
 		}
@@ -282,6 +292,29 @@ void CTransition::Update(void)
 	else
 	{
 		m_col.a = 0.0f;
+	}
+
+	if (m_type == TYPE_GAMEOVER)
+	{// ゲームオーバー
+		m_nCounterAnim++;
+
+		if (m_nCounterAnim % 4 == 0)
+		{// 一定間隔
+			m_nPatternAnim++;
+
+			if (m_nPatternAnim >= 6)
+			{// 最後で固定
+				m_nPatternAnim = 5;
+
+				if (m_fade == FADE_OUT)
+				{// 遷移してフェードイン
+					// モードの設定
+					CManager::SetMode(m_modeNext);
+
+					m_fade = FADE_IN;
+				}
+			}
+		}
 	}
 
 	// ローカル変数宣言
@@ -296,11 +329,22 @@ void CTransition::Update(void)
 	pVtx[2].col = m_col;
 	pVtx[3].col = m_col;
 
-	// テクスチャ座標の設定
-	pVtx[0].tex.x += 0.001f;
-	pVtx[1].tex.x += 0.001f;
-	pVtx[2].tex.x += 0.001f;
-	pVtx[3].tex.x += 0.001f;
+	if (m_type == TYPE_NORMAL)
+	{// 通常
+		// テクスチャ座標の設定
+		pVtx[0].tex.x += 0.001f;
+		pVtx[1].tex.x += 0.001f;
+		pVtx[2].tex.x += 0.001f;
+		pVtx[3].tex.x += 0.001f;
+	}
+	else
+	{// ゲームオーバー
+		// テクスチャ座標の設定
+		pVtx[0].tex = D3DXVECTOR2(m_nPatternAnim * (1.0f / 6.0f), (m_nPatternAnim / 6) * (1.0f / 1.0f));
+		pVtx[1].tex = D3DXVECTOR2((m_nPatternAnim + 1) * (1.0f / 6.0f), (m_nPatternAnim / 6) * (1.0f / 1.0f));
+		pVtx[2].tex = D3DXVECTOR2(m_nPatternAnim * (1.0f / 6.0f), ((m_nPatternAnim / 6) + 1) * (1.0f / 1.0f));
+		pVtx[3].tex = D3DXVECTOR2((m_nPatternAnim + 1) * (1.0f / 6.0f), ((m_nPatternAnim / 6) + 1) * (1.0f / 1.0f));
+	}
 
 	// 頂点バッファをアンロックする
 	m_pVtxBuff->Unlock();
@@ -326,14 +370,14 @@ void CTransition::Draw(void)
 	pDevice->SetFVF(FVF_VERTEX_2D);
 
 	// テクスチャの設定
-	pDevice->SetTexture(0, pTexture->GetAddress(m_nIdxTexture));
+	pDevice->SetTexture(0, pTexture->GetAddress(m_aIdxTexture[m_type]));
 
 	// ポリゴンの描画
 	pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP,
 		0,					// 描画する最初の頂点インデックス
 		2);					// 描画するプリミティブ数
 
-	if (m_col.a == 1.0f)
+	if (m_col.a == 1.0f && m_type == TYPE_NORMAL)
 	{// 画面遷移中
 		// Zテストを無効にする
 		pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_ALWAYS);
@@ -384,15 +428,40 @@ void CTransition::Draw(void)
 //=============================================================================
 // 画面遷移の設定処理
 //=============================================================================
-void CTransition::SetTransition(CScene::MODE modenext)
+void CTransition::SetTransition(CScene::MODE modenext, const TYPE type)
 {
 	if (m_fade == FADE_NONE)
 	{
-		m_fade = FADE_OUT;					// フェードアウト状態に
-		m_modeNext = modenext;				// 次の画面(モード)を設定
-		m_col = WHT_INVISIBLE_VTX;
+		if (type == TYPE_NORMAL)
+		{// 通常
+			m_fade = FADE_OUT;					// フェードアウト状態に
+			m_col = WHT_INVISIBLE_VTX;
 
-		m_pos = D3DXVECTOR3(-200.0f, 30.0, 0.0f);
+			// ローカル変数宣言
+			VERTEX_2D* pVtx;					// 頂点情報へのポインタ
+
+			// 頂点バッファをロックし、頂点情報へのポインタを取得
+			m_pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
+
+			// テクスチャ座標の設定
+			pVtx[0].tex = D3DXVECTOR2(0.0f, 0.0f);
+			pVtx[1].tex = D3DXVECTOR2(1.0f, 0.0f);
+			pVtx[2].tex = D3DXVECTOR2(0.0f, 1.0f);
+			pVtx[3].tex = D3DXVECTOR2(1.0f, 1.0f);
+
+			// 頂点バッファをアンロックする
+			m_pVtxBuff->Unlock();
+
+			m_pos = D3DXVECTOR3(-200.0f, 30.0, 0.0f);
+		}
+		else
+		{// ゲームオーバー
+			m_fade = FADE_OUT;
+			m_col = WHT_VISIBLE_VTX;
+		}
+
+		m_type = type;
+		m_modeNext = modenext;				// 次の画面(モード)を設定
 	}
 }
 
@@ -401,5 +470,8 @@ void CTransition::SetTransition(CScene::MODE modenext)
 //=============================================================================
 void CTransition::SetState(FADE fade)
 {
-	m_fade = fade;
+	if (m_fade != fade)
+	{// 違うとき
+		m_fade = fade;
+	}
 }

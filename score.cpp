@@ -15,7 +15,7 @@
 // マクロ定義
 //************************************************************************
 #define POWER				(10)									// 10の累乗
-#define TEXTURE_WIDTH		(10)									// テクスチャの幅
+#define TEXTURE_HEIGHT		(10)									// テクスチャの高さ
 #define MAX_SCORE			(99999999)								// 最大スコア
 #define MIN_SCORE			(0)										// 最小スコア
 
@@ -236,7 +236,7 @@ void CScore::SetNum(const int nScore)
 		aTexU[nCntScore] = m_nScore % (int)pow(POWER, SCORE_NUMPLACE - nCntScore) / (int)pow(POWER, SCORE_NUMPLACE - nCntScore - 1);
 
 		// テクスチャ座標を設定
-		m_apNumber[nCntScore]->SetTexUV(aTexU[nCntScore], TEXTURE_WIDTH, 1);
+		m_apNumber[nCntScore]->SetTexUV(aTexU[nCntScore], 1, TEXTURE_HEIGHT);
 	}
 }
 

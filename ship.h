@@ -13,7 +13,7 @@
 //************************************************************************
 // マクロ定義
 //************************************************************************
-#define MAX_MODEL		(16)		// 船の最大
+#define MAX_MODEL_SHIP		(20)		// 船の最大
 
 //************************************************************************
 // 前方宣言
@@ -70,8 +70,8 @@ public:
 private:
 	HRESULT SetModel(const char* pFilename);
 
-	const char* m_apFileName[MAX_MODEL];		// 船Xファイルの名前
-	CModel* m_apModel[MAX_MODEL];				// モデル（パーツ）へのポインタ
+	const char* m_apFileName[MAX_MODEL_SHIP];		// 船Xファイルの名前
+	CModel* m_apModel[MAX_MODEL_SHIP];				// モデル（パーツ）へのポインタ
 	int m_nNumModel;							// モデル（パーツ）の総数
 
 	D3DXMATRIX m_mtxWorld;			// ワールドマトリックス
