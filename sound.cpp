@@ -10,9 +10,9 @@
 // 静的メンバ変数宣言
 //*****************************************************************************
 IXAudio2 *CSound::m_pXAudio2 = NULL;								// XAudio2オブジェクトへのインターフェイス
-IXAudio2MasteringVoice * CSound::m_pMasteringVoice = NULL;			// マスターボイス
-IXAudio2SourceVoice * CSound::m_apSourceVoice[SOUND_MAX] = {};		// ソースボイス
-BYTE * CSound::m_apDataAudio[SOUND_MAX] = {};						// オーディオデータ
+IXAudio2MasteringVoice *CSound::m_pMasteringVoice = NULL;			// マスターボイス
+IXAudio2SourceVoice *CSound::m_apSourceVoice[SOUND_MAX] = {};		// ソースボイス
+BYTE *CSound::m_apDataAudio[SOUND_MAX] = {};						// オーディオデータ
 DWORD CSound::m_aSizeAudio[SOUND_MAX] = {};							// オーディオデータサイズ
 
 // サウンドの情報

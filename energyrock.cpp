@@ -9,6 +9,7 @@
 #include "renderer.h"
 #include "manager.h"
 
+#include "particle3D.h"
 #include "game.h"
 #include "title.h"
 #include "UI_action.h"
@@ -154,6 +155,15 @@ void CEnergyRock::Uninit(void)
 //========================================================================
 void CEnergyRock::Update(void)
 {
+	if (CManager::GetMode() == CScene::MODE_TITLE)
+	{// チュートリアル
+		if (m_nLife == FIRST_LIFE && CTitle::isTutorial() == true)
+		{// 盗られてない時
+			CParticle3D::Create(GetPosition(), 1, 1, 4.0f, -0.01f, 0.00f,
+				CEffect3D::TYPE_BLENDADD, CParticle3D::TYPE_PIN, 400, 0.3f, false, COLOR_ORANGE, 10.0f, true,
+				NULL, D3DXVECTOR3(GetPosition().x, GetPosition().y + 10000.0f, GetPosition().z), 0.0001f);
+		}
+	}
 }
 
 //========================================================================

@@ -134,6 +134,7 @@ void CScore::Update(void)
 {
 #ifdef _DEBUG
 	CInputKeyboard* pInputKeyboard = CManager::GetInputKeyboard();		// キーボード入力の取得
+	CInputJoypad* pInputJoypad = CManager::GetInputJoypad();			// ジョイパッド入力の取得
 
 	// スコア上昇
 	if (pInputKeyboard->GetPress(DIK_1) == true)
@@ -168,6 +169,20 @@ void CScore::Update(void)
 	{
 		Add((int)pow(POWER, 0));
 	}
+
+	// UI隠し
+	if (pInputKeyboard->GetPress(DIK_F3) == true ||
+		pInputJoypad->GetPress(0, CInputJoypad::JOYKEY_BACK) == true)
+	{// キーが押された
+		SetDisp(false);
+
+	}
+	else if (pInputKeyboard->GetRelease(DIK_F3) == true ||
+		pInputJoypad->GetRelease(0, CInputJoypad::JOYKEY_BACK) == true)
+	{// キーが押された
+		SetDisp(true);
+	}
+
 #endif
 }
 

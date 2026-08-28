@@ -20,6 +20,7 @@ class CMountain;
 class CBeach;
 class CWaterSurface;
 class CMapObject;
+class CFrame;
 class CEnergyUI;
 class CJumpMeterUI;
 class CItemUI;
@@ -47,6 +48,7 @@ public:
 	static CBeach* GetBeach(void) { return m_pBeach; }
 	static CWaterSurface* GetWaterSurface(void) { return m_pWaterSurface; }
 	static CMapObject* GetMapObject(void) { return m_pMapObject; }
+	static CFrame* GetFrame(void) { return m_pFrame; }
 	static CEnergyUI* GetEnergyUI(void) { return m_pEnergyUI; }
 	static CJumpMeterUI* GetJumpMeterUI(void) { return m_pJumpMeterUI; }
 	static CItemUI* GetItemUI(void) { return m_pItemUI; }
@@ -61,6 +63,7 @@ private:
 	static CBeach* m_pBeach;						// 砂浜のインスタンス
 	static CWaterSurface* m_pWaterSurface;			// 海のインスタンス
 	static CMapObject* m_pMapObject;				// マップオブジェクトのインスタンス
+	static CFrame* m_pFrame;						// 枠のインスタンス
 	static CEnergyUI* m_pEnergyUI;					// エネルギーUIのインスタンス
 	static CJumpMeterUI* m_pJumpMeterUI;			// ジャンプメーターUIのインスタンス
 	static CItemUI* m_pItemUI;						// アイテムUIのインスタンス

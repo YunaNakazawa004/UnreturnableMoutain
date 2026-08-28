@@ -11,6 +11,7 @@
 #include "sound.h"
 #include "texture.h"
 
+#include "particle3D.h"
 #include "title.h"
 #include "player.h"
 
@@ -148,6 +149,13 @@ void CTutorialJump::Uninit(void)
 //========================================================================
 void CTutorialJump::Update(void)
 {
+	if (m_bClear == false)
+	{// ‚Ü‚¾ƒNƒŠƒA‚µ‚Ä‚¢‚È‚¢
+		CParticle3D::Create(GetPosition(), 1, 1, 4.0f, -0.01f, 0.00f,
+			CEffect3D::TYPE_BLENDADD, CParticle3D::TYPE_PIN, 400, 0.3f, false, COLOR_ORANGE, 10.0f, true,
+			NULL, D3DXVECTOR3(GetPosition().x, GetPosition().y + 10000.0f, GetPosition().z), 0.0001f);
+	}
+
 	CollisionPlayer();
 }
 

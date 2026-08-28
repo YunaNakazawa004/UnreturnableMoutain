@@ -156,6 +156,7 @@
     <ClCompile Include="explosion.cpp" />
     <ClCompile Include="fade.cpp" />
     <ClCompile Include="flower.cpp" />
+    <ClCompile Include="frame.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="grass.cpp" />
     <ClCompile Include="input.cpp" />
@@ -221,6 +222,7 @@
     <ClInclude Include="explosion.h" />
     <ClInclude Include="fade.h" />
     <ClInclude Include="flower.h" />
+    <ClInclude Include="frame.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="grass.h" />
     <ClInclude Include="input.h" />

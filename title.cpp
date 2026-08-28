@@ -20,6 +20,7 @@
 #include "player.h"
 #include "ship.h"
 #include "lab.h"
+#include "frame.h"
 #include "UI_energy.h"
 #include "UI_jump_meter.h"
 #include "UI_action.h"
@@ -34,6 +35,7 @@ CEnterUI* CTitle::m_pEnterUI = NULL;				// エンターUIのインスタンス
 CPlayer* CTitle::m_pPlayer = NULL;					// プレイヤーのインスタンス
 CShip* CTitle::m_pShip = NULL;						// 船のインスタンス
 CLab* CTitle::m_pLab = NULL;						// 研究所のインスタンス
+CFrame* CTitle::m_pFrame = NULL;						// 枠のインスタンス
 CEnergyUI* CTitle::m_pEnergyUI = NULL;				// エネルギーUIのインスタンス
 CJumpMeterUI* CTitle::m_pJumpMeterUI = NULL;		// ジャンプメーターUIのインスタンス
 CActionUI* CTitle::m_pActionUI = NULL;				// アクションUIのインスタンス
@@ -54,6 +56,7 @@ CTitle::CTitle() : CScene(CScene::MODE_TITLE)
 	m_pPlayer = NULL;
 	m_pShip = NULL;
 	m_pLab = NULL;
+	m_pFrame = NULL;
 	m_pEnergyUI = NULL;
 	m_pJumpMeterUI = NULL;
 	m_pActionUI = NULL;
@@ -83,6 +86,7 @@ HRESULT CTitle::Init(void)
 	// テクスチャを読み込み
 	CTitleLogo::Load();
 	CEnterUI::Load();
+	CFrame::Load();
 	CEnergyUI::Load();
 	CJumpMeterUI::Load();
 	CActionUI::Load();
@@ -116,6 +120,21 @@ HRESULT CTitle::Init(void)
 		}
 
 		m_pEnterUI->SetDisp(true);
+	}
+
+	// 枠を生成
+	if (m_pFrame == NULL)
+	{// NULLチェック
+		m_pFrame = CFrame::Create();
+
+		if (m_pFrame == NULL)
+		{// NULLチェック
+			OutputDebugStringA("! ! ! 枠の生成に失敗しました ! ! !\n");
+
+			return E_FAIL;
+		}
+
+		m_pFrame->SetDisp(false);
 	}
 
 	// エネルギーUIを生成
@@ -262,6 +281,7 @@ void CTitle::Uninit(void)
 	CActionUI::Unload();
 	CJumpMeterUI::Unload();
 	CEnergyUI::Unload();
+	CFrame::Unload();
 	CEnterUI::Unload();
 	CTitleLogo::Unload();
 
@@ -319,6 +339,12 @@ void CTitle::Uninit(void)
 		m_pEnergyUI = NULL;
 	}
 
+	// 枠の破棄
+	if (m_pFrame != NULL)
+	{// NULLチェック
+		m_pFrame = NULL;
+	}
+
 	// エンターUIの破棄
 	if (m_pEnterUI != NULL)
 	{// NULLチェック
@@ -349,6 +375,7 @@ void CTitle::Update(void)
 	if (m_bTutorial == false && m_pPlayer->GetState() == CPlayer::STATE_TUTORIAL)
 	{// チュートリアル中
 		// チュートリアル状態に設定
+		m_pFrame->SetDisp(true);
 		m_pEnergyUI->SetDisp(true);
 		m_pEnterUI->SetDisp(false);
 		m_pJumpMeterUI->SetDispAll(true);

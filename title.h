@@ -18,6 +18,7 @@ class CEnterUI;
 class CPlayer;
 class CShip;
 class CLab;
+class CFrame;
 class CEnergyUI;
 class CJumpMeterUI;
 class CActionUI;
@@ -48,6 +49,7 @@ public:
 	static CPlayer* GetPlayer(void) { return m_pPlayer; }
 	static CShip* GetShip(void) { return m_pShip; }
 	static CLab* GetLab(void) { return m_pLab; }
+	static CFrame* GetFrame(void) { return m_pFrame; }
 	static CEnergyUI* GetEnergyUI(void) { return m_pEnergyUI; }
 	static CJumpMeterUI* GetJumpMeterUI(void) { return m_pJumpMeterUI; }
 	static CActionUI* GetActionUI(void) { return m_pActionUI; }
@@ -55,12 +57,15 @@ public:
 	static CTutorialJump* GetTutorialJumpR(void) { return m_pTutorialJumpR; }
 	static CTutorialTxt* GetTutorialTxt(const int nIdx) { return m_apTutorialTxt[nIdx]; }
 
+	static bool isTutorial(void) { return m_bTutorial; }
+
 private:
 	static CTitleLogo* m_pTitleLogo;				// タイトルロゴのインスタンス
 	static CEnterUI* m_pEnterUI;					// エンターUIのインスタンス
 	static CPlayer* m_pPlayer;						// プレイヤーのインスタンス
 	static CShip* m_pShip;							// 船のインスタンス
 	static CLab* m_pLab;							// 研究所のインスタンス
+	static CFrame* m_pFrame;						// 枠のインスタンス
 	static CEnergyUI* m_pEnergyUI;					// エネルギーUIのインスタンス
 	static CJumpMeterUI* m_pJumpMeterUI;			// ジャンプメーターUIのインスタンス
 	static CActionUI* m_pActionUI;					// アクションUIのインスタンス

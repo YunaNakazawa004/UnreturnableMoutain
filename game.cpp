@@ -26,6 +26,7 @@
 #include "player.h"
 #include "ship.h"
 #include "energyrock.h"
+#include "frame.h"
 #include "UI_energy.h"
 #include "UI_jump_meter.h"
 #include "UI_item.h"
@@ -42,6 +43,7 @@ CMountain* CGame::m_pMountain = NULL;				// 山のインスタンス
 CBeach* CGame::m_pBeach = NULL;						// 砂浜のインスタンス
 CWaterSurface* CGame::m_pWaterSurface = NULL;		// 海のインスタンス
 CMapObject* CGame::m_pMapObject = NULL;				// マップオブジェクトのインスタンス
+CFrame* CGame::m_pFrame = NULL;						// 枠のインスタンス
 CEnergyUI* CGame::m_pEnergyUI = NULL;				// エネルギーUIのインスタンス
 CJumpMeterUI* CGame::m_pJumpMeterUI = NULL;			// ジャンプメーターUIのインスタンス
 CItemUI* CGame::m_pItemUI = NULL;					// アイテムUIのインスタンス
@@ -61,6 +63,7 @@ CGame::CGame() : CScene(CScene::MODE_GAME)
 	m_pBeach = NULL;
 	m_pWaterSurface = NULL;
 	m_pMapObject = NULL;
+	m_pFrame = NULL;
 	m_pEnergyUI = NULL;
 	m_pJumpMeterUI = NULL;
 	m_pItemUI = NULL;
@@ -86,6 +89,7 @@ HRESULT CGame::Init(void)
 	CSound* pSound = CManager::GetSound();		// サウンドを取得
 
 	// テクスチャを読み込み
+	CFrame::Load();
 	CEnergyUI::Load();
 	CJumpMeterUI::Load();
 	CItemUI::Load();
@@ -109,6 +113,21 @@ HRESULT CGame::Init(void)
 		}
 	}
 
+	// 枠を生成
+	if (m_pFrame == NULL)
+	{// NULLチェック
+		m_pFrame = CFrame::Create();
+
+		if (m_pFrame == NULL)
+		{// NULLチェック
+			OutputDebugStringA("! ! ! 枠の生成に失敗しました ! ! !\n");
+
+			return E_FAIL;
+		}
+
+		m_pFrame->SetDisp(false);
+	}
+	
 	// エネルギーUIを生成
 	if (m_pEnergyUI == NULL)
 	{// NULLチェック
@@ -327,6 +346,7 @@ void CGame::Uninit(void)
 	CItemUI::Unload();
 	CJumpMeterUI::Unload();
 	CEnergyUI::Unload();
+	CFrame::Unload();
 
 	// アクションUIの破棄
 	if (m_pActionUI != NULL)
@@ -356,6 +376,12 @@ void CGame::Uninit(void)
 	if (m_pEnergyUI != NULL)
 	{// NULLチェック
 		m_pEnergyUI = NULL;
+	}
+	
+	// 枠の破棄
+	if (m_pFrame != NULL)
+	{// NULLチェック
+		m_pFrame = NULL;
 	}
 
 	// 船の破棄

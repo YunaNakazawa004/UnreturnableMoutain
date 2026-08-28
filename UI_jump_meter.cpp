@@ -158,6 +158,24 @@ void CJumpMeterUI::Uninit(void)
 //========================================================================
 void CJumpMeterUI::Update(void)
 {
+#ifdef _DEBUG
+	CInputKeyboard* pInputKeyboard = CManager::GetInputKeyboard();		// キーボード入力の取得
+	CInputJoypad* pInputJoypad = CManager::GetInputJoypad();			// ジョイパッド入力の取得
+
+	// UI隠し
+	if (pInputKeyboard->GetPress(DIK_F3) == true ||
+		pInputJoypad->GetPress(0, CInputJoypad::JOYKEY_BACK) == true)
+	{// キーが押された
+		SetDisp(false);
+		m_pFrame->SetDisp(false);
+	}
+	else if (pInputKeyboard->GetRelease(DIK_F3) == true ||
+		pInputJoypad->GetRelease(0, CInputJoypad::JOYKEY_BACK) == true)
+	{// キーが押された
+		SetDisp(true);
+		m_pFrame->SetDisp(true);
+	}
+#endif
 }
 
 //========================================================================
