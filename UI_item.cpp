@@ -35,9 +35,14 @@ HRESULT CItemUI::Load(void)
 	m_aIdxTexture[1] = pTexture->Register("data\\TEXTURE\\UI\\item001.png");
 	m_aIdxTexture[2] = pTexture->Register("data\\TEXTURE\\UI\\item002.png");
 	m_aIdxTexture[3] = pTexture->Register("data\\TEXTURE\\UI\\item003.png");
-	m_aIdxTexture[4] = pTexture->Register("data\\TEXTURE\\UI\\item_frame.png");
+	m_aIdxTexture[4] = pTexture->Register("data\\TEXTURE\\UI\\item004.png");
+	m_aIdxTexture[5] = pTexture->Register("data\\TEXTURE\\UI\\item005.png");
+	m_aIdxTexture[6] = pTexture->Register("data\\TEXTURE\\UI\\item006.png");
+	m_aIdxTexture[7] = pTexture->Register("data\\TEXTURE\\UI\\item007.png");
+	m_aIdxTexture[8] = pTexture->Register("data\\TEXTURE\\UI\\item_frame.png");
 
-	if (m_aIdxTexture[0] == -1 || m_aIdxTexture[1] == -1 || m_aIdxTexture[2] == -1 || m_aIdxTexture[3] == -1 || m_aIdxTexture[4] == -1)
+	if (m_aIdxTexture[0] == -1 || m_aIdxTexture[1] == -1 || m_aIdxTexture[2] == -1 || m_aIdxTexture[3] == -1 || 
+		m_aIdxTexture[4] == -1 || m_aIdxTexture[5] == -1 || m_aIdxTexture[6] == -1 || m_aIdxTexture[7] == -1 || m_aIdxTexture[8] == -1)
 	{// テクスチャが設定できていない
 		OutputDebugStringA("! ! ! テクスチャの設定に失敗しました ! ! !\n");
 
@@ -132,7 +137,7 @@ HRESULT CItemUI::Init(const D3DXVECTOR3 pos, const float fWidth, const float fHe
 	}
 
 	// アイテムUIクラスの値を初期化
-	for (int nCnt = 0; nCnt < ITEMUI_NUM; nCnt++)
+	for (int nCnt = 0; nCnt < TYPE_MAX; nCnt++)
 	{
 		if (m_Item[nCnt].pItem == NULL)
 		{// NULLチェック
@@ -153,7 +158,7 @@ HRESULT CItemUI::Init(const D3DXVECTOR3 pos, const float fWidth, const float fHe
 			m_Item[nCnt].pCheck->SetDisp(false);
 		}
 
-		m_Item[nCnt].type = TYPE_TREE;
+		m_Item[nCnt].type = TYPE_TREE0;
 	}
 
 	return S_OK;
@@ -164,7 +169,7 @@ HRESULT CItemUI::Init(const D3DXVECTOR3 pos, const float fWidth, const float fHe
 //========================================================================
 void CItemUI::Uninit(void)
 {
-	for (int nCnt = 0; nCnt < ITEMUI_NUM; nCnt++)
+	for (int nCnt = 0; nCnt < TYPE_MAX; nCnt++)
 	{
 		if (m_Item[nCnt].pItem != NULL)
 		{// NULLチェック
@@ -204,7 +209,7 @@ void CItemUI::Draw(void)
 //========================================================================
 int CItemUI::SetItem(const int Item)
 {
-	if (m_nNumItem >= ITEMUI_NUM)
+	if (m_nNumItem >= TYPE_MAX)
 	{// 要素数を越えている
 		return -1;
 	}
@@ -234,7 +239,7 @@ int CItemUI::SetItem(const int Item)
 //========================================================================
 void CItemUI::Check(const int nIdx)
 {
-	if (nIdx >= ITEMUI_NUM)
+	if (nIdx >= TYPE_MAX)
 	{// 要素数を越えている
 		return;
 	}
@@ -254,7 +259,7 @@ void CItemUI::SetDispWOCheck(const bool bDisp)
 	SetDisp(bDisp);
 
 	// アイテムの設定
-	for (int nCnt = 0; nCnt < ITEMUI_NUM; nCnt++)
+	for (int nCnt = 0; nCnt < TYPE_MAX; nCnt++)
 	{
 		if (m_Item[nCnt].pItem != NULL)
 		{// NULLチェック
@@ -272,7 +277,7 @@ void CItemUI::SetDispAll(const bool bDisp)
 	SetDisp(bDisp);
 
 	// アイテムの設定
-	for (int nCnt = 0; nCnt < ITEMUI_NUM; nCnt++)
+	for (int nCnt = 0; nCnt < TYPE_MAX; nCnt++)
 	{
 		if (m_Item[nCnt].pItem != NULL)
 		{// NULLチェック

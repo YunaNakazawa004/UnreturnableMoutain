@@ -27,12 +27,20 @@ class CMotion;
 class CTree : public CObject
 {
 public:
+	// 種類
+	enum TYPE
+	{
+		TYPE_NORMAL = 0,	// 通常
+		TYPE_C,				// 収集アイテム
+		TYPE_MAX
+	};
+
 	CTree(const int nPriority = PRIORITY_3);
 	virtual ~CTree();
 
-	static CTree* Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot);
+	static CTree* Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot, const int type = TYPE_NORMAL);
 	HRESULT Init(void) { return S_OK; }
-	HRESULT Init(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot);
+	HRESULT Init(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot, const int type = TYPE_NORMAL);
 	void Uninit(void);
 	void Update(void);
 	void Draw(void);

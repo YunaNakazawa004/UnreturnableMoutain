@@ -452,9 +452,23 @@ void CPlayer::Update(void)
 	if (m_state == STATE_NORMAL)
 	{// 通常状態のみ
 		// マップ外には行かない
-		if (D3DXVec3Length(&pos) >= OUTMAP)
-		{// マップ外
-			pos = m_posOld;
+		// 移動制限
+		if (pos.x > OUTMAP)
+		{// Xの範囲
+			pos.x = OUTMAP;
+		}
+		else if (pos.x < -OUTMAP)
+		{// Xの範囲
+			pos.x = -OUTMAP;
+		}
+
+		if (pos.z > OUTMAP)
+		{// Zの範囲
+			pos.z = OUTMAP;
+		}
+		else if (pos.z < -OUTMAP)
+		{// Zの範囲
+			pos.z = -OUTMAP;
 		}
 	}
 	else if (m_state == STATE_TUTORIAL)

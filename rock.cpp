@@ -14,13 +14,20 @@
 #include "beach.h"
 
 //************************************************************************
-// マクロ定義
+// 静的メンバ変数宣言
 //************************************************************************
+const char* CRock::m_aFilename[TYPE_MAX] = {			// ファイル名
+	"data\\MODEL\\MAP_OBJECT\\rock.x",
+	"data\\MODEL\\MAP_OBJECT\\rock_C.x",
+	"data\\MODEL\\MAP_OBJECT\\rock_C2.x",
+	"data\\MODEL\\MAP_OBJECT\\rocktree_C.x",
+	"data\\MODEL\\MAP_OBJECT\\leaf_C2.x",
+};
 
 //========================================================================
 // 岩クラスの生成処理
 //========================================================================
-CRock* CRock::Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot)
+CRock* CRock::Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot, const int type)
 {
 #ifndef LIST
 	if (CObject::GetNumAll() >= MAX_OBJECT)
@@ -42,7 +49,7 @@ CRock* CRock::Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot)
 	if (pRock != NULL)
 	{// NULLチェック
 		// モデルファイル設定
-		pRock->BindModel("data\\MODEL\\MAP_OBJECT\\rock.x");
+		pRock->BindModel(m_aFilename[type]);
 
 		// 初期化処理
 		if (FAILED(pRock->Init(pos, rot)))

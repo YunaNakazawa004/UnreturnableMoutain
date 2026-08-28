@@ -22,10 +22,21 @@
 class CRock : public CObjectX
 {
 public:
+	// 種類
+	enum TYPE
+	{
+		TYPE_NORMAL = 0,		// 通常
+		TYPE_C0,				// 収集アイテム
+		TYPE_C1,				// 収集アイテム
+		TYPE_CT,				// 収集アイテム
+		TYPE_CL,				// 収集アイテム
+		TYPE_MAX
+	};
+
 	CRock(const int nPriority = PRIORITY_3);
 	virtual ~CRock();
 
-	static CRock* Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot);
+	static CRock* Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot, const int type = TYPE_NORMAL);
 	HRESULT Init(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot);
 	void Uninit(void);
 	void Update(void);
@@ -35,6 +46,7 @@ public:
 		const float fRadius, const float fHeight, bool* pLand, bool* pHead);
 
 private:
+	static const char* m_aFilename[TYPE_MAX];			// ファイル名
 };
 
 #endif

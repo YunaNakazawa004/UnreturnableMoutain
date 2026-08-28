@@ -15,7 +15,6 @@
 //************************************************************************
 #define ITEMUI_WIDTH		(150.0f)				// アイテムUIの幅
 #define ITEMUI_HEIGHT		(150.0f)				// アイテムUIの高さ
-#define ITEMUI_NUM			(8)						// UIの数
 
 //************************************************************************
 // アイテムUIクラス
@@ -26,10 +25,14 @@ public:
 	// 種類
 	enum TYPE
 	{
-		TYPE_GRASS = 0,		// 草
-		TYPE_TREE,			// 木
-		TYPE_ROCK,			// 岩
-		TYPE_FLOWER,		// 花
+		TYPE_TREE0 = 0,		// 木１
+		TYPE_TREE1,			// 木２
+		TYPE_ROCK0,			// 岩１
+		TYPE_ROCK1,			// 岩２
+		TYPE_FLOWER0,		// 花１
+		TYPE_FLOWER1,		// 花２
+		TYPE_LEAF0,			// 葉１
+		TYPE_LEAF1,			// 葉２
 		TYPE_MAX
 	};
 
@@ -60,7 +63,7 @@ public:
 
 private:
 	static int m_aIdxTexture[TYPE_MAX + 1];		// テクスチャのインデックス
-	Item m_Item[ITEMUI_NUM];		// アイテム情報
+	Item m_Item[TYPE_MAX];			// アイテム情報
 	static int m_nNumItem;			// アイテムの総数
 };
 

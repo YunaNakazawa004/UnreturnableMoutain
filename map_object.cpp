@@ -51,6 +51,62 @@ void CMapObject::Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot, const int 
 	{// NULLチェック
 		switch (mapObj)
 		{
+		case MAP_OBJ_TREE_C0:		// 収集アイテムを生成
+			m_aMapObject[m_nNumObject].apObject = CTree::Create(pos, rot, CTree::TYPE_C);
+			m_aMapObject[m_nNumObject].aObjType = mapObj;
+			m_aMapObject[m_nNumObject].bCollect = bCollect;
+
+			break;
+
+		case MAP_OBJ_TREE_C1:		// 収集アイテムを生成
+			m_aMapObject[m_nNumObject].apObject = CRock::Create(pos, rot, CRock::TYPE_CT);
+			m_aMapObject[m_nNumObject].aObjType = mapObj;
+			m_aMapObject[m_nNumObject].bCollect = bCollect;
+
+			break;
+
+		case MAP_OBJ_ROCK_C0:		// 収集アイテムを生成
+			m_aMapObject[m_nNumObject].apObject = CRock::Create(pos, rot, CRock::TYPE_C0);
+			m_aMapObject[m_nNumObject].aObjType = mapObj;
+			m_aMapObject[m_nNumObject].bCollect = bCollect;
+
+			break;
+
+		case MAP_OBJ_ROCK_C1:		// 収集アイテムを生成
+			m_aMapObject[m_nNumObject].apObject = CRock::Create(pos, rot, CRock::TYPE_C1);
+			m_aMapObject[m_nNumObject].aObjType = mapObj;
+			m_aMapObject[m_nNumObject].bCollect = bCollect;
+
+			break;
+
+		case MAP_OBJ_FLOWER_C0:		// 収集アイテムを生成
+			m_aMapObject[m_nNumObject].apObject = CFlower::Create(pos, rot, CFlower::TYPE_C_0);
+			m_aMapObject[m_nNumObject].aObjType = mapObj;
+			m_aMapObject[m_nNumObject].bCollect = bCollect;
+
+			break;
+
+		case MAP_OBJ_FLOWER_C1:		// 収集アイテムを生成
+			m_aMapObject[m_nNumObject].apObject = CFlower::Create(pos, rot, CFlower::TYPE_C_1);
+			m_aMapObject[m_nNumObject].aObjType = mapObj;
+			m_aMapObject[m_nNumObject].bCollect = bCollect;
+
+			break;
+
+		case MAP_OBJ_LEAF_C0:		// 収集アイテムを生成
+			m_aMapObject[m_nNumObject].apObject = CFlower::Create(pos, rot, CFlower::TYPE_CL_0);
+			m_aMapObject[m_nNumObject].aObjType = mapObj;
+			m_aMapObject[m_nNumObject].bCollect = bCollect;
+
+			break;
+
+		case MAP_OBJ_LEAF_C1:		// 収集アイテムを生成
+			m_aMapObject[m_nNumObject].apObject = CRock::Create(pos, rot, CRock::TYPE_CL);
+			m_aMapObject[m_nNumObject].aObjType = mapObj;
+			m_aMapObject[m_nNumObject].bCollect = bCollect;
+
+			break;
+
 		case MAP_OBJ_GRASS:			// 草を生成
 			m_aMapObject[m_nNumObject].apObject = CGrass::Create(pos, rot);
 			m_aMapObject[m_nNumObject].aObjType = mapObj;

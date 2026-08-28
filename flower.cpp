@@ -24,16 +24,19 @@
 //************************************************************************
 // 静的メンバ変数宣言
 //************************************************************************
-const char* CFlower::m_aFilename[FLOWER_NUM] = {		// 花のファイル名
+const char* CFlower::m_aFilename[FLOWER_NUM + COLLECT_NUM] = {		// 花のファイル名
 	"data\\MODEL\\MAP_OBJECT\\flower_white.x",
 	"data\\MODEL\\MAP_OBJECT\\flower_red.x",
 	"data\\MODEL\\MAP_OBJECT\\flower_blue.x",
+	"data\\MODEL\\MAP_OBJECT\\flower_C.x",
+	"data\\MODEL\\MAP_OBJECT\\flower_C2.x",
+	"data\\MODEL\\MAP_OBJECT\\leaf_C.x",
 };
 
 //========================================================================
 // 花クラスの生成処理
 //========================================================================
-CFlower* CFlower::Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot)
+CFlower* CFlower::Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot, const int type)
 {
 #ifndef LIST
 	if (CObject::GetNumAll() >= MAX_OBJECT)
@@ -54,8 +57,16 @@ CFlower* CFlower::Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot)
 
 	if (pFlower != NULL)
 	{// NULLチェック
-		// モデルファイル設定
-		pFlower->BindModel(m_aFilename[rand() % FLOWER_NUM]);
+		if (type == TYPE_NORMAL)
+		{// ノーマル
+			// モデルファイル設定
+			pFlower->BindModel(m_aFilename[rand() % FLOWER_NUM]);
+		}
+		else
+		{// 収集アイテム
+			// モデルファイル設定
+			pFlower->BindModel(m_aFilename[COLLECT_NUM + type - 1]);
+		}
 
 		// 初期化処理
 		if (FAILED(pFlower->Init(pos, rot)))

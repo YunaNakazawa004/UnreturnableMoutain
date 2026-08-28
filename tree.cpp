@@ -29,7 +29,7 @@
 //========================================================================
 // 木クラスの生成処理
 //========================================================================
-CTree* CTree::Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot)
+CTree* CTree::Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot, const int type)
 {
 #ifndef LIST
 	if (CObject::GetNumAll() >= MAX_OBJECT)
@@ -51,7 +51,7 @@ CTree* CTree::Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot)
 	if (pTree != NULL)
 	{// NULLチェック
 		// 初期化処理
-		if (FAILED(pTree->Init(pos, rot)))
+		if (FAILED(pTree->Init(pos, rot, type)))
 		{// もし失敗した場合
 			OutputDebugStringA("! ! ! 木の初期化に失敗しました ! ! !\n");
 
@@ -96,7 +96,7 @@ CTree::~CTree()
 //========================================================================
 // 木クラスの初期化処理
 //========================================================================
-HRESULT CTree::Init(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot)
+HRESULT CTree::Init(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot, const int type)
 {
 	// 値を初期化
 	m_pos = pos;
@@ -104,11 +104,22 @@ HRESULT CTree::Init(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot)
 	m_scale = D3DXVECTOR3(1.0f, 1.0f, 1.0f);
 	m_col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 
-	// モデルを設定
-	m_apModel[0] = CModel::Create(DEFAULT_VECTER3, m_rot, "data\\MODEL\\MAP_OBJECT\\TREE\\tree.x");
-	m_apModel[0]->SetParent(NULL);
-	m_apModel[1] = CModel::Create(D3DXVECTOR3(0.0f, 150.0f, 0.0f), m_rot, "data\\MODEL\\MAP_OBJECT\\TREE\\treeleaf.x");
-	m_apModel[1]->SetParent(m_apModel[0]);
+	if (type == TYPE_NORMAL)
+	{// 通常
+		// モデルを設定
+		m_apModel[0] = CModel::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), m_rot, "data\\MODEL\\MAP_OBJECT\\TREE\\tree.x");
+		m_apModel[0]->SetParent(NULL);
+		m_apModel[1] = CModel::Create(D3DXVECTOR3(0.0f, 150.0f, 0.0f), m_rot, "data\\MODEL\\MAP_OBJECT\\TREE\\treeleaf.x");
+		m_apModel[1]->SetParent(m_apModel[0]);
+	}
+	else
+	{// 収集アイテム
+		// モデルを設定
+		m_apModel[0] = CModel::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), m_rot, "data\\MODEL\\MAP_OBJECT\\TREE\\tree_C.x");
+		m_apModel[0]->SetParent(NULL);
+		m_apModel[1] = CModel::Create(D3DXVECTOR3(0.0f, 150.0f, 0.0f), m_rot, "data\\MODEL\\MAP_OBJECT\\TREE\\tree_leaf_C.x");
+		m_apModel[1]->SetParent(m_apModel[0]);
+	}
 
 	// モデル数を設定
 	m_nNumModel = 2;

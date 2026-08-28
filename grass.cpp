@@ -154,10 +154,10 @@ HRESULT CGrass::Init(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot)
 	fHeightM = pMountain->GetHeight(posC, polygonIdxM);
 
 	// »•l‚Ìƒ|ƒŠƒSƒ“”Ô†‚ðŽæ“¾
-	polygonIdxB = pMountain->GetPolygonIdx(posC);
+	polygonIdxB = pBeach->GetPolygonIdx(posC);
 
 	// »•l‚Ì’n–Ê‚Ì‚‚³‚ðŽæ“¾
-	fHeightB = pMountain->GetHeight(posC, polygonIdxB);
+	fHeightB = pBeach->GetHeight(posC, polygonIdxB);
 
 	// ÅI“I‚È‚‚³
 	fHeight = (fHeightM >= fHeightB) ? fHeightM : fHeightB;
