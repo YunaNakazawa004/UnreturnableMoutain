@@ -784,7 +784,10 @@ void CPlayer::Update(void)
 
 		// モーションを設定
 		m_pMotion->Set(MOTIONTYPE_DEATH, true, 20);
+	}
 
+	if (m_pMotion->GetType() == MOTIONTYPE_DEATH && m_pMotion->IsFinish() == true)
+	{// 死んだ
 #ifndef _DEBUG		// リリースビルドならリザルト画面へ
 		// 画面遷移
 		CGame::SetFadeEnable();
