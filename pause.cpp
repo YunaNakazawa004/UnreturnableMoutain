@@ -15,13 +15,19 @@
 
 #include "object2D.h"
 
+//*****************************************************************************
+// マクロ定義
+//*****************************************************************************
+#define FADE_SPEED				(0.06f)							// フェードの速さ
+
 //************************************************************************
 // 静的メンバ変数宣言
 //************************************************************************
-const char* CPause::m_apFilename[MENU_MAX] = {				// テクスチャのファイル名
+const char* CPause::m_apFilename[MENU_MAX + 1] = {				// テクスチャのファイル名
 	"data\\TEXTURE\\UI\\pause000.png",
 	"data\\TEXTURE\\UI\\pause001.png",
 	"data\\TEXTURE\\UI\\pause002.png",
+	"data\\TEXTURE\\UI\\pause_back.png",
 };
 
 //========================================================================
@@ -62,8 +68,11 @@ CPause::CPause()
 {
 	// 値をクリア
 	memset(&m_apObject2D[0], NULL, sizeof m_apObject2D);
+	m_pBack = NULL;
 	m_menu = MENU_CONTINUE;
 	m_nMenu = 0;
+	m_fade = FADE_NONE;
+	m_fLength = 0.0f;
 }
 
 //========================================================================
@@ -82,14 +91,24 @@ HRESULT CPause::Init(const MENU menu)
 	m_menu = MENU_CONTINUE;
 	m_nMenu = 0;
 
+	m_pBack = CObject2D::Create(D3DXVECTOR3(640.0f, 360.0f, 0.0f), 640.0f, 360.0f,
+		CObject::TYPE_PAUSE, m_apFilename[MENU_MAX], CObject::PRIORITY_6);
+
+	if (m_pBack != NULL)
+	{// NULLチェック
+		m_pBack->SetColor(D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.0f));
+	}
+
 	for (int nCnt = 0; nCnt < MENU_MAX; nCnt++)
 	{
-		m_apObject2D[nCnt] = CObject2D::Create(D3DXVECTOR3(640.0f, 260.0f + (nCnt * 100.0f), 0.0f), 160.0f, 30.0f,
+		m_apObject2D[nCnt] = CObject2D::Create(D3DXVECTOR3(240.0f + (nCnt * 400.0f), 360.0f, 0.0f), 200.0f, 40.0f,
 			CObject::TYPE_PAUSE, m_apFilename[nCnt], CObject::PRIORITY_6);
 
 		if (m_apObject2D[nCnt] != NULL)
 		{// NULLチェック
 			m_apObject2D[nCnt]->SetDisp(false);
+
+			m_fLength = m_apObject2D[nCnt]->GetSize();
 		}
 	}
 
@@ -109,6 +128,12 @@ void CPause::Uninit(void)
 			m_apObject2D[nCnt] = NULL;
 		}
 	}
+
+	if (m_pBack != NULL)
+	{// NULLチェック
+		// 終了処理
+		m_pBack = NULL;
+	}
 }
 
 //========================================================================
@@ -121,6 +146,7 @@ void CPause::Update(void)
 	CFade* pFade = CManager::GetFade();									// フェードの取得
 	CTransition* pTransition = CManager::GetTransition();				// 画面遷移の取得
 	CSound* pSound = CManager::GetSound();								// サウンドを取得
+	D3DXCOLOR col = m_pBack->GetColor();
 
 	for (int nCnt = 0; nCnt < MENU_MAX; nCnt++)
 	{
@@ -128,13 +154,11 @@ void CPause::Update(void)
 		{// NULLチェック
 			if (m_nMenu == nCnt)
 			{// 選択されている場合
-				// 頂点カラーの設定
-				m_apObject2D[nCnt]->SetColor(COLOR_WHITE);
+				m_apObject2D[nCnt]->SetSize(m_fLength * 1.2f);
 			}
 			else
 			{// 選択されていない場合
-				// 頂点カラーの設定
-				m_apObject2D[nCnt]->SetColor(COLOR_DARKGRAY);
+				m_apObject2D[nCnt]->SetSize(m_fLength);
 			}
 		}
 	}
@@ -188,8 +212,11 @@ void CPause::Update(void)
 
 	if (m_menu == MENU_CONTINUE)
 	{
-		if (pInputKeyboard->GetRepeat(DIK_W) == true || pInputJoypad->GetRepeat(0, CInputJoypad::JOYKEY_UP) == true || 
-			(pInputJoypad->GetStickSlow(0) == true && pInputJoypad->GetStick(0, CInputJoypad::JOYKEY_LEFTSTICK_UP, NULL, NULL) == true))
+		if (pInputKeyboard->GetRepeat(DIK_W) == true || pInputKeyboard->GetRepeat(DIK_A) == true 
+			|| pInputJoypad->GetRepeat(0, CInputJoypad::JOYKEY_UP) == true || 
+			pInputJoypad->GetRepeat(0, CInputJoypad::JOYKEY_LEFT) == true ||
+			(pInputJoypad->GetStickSlow(0) == true && pInputJoypad->GetStick(0, CInputJoypad::JOYKEY_LEFTSTICK_UP, NULL, NULL) == true) ||
+			(pInputJoypad->GetStickSlow(0) == true && pInputJoypad->GetStick(0, CInputJoypad::JOYKEY_LEFTSTICK_LEFT, NULL, NULL) == true))
 		{// 上に移動
 			m_nMenu = (m_nMenu + MENU_MAX - 1) % MENU_MAX;
 
@@ -197,8 +224,11 @@ void CPause::Update(void)
 			pSound->PlaySound(CSound::SE_CURSOR);
 		}
 
-		else if (pInputKeyboard->GetRepeat(DIK_S) == true || pInputJoypad->GetRepeat(0, CInputJoypad::JOYKEY_DOWN) == true || 
-			(pInputJoypad->GetStickSlow(0) == true && pInputJoypad->GetStick(0, CInputJoypad::JOYKEY_LEFTSTICK_DOWN, NULL, NULL) == true))
+		else if (pInputKeyboard->GetRepeat(DIK_S) == true || pInputKeyboard->GetRepeat(DIK_D) == true || 
+			pInputJoypad->GetRepeat(0, CInputJoypad::JOYKEY_DOWN) == true ||
+			pInputJoypad->GetRepeat(0, CInputJoypad::JOYKEY_RIGHT) == true ||
+			(pInputJoypad->GetStickSlow(0) == true && pInputJoypad->GetStick(0, CInputJoypad::JOYKEY_LEFTSTICK_DOWN, NULL, NULL) == true) ||
+			(pInputJoypad->GetStickSlow(0) == true && pInputJoypad->GetStick(0, CInputJoypad::JOYKEY_LEFTSTICK_RIGHT, NULL, NULL) == true))
 		{// 下に移動
 			m_nMenu = (m_nMenu + 1) % MENU_MAX;
 
@@ -206,6 +236,41 @@ void CPause::Update(void)
 			pSound->PlaySound(CSound::SE_CURSOR);
 		}
 	}
+
+	if (m_fade != FADE_NONE)
+	{
+		if (m_fade == FADE_IN)
+		{// フェードイン状態
+			SetDisp(false);
+
+			col.a -= FADE_SPEED;			// ポリゴンを透明にしていく
+
+			if (col.a <= 0.0f)
+			{// 透明になった
+				col.a = 0.0f;
+				m_fade = FADE_NONE;			// 何もしていない状態にする
+			}
+		}
+
+		else if (m_fade == FADE_OUT)
+		{// フェードアウト状態
+			col.a += FADE_SPEED;			// ポリゴンを不透明にしていく
+
+			if (col.a >= 1.0f)
+			{// 不透明になった
+				col.a = 1.0f;
+
+				SetDisp(true);
+			}
+		}
+	}
+	else
+	{
+		col.a = 0.0f;
+	}
+
+	// 色を適用
+	m_pBack->SetColor(col);
 }
 
 //========================================================================
@@ -227,5 +292,16 @@ void CPause::SetDisp(const bool bDisp)
 			// 表示設定
 			m_apObject2D[nCnt]->SetDisp(bDisp);
 		}
+	}
+}
+
+//========================================================================
+// 背景のフェードを設定
+//========================================================================
+void CPause::SetFade(const int fade)
+{
+	if (m_fade != fade)
+	{// 違うときだけ
+		m_fade = fade;
 	}
 }

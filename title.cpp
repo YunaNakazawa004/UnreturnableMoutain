@@ -110,7 +110,7 @@ HRESULT CTitle::Init(void)
 	// エンターUIを生成
 	if (m_pEnterUI == NULL)
 	{// NULLチェック
-		m_pEnterUI = CEnterUI::Create(D3DXVECTOR3(640.0f, 480.0f, 0.0f), 450.0f, 50.0f);
+		m_pEnterUI = CEnterUI::Create(D3DXVECTOR3(640.0f, 480.0f, 0.0f), 250.0f, 50.0f);
 
 		if (m_pEnterUI == NULL)
 		{// NULLチェック
@@ -371,6 +371,15 @@ void CTitle::Update(void)
 	CInputKeyboard* pInputKeyboard = CManager::GetInputKeyboard();		// キーボード入力の取得
 	CTransition* pTransition = CManager::GetTransition();				// 画面遷移の取得
 	CCamera* pCamera = CManager::GetCamera();							// カメラの取得
+
+#ifdef AUTOLOOP_ENABLE
+	if (pTransition != NULL)
+	{// NULLチェック
+		pTransition->SetTransition(MODE_GAME);
+	}
+
+	return;
+#endif
 
 	if (m_bTutorial == false && m_pPlayer->GetState() == CPlayer::STATE_TUTORIAL)
 	{// チュートリアル中

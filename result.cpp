@@ -323,6 +323,15 @@ void CResult::Update(void)
 	CFade* pFade = CManager::GetFade();									// フェードの取得
 	CSound* pSound = CManager::GetSound();								// サウンドを取得
 
+#ifdef AUTOLOOP_ENABLE
+	if (pFade != NULL)
+	{// NULLチェック
+		pFade->SetFade(MODE_RANKING);
+	}
+
+	return;
+#endif
+
 	// 画面遷移
 	if ((pInputKeyboard->GetTrigger(DIK_RETURN) == true ||
 		pInputJoypad->GetTrigger(0, CInputJoypad::JOYKEY_A) == true ||

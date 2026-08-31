@@ -29,6 +29,15 @@ public:
 		MENU_MAX
 	}MENU;
 
+	// 背景のフェード状態
+	enum FADE
+	{
+		FADE_NONE = 0,				// フェードなし
+		FADE_IN,					// フェードイン
+		FADE_OUT,					// フェードアウト
+		FADE_MAX
+	};
+
 	CPause();
 	~CPause();
 
@@ -41,12 +50,16 @@ public:
 	void SetMenu(const MENU menu) { m_menu = menu; m_nMenu = (int)menu; }
 	MENU GetMenu(void) { return m_menu; }
 	void SetDisp(const bool bDisp);
+	void SetFade(const int fade);
 
 private:
-	CObject2D* m_apObject2D[MENU_MAX];			// ポーズメニューのポリゴン
-	static const char* m_apFilename[MENU_MAX];	// テクスチャのファイル名
+	CObject2D* m_apObject2D[MENU_MAX];				// ポーズメニューのポリゴン
+	CObject2D* m_pBack;								// ポーズメニュー背景
+	static const char* m_apFilename[MENU_MAX + 1];	// テクスチャのファイル名
 	MENU m_menu;		// 現在のポーズ選択肢
 	int m_nMenu;		// 現在の選択肢番号
+	int m_fade;			// 背景のフェード状態
+	float m_fLength;	// 既定の大きさ
 };
 
 #endif

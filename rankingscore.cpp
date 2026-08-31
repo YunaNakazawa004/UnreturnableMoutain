@@ -26,7 +26,7 @@
 #define SCORE_POS_X			(471.0f)								// スコア全体の基準位置X座標
 #define SCORE_POS_X_FIRST	(430.0f)								// スコア全体最初の基準位置X座標
 #define SCORE_POS_X_MOVE	(200.0f)								// スコアそれぞれずらすX座標
-#define SCORE_POS_Y			(120.0f)								// スコア全体の基準位置Y座標
+#define SCORE_POS_Y			(150.0f)								// スコア全体の基準位置Y座標
 #define SCORE_LINES			(17.0f)									// スコアとスコアの行間
 #define SCORE_MOVE			(D3DXVECTOR3(10.0f, 0.0f, 0.0f))		// スコアが動く速さ
 #define TEXTURE_WIDTH		(0.1f)									// テクスチャの幅

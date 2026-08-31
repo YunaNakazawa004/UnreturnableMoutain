@@ -37,7 +37,7 @@ HRESULT CEnterUI::Load(void)
 	CTexture* pTexture = CManager::GetTexture();			// テクスチャへのポインタ
 
 	// テクスチャの設定
-	m_nIdxTexture = pTexture->Register("data\\TEXTURE\\UI\\press_enter.png");
+	m_nIdxTexture = pTexture->Register("data\\TEXTURE\\UI\\start.png");
 
 	if (m_nIdxTexture == -1)
 	{// テクスチャが設定できていない

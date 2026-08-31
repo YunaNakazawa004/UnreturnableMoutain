@@ -448,20 +448,36 @@ void CGame::Update(void)
 	CTransition* pTransition = CManager::GetTransition();				// 画面遷移の取得
 	CSound* pSound = CManager::GetSound();								// サウンドを取得
 
+#ifdef AUTOLOOP_ENABLE
+	if (pTransition != NULL)
+	{// NULLチェック
+		pTransition->SetTransition(MODE_RESULT);
+	}
+
+	return;
+#endif
+
 	if (m_pPause != NULL)
 	{// NULLチェック
 		// ポーズ画面表示/非表示
-		m_pPause->SetDisp(CManager::GetPause());
+		if (CManager::GetPause() == true)
+		{// ポーズ中
+			m_pPause->SetFade(2);
+		}
+		else if (CManager::GetPause() == false)
+		{// ポーズしてない
+			m_pPause->SetFade(1);
+		}
+	}
+
+	if (m_pPause != NULL)
+	{// NULLチェック
+		// 更新処理
+		m_pPause->Update();
 	}
 
 	if (CManager::GetPause() == true)
 	{// ポーズ中
-		if (m_pPause != NULL)
-		{// NULLチェック
-			// 更新処理
-			m_pPause->Update();
-		}
-
 		return;
 	}
 	else
@@ -503,7 +519,7 @@ void CGame::Update(void)
 
 #ifdef _DEBUG
 	// 画面遷移（デバッグ）
-	if (pInputKeyboard->GetTrigger(DIK_RETURN) == true ||
+	if (pInputKeyboard->GetTrigger(DIK_Z) == true ||
 		pInputJoypad->GetTrigger(0, CInputJoypad::JOYKEY_START) == true)
 	{// ENTERが押された
 		if (pTransition != NULL)

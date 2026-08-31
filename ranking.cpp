@@ -190,6 +190,15 @@ void CRanking::Update(void)
 	CFade* pFade = CManager::GetFade();									// フェードの取得
 	CSound* pSound = CManager::GetSound();								// サウンドを取得
 
+#ifdef AUTOLOOP_ENABLE
+	if (pFade != NULL)
+	{// NULLチェック
+		pFade->SetFade(MODE_TITLE);
+	}
+
+	return;
+#endif
+
 	m_nModeCounter++;
 
 	// 画面遷移
