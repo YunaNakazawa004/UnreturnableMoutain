@@ -504,6 +504,14 @@ void CManager::Update(void)
 	{// NULLチェック
 		// ジョイパッド入力の更新
 		m_pInputJoypad->Update();
+
+		if (m_pInputJoypad->GetTrigger(0, CInputJoypad::JOYKEY_START) == true)
+		{// ポーズ切り替え
+			m_bPause = m_bPause ? false : true;
+
+			m_pSound->PlaySoundA(CSound::SE_PAUSE);
+		}
+
 	}
 
 	if (m_pDebugProc != NULL)

@@ -135,8 +135,9 @@ public:
 		JOYKEY_RIGHTSTICK_RIGHT,	// [23]右スティックの右入力
 		JOYKEY_RIGHTSTICK_UP,		// [24]右スティックの上入力
 		JOYKEY_RIGHTSTICK_DOWN,		// [25]右スティックの下入力
-		JOYKEY_LEFTTRIGGER,			// [26]左のトリガー
-		JOYKEY_RIGHTTRIGGER,		// [27]右のトリガー
+		JOYKEY_TRIGGER,				// [26]トリガー
+		JOYKEY_LEFTTRIGGER,			// [27]左のトリガー
+		JOYKEY_RIGHTTRIGGER,		// [28]右のトリガー
 		JOYKEY_MAX
 	}JOYKEY;
 
@@ -152,7 +153,7 @@ public:
 	bool GetRelease(int nIdx, JOYKEY key);
 	bool GetRepeat(int nIdx, JOYKEY key);
 	bool GetStick(int nIdx, JOYKEY key, int* pValueH, int* pValueV);
-	bool GetShoulder(int nIdx, JOYKEY key, int* pValue);
+	bool GetShoulder(int nIdx, JOYKEY key, int* pValueR, int* pValueL);
 	bool GetStickSlow(int nIdx);
 	void SetVibration(int nIdx, WORD wLeftVibSpeed, WORD wRightVibSpeed, int nVibCount);
 	void UpdateVibration(void);

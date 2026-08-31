@@ -235,8 +235,8 @@ void CPlayer::Update(void)
 		CGame::GetEnergyUI() : CTitle::GetEnergyUI();		// エネルギーUIの取得
 	CJumpMeterUI* pJumpMeterUI = (CManager::GetMode() == CScene::MODE_GAME) ?
 		CGame::GetJumpMeterUI() : CTitle::GetJumpMeterUI();	// ジャンプメーターUIの取得
-	CShip* pShip = 
-		(CManager::GetMode() == CScene::MODE_GAME) ? 
+	CShip* pShip =
+		(CManager::GetMode() == CScene::MODE_GAME) ?
 		CGame::GetShip() : CTitle::GetShip();				// 船の取得
 	CScore* pScore = CGame::GetScore();						// スコアの取得
 	D3DXVECTOR3 pos = CPlayer::GetPosition();				// プレイヤーの位置	
@@ -251,7 +251,7 @@ void CPlayer::Update(void)
 
 	float fHeightB = 0.0f;		// 砂浜の地面の高さ
 	D3DXVECTOR2 polygonIdxB = { -1.0f,-1.0f };		// ポリゴン番号
-	
+
 	float fHeightW = 0.0f;		// 水面の地面の高さ
 	D3DXVECTOR2 polygonIdxW = { -1.0f,-1.0f };		// ポリゴン番号
 
@@ -299,7 +299,7 @@ void CPlayer::Update(void)
 		pDebugProc->Print("状態 : チュートリアル状態\n");
 
 		break;
-		
+
 	case STATE_WAIT:		// 待機状態
 		pDebugProc->Print("状態 : 待機状態\n");
 
@@ -505,7 +505,7 @@ void CPlayer::Update(void)
 	// 角度を慣性ありで加算
 	rot.y += (m_rotDest.y - rot.y) * 0.1f;
 
-	if ((m_state == STATE_NORMAL && pos.x != m_posOld.x && pos.z != m_posOld.z) || 
+	if ((m_state == STATE_NORMAL && pos.x != m_posOld.x && pos.z != m_posOld.z) ||
 		m_state == STATE_APPEAR || m_state == STATE_DEATH)
 	{// 通常状態のみ
 		// 山のポリゴン番号を取得
@@ -533,8 +533,6 @@ void CPlayer::Update(void)
 			polygonIdx = polygonIdxB;
 			pMeshField = pBeach;
 		}
-
-		pDebugProc->Print("傾斜 : %f\n", pMeshField->GetSlope(pos, polygonIdx));
 
 		if (m_bJump == false)
 		{// 地上にいるときだけ
@@ -678,36 +676,6 @@ void CPlayer::Update(void)
 			// エネルギーを消費する
 			m_nEnergyCounter++;
 		}
-	}
-
-	// 転ぶ
-	if (m_bJump == true)
-	{// 空中にいるとき
-		float headLine = m_apModel[3]->GetMtxWorld()._42 - 5.0f;
-
-		if (headLine < fHeight)
-		{// 上半身が先に地面についた
-			m_state = STATE_FALL;
-
-			// モーションを設定
-			m_pMotion->Set(MOTIONTYPE_FALL, true, 20);
-
-			m_bLand = true;
-
-			m_move.y = 0.0f;
-			m_bJump = false;
-
-			m_fEnergy -= ONE_ENERGY;
-			m_fUsedEnergy += ONE_ENERGY;
-		}
-	}
-
-	if (m_bLand == true && m_pMotion->GetType() == MOTIONTYPE_FALL && m_pMotion->IsFinish() == true)
-	{// 転びモーションが終わった
-		m_bLand = false;
-		m_bAct = false;
-
-		m_state = STATE_NORMAL;
 	}
 
 	if (pos.y <= fHeight || bLand == true)
@@ -977,7 +945,7 @@ bool CPlayer::Movement(const D3DXVECTOR3 rot)
 	D3DXVECTOR3 UpperRotDest = { 0.0f,0.0f,0.0f };			// 上半身の目的の傾き
 
 	bool bMove = false;
-	int nValueH, nValueV;
+	int nValueH = 0, nValueV = 0, nValueL = 0, nValueR = 0;
 	static float fRotCounterX = 0.0f;		// 傾きの追加角度X
 	static float fRotCounterZ = 0.0f;		// 傾きの追加角度Z
 
@@ -986,24 +954,44 @@ bool CPlayer::Movement(const D3DXVECTOR3 rot)
 	float fSpeedX = (m_bJump ? AIR_MOVEMENT.x : LAND_MOVEMENT.x) * fCustomSpeed;
 	float fSpeedZ = (m_bJump ? AIR_MOVEMENT.z : LAND_MOVEMENT.z) * fCustomSpeed;
 
-	if (pInputJoypad->GetStick(0, CInputJoypad::JOYKEY_LEFTSTICK, &nValueH, &nValueV) == true)
-	{// スティック移動
-		float fSpeed = (m_bJump ? -(float)nValueV * 0.0000183f / 6.0f : -(float)nValueV * 0.0000183f) * fCustomSpeed;		// スピード
+	if (pInputJoypad->GetShoulder(0, CInputJoypad::JOYKEY_TRIGGER, &nValueR, &nValueL) == true)
+	{// トリガースティック移動
+		float fSpeed = 0.0f, fBrake = 0.0f;
+		
+		if (nValueR > 0)
+		{// 入力されている
+			fSpeed = (m_bJump ? -(float)nValueR * 0.0025f / 6.0f : -(float)nValueR * 0.0025f) * fCustomSpeed;	// スピード(トリガー)
 
-		m_move.x += sinf(rot.y) * fSpeed;
-		m_move.z += cosf(rot.y) * fSpeed;
+			// 進んだ方向にモデルを傾ける
+			UnderRotDest.x = -(MODEL_ROT + fRotCounterX);
+			UpperRotDest.x = -MODEL_ROT;
+			TireRot.x += -TIRE_ROT;
+		}
+		
+		if (nValueL > 0)
+		{// 入力されている
+			fBrake = (m_bJump ? -(float)nValueL * 0.0025f / 6.0f : -(float)nValueL * 0.0025f) * fCustomSpeed;	// スピード(トリガー)
 
-		// 進んだ方向にモデルを傾ける
-		UnderRotDest.x = (MODEL_ROT + fRotCounterX) * ((nValueV < 0) ? 1 : -1);
-		UnderRotDest.z = (MODEL_ROT + fRotCounterZ) * ((nValueH < 0) ? -1 : 1);
-		UpperRotDest.x = MODEL_ROT * ((nValueV < 0) ? 1 : -1);
-		UpperRotDest.z = MODEL_ROT * ((nValueH < 0) ? -1 : 1);
-		TireRot.x += TIRE_ROT * ((nValueV < 0) ? 1 : -1);
+			// 進んだ方向にモデルを傾ける
+			UnderRotDest.x = (MODEL_ROT + fRotCounterX);
+			UpperRotDest.x = MODEL_ROT;
+			TireRot.x += TIRE_ROT;
+		}
+		
+		m_move.x += sinf(rot.y) * (fSpeed - fBrake);
+		m_move.z += cosf(rot.y) * (fSpeed - fBrake);
 
-		// 進んだ方向に角度を向ける
-		m_rotDest.y = rot.y + ((float)nValueH * 0.00001f * ((nValueV < 0) ? -1 : 1));
+		if (pInputJoypad->GetStick(0, CInputJoypad::JOYKEY_LEFTSTICK, &nValueH, &nValueV) == true)
+		{// スティックで方向
+			// 進んだ方向にモデルを傾ける
+			UnderRotDest.z = (MODEL_ROT + fRotCounterZ) * ((nValueH < 0) ? -1 : 1);
+			UpperRotDest.z = MODEL_ROT * ((nValueH < 0) ? -1 : 1);
 
-		if (nValueV != 0 && m_bJump == true)
+			// 進んだ方向に角度を向ける
+			m_rotDest.y = rot.y + ((float)nValueH * 0.00001f * ((nValueL > 0) ? -1 : 1));
+		}
+
+		if (nValueR != 0 && m_bJump == true)
 		{// 前後にも動いている/空中
 			fRotCounterX += MODEL_ROT_X;		// カウンター加算
 		}

@@ -208,6 +208,8 @@ void CRanking::Update(void)
 		m_nModeCounter >= TITLE_COUNT) && isFade() == true)
 	{// ENTER‚ª‰Ÿ‚³‚ê‚½
 		pSound->PlaySound(CSound::SE_ENTER);
+		pInputJoypad->SetVibration(0, 500, 500, 20);
+
 		m_nModeCounter = 0;
 
 		if (pFade != NULL)

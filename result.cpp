@@ -341,6 +341,7 @@ void CResult::Update(void)
 		{// NULLチェック
 			CRanking::SetUserScore(m_pFinalScore->GetScore());
 			pSound->PlaySound(CSound::SE_ENTER);
+			pInputJoypad->SetVibration(0, 500, 500, 20);
 
 			pFade->SetFade(MODE_RANKING);
 		}

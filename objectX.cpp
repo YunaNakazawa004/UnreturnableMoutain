@@ -575,7 +575,10 @@ bool CObjectX::Collision(D3DXVECTOR3* pPos, D3DXVECTOR3* pPosOld, D3DXVECTOR3* p
 					pPos->y = m_pos.y + m_VtxMin.y - fHeight;
 					pMove->y = -0.5f;							// 移動量を0にする
 
-					*pHead = true;
+					if (pHead != NULL)
+					{// NULLチェック
+						*pHead = true;
+					}
 				}
 				else if ((m_pos.y + m_VtxMax.y <= pPosOld->y) &&
 					(m_pos.y + m_VtxMax.y >= pPos->y))

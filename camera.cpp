@@ -23,7 +23,7 @@
 
 #define CAMERA_POS				(D3DXVECTOR3(0.0f, 100.0f, -200.0f))	// 初期座標
 #define FIRST_ROT_X				(200.0f)								// 視点と注視点間の距離
-#define HEIGHT					(0.0f)									// 視点の高さ
+#define HEIGHT					(10.0f)									// 視点の高さ
 #define MOVEMENT				(D3DXVECTOR3(5.0f, 5.0f, 5.0f))			// 移動量
 #define MAUSE_MOVEV				(0.005f)								// マウス使用時の視点移動量
 #define MAUSE_MOVER				(0.003f)								// マウス使用時の注視点移動量

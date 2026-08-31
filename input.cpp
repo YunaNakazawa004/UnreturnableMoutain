@@ -613,13 +613,36 @@ bool CInputJoypad::GetStick(int nIdx, JOYKEY key, int* pValueH, int* pValueV)
 //=============================================================================
 // ジョイパッドの肩トリガー情報を取得(true : 動く	false : 動かない)
 //=============================================================================
-bool CInputJoypad::GetShoulder(int nIdx, JOYKEY key, int* pValue)
+bool CInputJoypad::GetShoulder(int nIdx, JOYKEY key, int* pValueR, int* pValueL)
 {
+	if (key == JOYKEY_TRIGGER)
+	{// 両方
+		if (pValueL != NULL)
+		{// 左トリガー
+			*pValueL = m_joykeyState[nIdx].Gamepad.bLeftTrigger;
+		}
+
+		if (pValueR != NULL)
+		{// 右トリガー
+			*pValueR = m_joykeyState[nIdx].Gamepad.bRightTrigger;
+		}
+
+		if (m_joykeyState[nIdx].Gamepad.bLeftTrigger > XINPUT_GAMEPAD_TRIGGER_THRESHOLD || 
+			m_joykeyState[nIdx].Gamepad.bRightTrigger > XINPUT_GAMEPAD_TRIGGER_THRESHOLD)
+		{// 入力がある
+			return true;
+		}
+		else
+		{// 入力がない
+			return false;
+		}
+	}
+
 	if (key == JOYKEY_LEFTTRIGGER)
 	{// 左トリガー
-		if (pValue != NULL)
-		{// 水平方向
-			*pValue = m_joykeyState[nIdx].Gamepad.bLeftTrigger;
+		if (pValueL != NULL)
+		{// 左トリガー
+			*pValueL = m_joykeyState[nIdx].Gamepad.bLeftTrigger;
 		}
 
 		if (m_joykeyState[nIdx].Gamepad.bLeftTrigger > XINPUT_GAMEPAD_TRIGGER_THRESHOLD)
@@ -634,9 +657,9 @@ bool CInputJoypad::GetShoulder(int nIdx, JOYKEY key, int* pValue)
 
 	if (key == JOYKEY_RIGHTTRIGGER)
 	{// 右トリガー
-		if (pValue != NULL)
-		{// 水平方向
-			*pValue = m_joykeyState[nIdx].Gamepad.bRightTrigger;
+		if (pValueR != NULL)
+		{// 右トリガー
+			*pValueR = m_joykeyState[nIdx].Gamepad.bRightTrigger;
 		}
 
 		if (m_joykeyState[nIdx].Gamepad.bRightTrigger > XINPUT_GAMEPAD_TRIGGER_THRESHOLD)

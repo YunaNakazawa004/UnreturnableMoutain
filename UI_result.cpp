@@ -217,6 +217,7 @@ void CResultUI::Update(void)
 		{// ƒL[‚ª‰Ÿ‚³‚ê‚½
 			m_pDecision->SetDisp(true);
 			pSound->PlaySound(CSound::SE_DECISION);
+			pInputJoypad->SetVibration(0, 500, 500, 20);
 
 			CResult::SetFadeEnable();
 		}

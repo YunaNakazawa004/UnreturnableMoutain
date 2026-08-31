@@ -163,77 +163,80 @@ void CPause::Update(void)
 		}
 	}
 
-	if ((pInputKeyboard->GetTrigger(DIK_RETURN) == true || pInputJoypad->GetTrigger(0, CInputJoypad::JOYKEY_A) == true))
-	{// 決定キーが押された
+	if (CManager::GetPause() == true)
+	{// ポーズ中
+		if ((pInputKeyboard->GetTrigger(DIK_RETURN) == true || pInputJoypad->GetTrigger(0, CInputJoypad::JOYKEY_A) == true))
+		{// 決定キーが押された
 
-		switch (m_nMenu)
-		{
-		case MENU_CONTINUE:		// ポーズを解除
+			switch (m_nMenu)
+			{
+			case MENU_CONTINUE:		// ポーズを解除
+				m_menu = MENU_CONTINUE;
+				CManager::SetPause(false);
+
+				// サウンドの再生
+				pSound->PlaySound(CSound::SE_PAUSE);
+
+				break;
+
+			case MENU_RETRY:			// モード設定(ゲーム画面に移行)
+				m_menu = MENU_RETRY;
+
+				if (pTransition != NULL)
+				{// NULLチェック
+					pTransition->SetTransition(CScene::MODE_GAME);
+				}
+
+				// サウンドの再生
+				pSound->PlaySound(CSound::SE_ENTER);
+
+				break;
+
+			case MENU_QUIT:			// モード設定(タイトル画面に移行)
+				m_menu = MENU_QUIT;
+
+				if (pTransition != NULL)
+				{// NULLチェック
+					pTransition->SetTransition(CScene::MODE_TITLE);
+				}
+
+				// サウンドの再生
+				pSound->PlaySound(CSound::SE_ENTER);
+
+				break;
+			}
+		}
+		else if ((pInputKeyboard->GetTrigger(DIK_P) == true || pInputJoypad->GetTrigger(0, CInputJoypad::JOYKEY_START) == true))
+		{// 閉じられた
+			m_nMenu = 0;
 			m_menu = MENU_CONTINUE;
-			CManager::SetPause(false);
-
-			// サウンドの再生
-			pSound->PlaySound(CSound::SE_PAUSE);
-
-			break;
-
-		case MENU_RETRY:			// モード設定(ゲーム画面に移行)
-			m_menu = MENU_RETRY;
-
-			if (pTransition != NULL)
-			{// NULLチェック
-				pTransition->SetTransition(CScene::MODE_GAME);
-			}
-
-			// サウンドの再生
-			pSound->PlaySound(CSound::SE_ENTER);
-
-			break;
-
-		case MENU_QUIT:			// モード設定(タイトル画面に移行)
-			m_menu = MENU_QUIT;
-
-			if (pTransition != NULL)
-			{// NULLチェック
-				pTransition->SetTransition(CScene::MODE_TITLE);
-			}
-
-			// サウンドの再生
-			pSound->PlaySound(CSound::SE_ENTER);
-
-			break;
-		}
-	}
-	else if ((pInputKeyboard->GetTrigger(DIK_P) == true || pInputJoypad->GetTrigger(0, CInputJoypad::JOYKEY_START) == true))
-	{// 閉じられた
-		m_nMenu = 0;
-		m_menu = MENU_CONTINUE;
-	}
-
-	if (m_menu == MENU_CONTINUE)
-	{
-		if (pInputKeyboard->GetRepeat(DIK_W) == true || pInputKeyboard->GetRepeat(DIK_A) == true 
-			|| pInputJoypad->GetRepeat(0, CInputJoypad::JOYKEY_UP) == true || 
-			pInputJoypad->GetRepeat(0, CInputJoypad::JOYKEY_LEFT) == true ||
-			(pInputJoypad->GetStickSlow(0) == true && pInputJoypad->GetStick(0, CInputJoypad::JOYKEY_LEFTSTICK_UP, NULL, NULL) == true) ||
-			(pInputJoypad->GetStickSlow(0) == true && pInputJoypad->GetStick(0, CInputJoypad::JOYKEY_LEFTSTICK_LEFT, NULL, NULL) == true))
-		{// 上に移動
-			m_nMenu = (m_nMenu + MENU_MAX - 1) % MENU_MAX;
-
-			// サウンドの再生
-			pSound->PlaySound(CSound::SE_CURSOR);
 		}
 
-		else if (pInputKeyboard->GetRepeat(DIK_S) == true || pInputKeyboard->GetRepeat(DIK_D) == true || 
-			pInputJoypad->GetRepeat(0, CInputJoypad::JOYKEY_DOWN) == true ||
-			pInputJoypad->GetRepeat(0, CInputJoypad::JOYKEY_RIGHT) == true ||
-			(pInputJoypad->GetStickSlow(0) == true && pInputJoypad->GetStick(0, CInputJoypad::JOYKEY_LEFTSTICK_DOWN, NULL, NULL) == true) ||
-			(pInputJoypad->GetStickSlow(0) == true && pInputJoypad->GetStick(0, CInputJoypad::JOYKEY_LEFTSTICK_RIGHT, NULL, NULL) == true))
-		{// 下に移動
-			m_nMenu = (m_nMenu + 1) % MENU_MAX;
+		if (m_menu == MENU_CONTINUE)
+		{
+			if (pInputKeyboard->GetRepeat(DIK_W) == true || pInputKeyboard->GetRepeat(DIK_A) == true
+				|| pInputJoypad->GetRepeat(0, CInputJoypad::JOYKEY_UP) == true ||
+				pInputJoypad->GetRepeat(0, CInputJoypad::JOYKEY_LEFT) == true ||
+				(pInputJoypad->GetStickSlow(0) == true && pInputJoypad->GetStick(0, CInputJoypad::JOYKEY_LEFTSTICK_UP, NULL, NULL) == true) ||
+				(pInputJoypad->GetStickSlow(0) == true && pInputJoypad->GetStick(0, CInputJoypad::JOYKEY_LEFTSTICK_LEFT, NULL, NULL) == true))
+			{// 上に移動
+				m_nMenu = (m_nMenu + MENU_MAX - 1) % MENU_MAX;
 
-			// サウンドの再生
-			pSound->PlaySound(CSound::SE_CURSOR);
+				// サウンドの再生
+				pSound->PlaySound(CSound::SE_CURSOR);
+			}
+
+			else if (pInputKeyboard->GetRepeat(DIK_S) == true || pInputKeyboard->GetRepeat(DIK_D) == true ||
+				pInputJoypad->GetRepeat(0, CInputJoypad::JOYKEY_DOWN) == true ||
+				pInputJoypad->GetRepeat(0, CInputJoypad::JOYKEY_RIGHT) == true ||
+				(pInputJoypad->GetStickSlow(0) == true && pInputJoypad->GetStick(0, CInputJoypad::JOYKEY_LEFTSTICK_DOWN, NULL, NULL) == true) ||
+				(pInputJoypad->GetStickSlow(0) == true && pInputJoypad->GetStick(0, CInputJoypad::JOYKEY_LEFTSTICK_RIGHT, NULL, NULL) == true))
+			{// 下に移動
+				m_nMenu = (m_nMenu + 1) % MENU_MAX;
+
+				// サウンドの再生
+				pSound->PlaySound(CSound::SE_CURSOR);
+			}
 		}
 	}
 
