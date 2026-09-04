@@ -24,7 +24,6 @@
 #include "UI_energy.h"
 #include "UI_jump_meter.h"
 #include "UI_action.h"
-#include "tutorial_jump.h"
 #include "tutorial_txt.h"
 
 //************************************************************************
@@ -35,12 +34,10 @@ CEnterUI* CTitle::m_pEnterUI = NULL;				// エンターUIのインスタンス
 CPlayer* CTitle::m_pPlayer = NULL;					// プレイヤーのインスタンス
 CShip* CTitle::m_pShip = NULL;						// 船のインスタンス
 CLab* CTitle::m_pLab = NULL;						// 研究所のインスタンス
-CFrame* CTitle::m_pFrame = NULL;						// 枠のインスタンス
+CFrame* CTitle::m_pFrame = NULL;					// 枠のインスタンス
 CEnergyUI* CTitle::m_pEnergyUI = NULL;				// エネルギーUIのインスタンス
 CJumpMeterUI* CTitle::m_pJumpMeterUI = NULL;		// ジャンプメーターUIのインスタンス
 CActionUI* CTitle::m_pActionUI = NULL;				// アクションUIのインスタンス
-CTutorialJump* CTitle::m_pTutorialJumpL = NULL;		// ジャンプバーのインスタンス
-CTutorialJump* CTitle::m_pTutorialJumpR = NULL;		// ジャンプバーのインスタンス
 CTutorialTxt* CTitle::m_apTutorialTxt[NUM_TUTORIALTXT] = {};		// チュートリアル文のインスタンス
 bool CTitle::m_bTutorial = false;					// チュートリアル中かどうかのフラグ
 bool CTitle::m_bReady = false;						// チュートリアル完了フラグ
@@ -60,8 +57,6 @@ CTitle::CTitle() : CScene(CScene::MODE_TITLE)
 	m_pEnergyUI = NULL;
 	m_pJumpMeterUI = NULL;
 	m_pActionUI = NULL;
-	m_pTutorialJumpL = NULL;
-	m_pTutorialJumpR = NULL;
 	memset(&m_apTutorialTxt[0], NULL, sizeof m_apTutorialTxt);
 	m_bTutorial = false;
 	m_bReady = false;
@@ -201,7 +196,7 @@ HRESULT CTitle::Init(void)
 	// 船を生成
 	if (m_pShip == NULL)
 	{// NULLチェック
-		m_pShip = CShip::Create(D3DXVECTOR3(0.0f, 0.0f, -130.0f), DEFAULT_VECTER3);
+		m_pShip = CShip::Create(D3DXVECTOR3(0.0f, -4.0f, -130.0f), DEFAULT_VECTER3);
 
 		if (m_pShip == NULL)
 		{// NULLチェック
@@ -221,32 +216,6 @@ HRESULT CTitle::Init(void)
 		if (m_pLab == NULL)
 		{// NULLチェック
 			OutputDebugStringA("! ! ! 研究所の生成に失敗しました ! ! !\n");
-
-			return E_FAIL;
-		}
-	}
-	
-	// ジャンプバーを生成
-	if (m_pTutorialJumpL == NULL)
-	{// NULLチェック
-		m_pTutorialJumpL = CTutorialJump::Create(D3DXVECTOR3(-235.0f, 25.0f, -120.0f), DEFAULT_VECTER3);
-
-		if (m_pTutorialJumpL == NULL)
-		{// NULLチェック
-			OutputDebugStringA("! ! ! ジャンプバーの生成に失敗しました ! ! !\n");
-
-			return E_FAIL;
-		}
-	}
-	
-	// ジャンプバーを生成
-	if (m_pTutorialJumpR == NULL)
-	{// NULLチェック
-		m_pTutorialJumpR = CTutorialJump::Create(D3DXVECTOR3(235.0f, 40.0f, -120.0f), DEFAULT_VECTER3);
-
-		if (m_pTutorialJumpR == NULL)
-		{// NULLチェック
-			OutputDebugStringA("! ! ! ジャンプバーの生成に失敗しました ! ! !\n");
 
 			return E_FAIL;
 		}
@@ -289,18 +258,6 @@ void CTitle::Uninit(void)
 	if (m_apTutorialTxt[0] != NULL || m_apTutorialTxt[1] != NULL || m_apTutorialTxt[2] != NULL || m_apTutorialTxt[3] != NULL)
 	{// NULLチェック
 		memset(&m_apTutorialTxt[0], NULL, sizeof m_apTutorialTxt);
-	}
-	
-	// ジャンプバーの破棄
-	if (m_pTutorialJumpR != NULL)
-	{// NULLチェック
-		m_pTutorialJumpR = NULL;
-	}
-
-	// ジャンプバーの破棄
-	if (m_pTutorialJumpL != NULL)
-	{// NULLチェック
-		m_pTutorialJumpL = NULL;
 	}
 	
 	// 研究所の破棄
@@ -396,8 +353,7 @@ void CTitle::Update(void)
 		m_bTutorial = true;
 	}
 
-	if (m_pTutorialJumpL->GetClear() == true && m_pTutorialJumpR->GetClear() == true &&
-		m_pPlayer->GetEnergy() > 40.0f && m_bReady == false)
+	if (m_pPlayer->GetEnergy() > 40.0f && m_bReady == false)
 	{// チュートリアルクリア
 		m_pShip->SetState(CShip::STATE_READY);
 

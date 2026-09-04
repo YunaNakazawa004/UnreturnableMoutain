@@ -408,6 +408,12 @@ void CShip::Update(void)
 
 		if (pos.y > fHeight + 10.0f)
 		{// 落ちる
+			if (pInputKeyboard->GetTrigger(DIK_SPACE) == true ||
+				pInputJoypad->GetTrigger(0, CInputJoypad::JOYKEY_A) == true)
+			{// スキップ
+				pos.y = fHeight + 10.0f;
+			}
+
 			pos.y += (fHeight - pos.y) * 0.005f;
 
 			pInputJoypad->SetVibration(0, 20000, 20000, 10);

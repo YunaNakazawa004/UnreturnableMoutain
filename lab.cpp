@@ -119,7 +119,7 @@ HRESULT CLab::Init(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot)
 
 	D3DXVECTOR3 posE;
 	posE.x = m_apModel[5]->GetMtxWorld()._41;
-	posE.y = m_apModel[5]->GetMtxWorld()._42 + 15.0f;
+	posE.y = m_apModel[5]->GetMtxWorld()._42 + 4.0f;
 	posE.z = m_apModel[5]->GetMtxWorld()._43 + 70.0f;
 
 	// チュートリアル用のエネルギー鉱石

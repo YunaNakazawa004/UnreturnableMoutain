@@ -369,56 +369,6 @@ void CPlayer::Update(void)
 		}
 	}
 
-	if (m_bJump == false && (m_state == STATE_NORMAL || m_state == STATE_TUTORIAL))
-	{// ジャンプしていないとき
-		static float fMinusEnergy = 0.0f;
-
-		if (pInputKeyboard->GetPress(DIK_SPACE) == true || pInputJoypad->GetPress(0, CInputJoypad::JOYKEY_A) == true)
-		{// ジャンプキー長押し
-			// ジャンプ量を上げる
-			m_fJumpHigh += JUMP_ADD;
-
-			if (m_fJumpHigh > MAX_JUMP)
-			{// 最大値に固定
-				m_fJumpHigh = MAX_JUMP;
-			}
-			else
-			{// 最大値ではないときだけ
-				// モデルの位置を変更
-				UpperPos.y -= JUMP_ADD;
-
-				// 消費するエネルギー量を増やす
-				fMinusEnergy += 0.1f;
-			}
-		}
-
-		if (pInputKeyboard->GetRelease(DIK_SPACE) == true || pInputJoypad->GetRelease(0, CInputJoypad::JOYKEY_A) == true)
-		{// ジャンプ
-			m_bJump = true;
-			m_move.y = JUMP_HEIGHT + (JUMP_HEIGHT * m_fJumpHigh) - ((JUMP_HEIGHT * 0.8f) * (m_fEnergy * 0.01f));
-
-			pSound->PlaySound(CSound::SE_ROBO_JUMP);
-
-			// モーションを設定
-			m_pMotion->Set(MOTIONTYPE_JUMP, true, 20);
-
-			// ジャンプ量リセット
-			m_fJumpHigh = 0.0f;
-			UpperPos.y = UpperPosOff.y;
-
-			if (m_state == STATE_NORMAL)
-			{// 通常状態のみ
-				// エネルギーを消費する
-				m_fEnergy -= fMinusEnergy;
-				m_fUsedEnergy += fMinusEnergy;
-
-				pScore->Minus((int)(fMinusEnergy * 1000.0f));
-			}
-
-			fMinusEnergy = 0.0f;		// リセット
-		}
-	}
-
 #ifdef _DEBUG
 	if (pInputKeyboard->GetTrigger(DIK_BACKSPACE) == true || pInputJoypad->GetTrigger(0, CInputJoypad::JOYKEY_START) == true)
 	{// 位置回転リセット
@@ -971,47 +921,35 @@ bool CPlayer::Movement(const D3DXVECTOR3 rot)
 
 	// 8方向移動時のスピード
 	float fCustomSpeed = (1.5f - (m_fEnergy * 0.01f)) * ((fRotCounterZ >= MAX_ROTADD || fRotCounterZ <= MIN_ROTADD) ? 0.1f : 1.0f) * 0.5f;
+
+	// ダッシュ
+	if (pInputKeyboard->GetPress(DIK_SPACE) == true ||
+		pInputJoypad->GetShoulder(0, CInputJoypad::JOYKEY_RIGHTTRIGGER, &nValueR, &nValueL))
+	{// ダッシュキーが押された
+		fCustomSpeed *= 3.0f;
+	}
+
 	float fSpeedX = (m_bJump ? AIR_MOVEMENT.x : LAND_MOVEMENT.x) * fCustomSpeed;
 	float fSpeedZ = (m_bJump ? AIR_MOVEMENT.z : LAND_MOVEMENT.z) * fCustomSpeed;
 
-	if (pInputJoypad->GetShoulder(0, CInputJoypad::JOYKEY_TRIGGER, &nValueR, &nValueL) == true)
-	{// トリガースティック移動
-		float fSpeed = 0.0f, fBrake = 0.0f;
-		
-		if (nValueR > 0)
-		{// 入力されている
-			fSpeed = (m_bJump ? -(float)nValueR * 0.0025f / 6.0f : -(float)nValueR * 0.0025f) * fCustomSpeed;	// 右トリガーでの移動量
+	if (pInputJoypad->GetStick(0, CInputJoypad::JOYKEY_LEFTSTICK, &nValueH, &nValueV) == true)
+	{// スティック移動
+		float fSpeed = (m_bJump ? -(float)nValueV * 0.0000183f / 6.0f : -(float)nValueV * 0.0000183f) * fCustomSpeed;		// スピード
 
-			// 進んだ方向にモデルを傾ける
-			UnderRotDest.x = -(MODEL_ROT + fRotCounterX);
-			UpperRotDest.x = -MODEL_ROT;
-			TireRot.x += -TIRE_ROT;
-		}
-		
-		if (nValueL > 0)
-		{// 入力されている
-			fBrake = (m_bJump ? -(float)nValueL * 0.0025f / 6.0f : -(float)nValueL * 0.0025f) * fCustomSpeed;	// 左トリガーでの移動量
+		m_move.x += sinf(rot.y) * fSpeed;
+		m_move.z += cosf(rot.y) * fSpeed;
 
-			// 進んだ方向にモデルを傾ける
-			UnderRotDest.x = (MODEL_ROT + fRotCounterX);
-			UpperRotDest.x = MODEL_ROT;
-			TireRot.x += TIRE_ROT;
-		}
-		
-		m_move.x += sinf(rot.y) * (fSpeed - fBrake);
-		m_move.z += cosf(rot.y) * (fSpeed - fBrake);
+		// 進んだ方向にモデルを傾ける
+		UnderRotDest.x = (MODEL_ROT + fRotCounterX) * ((nValueV < 0) ? 1 : -1);
+		UnderRotDest.z = (MODEL_ROT + fRotCounterZ) * ((nValueH < 0) ? -1 : 1);
+		UpperRotDest.x = MODEL_ROT * ((nValueV < 0) ? 1 : -1);
+		UpperRotDest.z = MODEL_ROT * ((nValueH < 0) ? -1 : 1);
+		TireRot.x += TIRE_ROT * ((nValueV < 0) ? 1 : -1);
 
-		if (pInputJoypad->GetStick(0, CInputJoypad::JOYKEY_LEFTSTICK, &nValueH, &nValueV) == true)
-		{// スティックで方向
-			// 進んだ方向にモデルを傾ける
-			UnderRotDest.z = (MODEL_ROT + fRotCounterZ) * ((nValueH < 0) ? -1 : 1);
-			UpperRotDest.z = MODEL_ROT * ((nValueH < 0) ? -1 : 1);
+		// 進んだ方向に角度を向ける
+		m_rotDest.y = rot.y + ((float)nValueH * 0.00001f * ((nValueV < 0) ? -1 : 1));
 
-			// 進んだ方向に角度を向ける
-			m_rotDest.y = rot.y + ((float)nValueH * 0.00001f * ((nValueL > 0) ? -1 : 1));
-		}
-
-		if ((nValueR != 0 || nValueL != 0) && m_bJump == true)
+		if (nValueV != 0 && m_bJump == true)
 		{// 前後にも動いている/空中
 			fRotCounterX += MODEL_ROT_X;		// カウンター加算
 		}
