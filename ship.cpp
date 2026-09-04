@@ -248,6 +248,7 @@ void CShip::Update(void)
 			if (pInputKeyboard->GetTrigger(DIK_E) == true || pInputJoypad->GetTrigger(0, CInputJoypad::JOYKEY_B) == true)
 			{// ƒ{ƒ^ƒ“‚ð‰Ÿ‚µ‚½
 				pSound->PlaySound(CSound::SE_LEAVE);
+				pSound->PlaySound(CSound::SE_ROBO_GO);
 
 				m_state = STATE_CLOSE;
 				pSound->PlaySound(CSound::SE_OPENCLOSE);

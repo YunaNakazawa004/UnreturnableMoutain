@@ -35,6 +35,11 @@ public:
 		SE_WIND,					// 風
 		SE_DECISION,				// 判定
 		SE_GAMEOVER,				// ゲームオーバー
+		SE_ROBO_GO,					// ロボ（出発）
+		SE_ROBO_JUMP,				// ロボ（ジャンプ）
+		SE_ROBO_LAND,				// ロボ（着地）
+		SE_ROBO_WALK0,				// ロボ（歩行時）
+		SE_ROBO_WALK1,				// ロボ（歩行時）
 		SOUND_MAX,
 	} SOUND_LABEL;
 

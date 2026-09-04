@@ -397,6 +397,8 @@ void CPlayer::Update(void)
 			m_bJump = true;
 			m_move.y = JUMP_HEIGHT + (JUMP_HEIGHT * m_fJumpHigh) - ((JUMP_HEIGHT * 0.8f) * (m_fEnergy * 0.01f));
 
+			pSound->PlaySound(CSound::SE_ROBO_JUMP);
+
 			// ƒ‚[ƒVƒ‡ƒ“‚ðÝ’è
 			m_pMotion->Set(MOTIONTYPE_JUMP, true, 20);
 
@@ -629,6 +631,7 @@ void CPlayer::Update(void)
 			stateOld = m_state;
 
 			pInputJoypad->SetVibration(0, 10000, 10000, 10);
+			pSound->PlaySound(CSound::SE_ROBO_LAND);
 
 			// “yšº
 			CExplosion::Ray(pos, 1.0f, 2, 0.5f, D3DXCOLOR(COLOR_DARKGRAY.r, COLOR_DARKGRAY.g, COLOR_DARKGRAY.b, 0.5f));
@@ -791,6 +794,18 @@ void CPlayer::Update(void)
 		if (pos.y < 200.0f && m_nCounter % 1800 == 0)
 		{// ŠC‚Ì‰¹
 			pSound->PlaySound(CSound::SE_SEA);
+		}
+	}
+
+	if (m_nCounter % (rand() % 5000 + 1) == 0 && m_bJump == false)
+	{// •àsŽžƒ‰ƒ“ƒ_ƒ€‰¹º
+		if (m_nCounter % 2 == 0)
+		{// 50%
+			pSound->PlaySound(CSound::SE_ROBO_WALK0);
+		}
+		else
+		{// 50%
+			pSound->PlaySound(CSound::SE_ROBO_WALK1);
 		}
 	}
 

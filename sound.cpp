@@ -35,6 +35,11 @@ CSound::SOUNDINFO CSound::m_aSoundInfo[SOUND_MAX] =
 	{"data/SE/wind.wav",0},					// 風
 	{"data/SE/decision.wav",0},				// 判定
 	{"data/SE/down.wav",0},					// ゲームオーバー
+	{"data/SE/go.wav",0},					// ロボ（出発）
+	{"data/SE/jump.wav",0},					// ロボ（ジャンプ）
+	{"data/SE/land.wav",0},					// ロボ（着地）
+	{"data/SE/walk_0.wav",0},				// ロボ（歩行時）
+	{"data/SE/walk_1.wav",0},				// ロボ（歩行時）
 };
 
 //=============================================================================
