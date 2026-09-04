@@ -180,6 +180,7 @@ void CEnterUI::Update(void)
 		}
 
 		if (pInputKeyboard->GetTrigger(DIK_RETURN) == true || 
+			pInputKeyboard->GetTrigger(DIK_SPACE) == true || 
 			pInputJoypad->GetTrigger(0, CInputJoypad::JOYKEY_A) == true || 
 			pInputJoypad->GetTrigger(0, CInputJoypad::JOYKEY_START) == true || 
 			(MouseCollision(pInputMouse->GetPosition(),m_fWidth, m_fHeight) == true) && 

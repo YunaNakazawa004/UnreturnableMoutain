@@ -32,7 +32,7 @@ public:
 		TYPE_MAX
 	};
 
-	CExplosion(const int nPriority = PRIORITY_2);
+	CExplosion(const int nPriority = PRIORITY_3);
 	~CExplosion();
 
 	static HRESULT Load(void);

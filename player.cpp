@@ -692,7 +692,8 @@ void CPlayer::Update(void)
 	if (pEnergyRock != NULL &&
 		m_bJump == false && (m_state == STATE_NORMAL || m_state == STATE_TUTORIAL))
 	{// エネルギー鉱物と当たっているとき/空中ではないとき
-		if (pInputKeyboard->GetTrigger(DIK_E) == true || pInputJoypad->GetTrigger(0, CInputJoypad::JOYKEY_B) == true)
+		if ((pInputKeyboard->GetTrigger(DIK_E) == true || pInputJoypad->GetTrigger(0, CInputJoypad::JOYKEY_B) == true) && 
+			m_pMotion->GetType() != MOTIONTYPE_ACTION)
 		{// 回収するキーを押した
 			// モーションを設定
 			m_pMotion->Set(MOTIONTYPE_ACTION, true, 20);
@@ -794,6 +795,10 @@ void CPlayer::Update(void)
 		if (pos.y < 200.0f && m_nCounter % 1800 == 0)
 		{// 海の音
 			pSound->PlaySound(CSound::SE_SEA);
+		}
+		else if (pos.y >= 200.0f)
+		{// 範囲外
+			pSound->StopSound(CSound::SE_SEA);
 		}
 	}
 
@@ -975,7 +980,7 @@ bool CPlayer::Movement(const D3DXVECTOR3 rot)
 		
 		if (nValueR > 0)
 		{// 入力されている
-			fSpeed = (m_bJump ? -(float)nValueR * 0.0025f / 6.0f : -(float)nValueR * 0.0025f) * fCustomSpeed;	// スピード(トリガー)
+			fSpeed = (m_bJump ? -(float)nValueR * 0.0025f / 6.0f : -(float)nValueR * 0.0025f) * fCustomSpeed;	// 右トリガーでの移動量
 
 			// 進んだ方向にモデルを傾ける
 			UnderRotDest.x = -(MODEL_ROT + fRotCounterX);
@@ -985,7 +990,7 @@ bool CPlayer::Movement(const D3DXVECTOR3 rot)
 		
 		if (nValueL > 0)
 		{// 入力されている
-			fBrake = (m_bJump ? -(float)nValueL * 0.0025f / 6.0f : -(float)nValueL * 0.0025f) * fCustomSpeed;	// スピード(トリガー)
+			fBrake = (m_bJump ? -(float)nValueL * 0.0025f / 6.0f : -(float)nValueL * 0.0025f) * fCustomSpeed;	// 左トリガーでの移動量
 
 			// 進んだ方向にモデルを傾ける
 			UnderRotDest.x = (MODEL_ROT + fRotCounterX);
@@ -1006,7 +1011,7 @@ bool CPlayer::Movement(const D3DXVECTOR3 rot)
 			m_rotDest.y = rot.y + ((float)nValueH * 0.00001f * ((nValueL > 0) ? -1 : 1));
 		}
 
-		if (nValueR != 0 && m_bJump == true)
+		if ((nValueR != 0 || nValueL != 0) && m_bJump == true)
 		{// 前後にも動いている/空中
 			fRotCounterX += MODEL_ROT_X;		// カウンター加算
 		}
