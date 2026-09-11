@@ -60,6 +60,7 @@ public:
 		TYPE_TITLELOGO,			// タイトルロゴ
 		TYPE_ENTERUI,			// エンターUI
 		TYPE_RESULTUI,			// リザルトUI
+		TYPE_RANKINGUI,			// ランキングUI
 		TYPE_LISTUI,			// リザルト内訳UI
 		TYPE_JUMPUI,			// ジャンプUI
 		TYPE_ITEMUI,			// アイテムUI

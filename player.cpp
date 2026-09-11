@@ -129,7 +129,7 @@ CPlayer::CPlayer(const int nPriority) :CObject(nPriority)
 	m_col = COLOR_WHITE;
 	m_fRadius = 0.0f;
 	m_fHeight = 0.0f;
-	m_fJumpHigh = 0.0f;
+	m_fAddSpeed = 0.0f;
 	m_nCounter = 0;
 	m_fEnergy = 0.0f;
 	m_nEnergyCounter = 0;
@@ -163,6 +163,7 @@ HRESULT CPlayer::Init(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot, const float 
 	m_scale = D3DXVECTOR3(1.0f, 1.0f, 1.0f);
 	m_col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 	m_fEnergy = fEnergy;
+	m_fAddSpeed = 1.0f;
 	m_state = STATE_APPEAR;
 
 	// モーションを生成/初期化
@@ -234,8 +235,6 @@ void CPlayer::Update(void)
 	CWaterSurface* pWaterSurface = CGame::GetWaterSurface();			// 水面の取得
 	CEnergyUI* pEnergyUI = (CManager::GetMode() == CScene::MODE_GAME) ?
 		CGame::GetEnergyUI() : CTitle::GetEnergyUI();		// エネルギーUIの取得
-	CJumpMeterUI* pJumpMeterUI = (CManager::GetMode() == CScene::MODE_GAME) ?
-		CGame::GetJumpMeterUI() : CTitle::GetJumpMeterUI();	// ジャンプメーターUIの取得
 	CLocater* pLocater = (CManager::GetMode() == CScene::MODE_GAME) ?
 		CGame::GetLocater() : CTitle::GetLocater();			// ロケーターの取得
 	CShip* pShip =
@@ -460,104 +459,104 @@ void CPlayer::Update(void)
 	// 角度を慣性ありで加算
 	rot.y += (m_rotDest.y - rot.y) * 0.1f;
 
-		if ((m_state == STATE_NORMAL && pos.x != m_posOld.x && pos.z != m_posOld.z) ||
-			m_state == STATE_APPEAR || m_state == STATE_DEATH)
-		{// 通常状態のみ
-			// 山のポリゴン番号を取得
-			polygonIdxM = pMountain->GetPolygonIdx(pos);
+	if ((m_state == STATE_NORMAL && pos.x != m_posOld.x && pos.z != m_posOld.z) ||
+		m_state == STATE_APPEAR || m_state == STATE_DEATH)
+	{// 通常状態のみ
+		// 山のポリゴン番号を取得
+		polygonIdxM = pMountain->GetPolygonIdx(pos);
 
-			// 山の地面の高さを取得
-			fHeightM = pMountain->GetHeight(pos, polygonIdxM);
+		// 山の地面の高さを取得
+		fHeightM = pMountain->GetHeight(pos, polygonIdxM);
 
-			// 砂浜のポリゴン番号を取得
-			polygonIdxB = pBeach->GetPolygonIdx(pos);
+		// 砂浜のポリゴン番号を取得
+		polygonIdxB = pBeach->GetPolygonIdx(pos);
 
-			// 砂浜の地面の高さを取得
-			fHeightB = pBeach->GetHeight(pos, polygonIdxB);
+		// 砂浜の地面の高さを取得
+		fHeightB = pBeach->GetHeight(pos, polygonIdxB);
 
-			// 最終的な高さ/ポリゴン番号
-			if (fHeightM >= fHeightB)
-			{// 山
-				fHeight = fHeightM;
-				polygonIdx = polygonIdxM;
-				pMeshField = pMountain;
-			}
-			else
-			{// 砂浜
-				fHeight = fHeightB;
-				polygonIdx = polygonIdxB;
-				pMeshField = pBeach;
-			}
-
-			if (m_bJump == false)
-			{// 地上にいるときだけ
-				// 傾斜によって進む距離を調整
-				pos = m_posOld + ((pos - m_posOld) * pMeshField->GetSlope(pos, polygonIdx));
-			}
-
-			// 山のポリゴン番号を取得
-			polygonIdxM = pMountain->GetPolygonIdx(pos);
-
-			// 山の地面の高さを取得
-			fHeightM = pMountain->GetHeight(pos, polygonIdxM);
-
-			// 砂浜のポリゴン番号を取得
-			polygonIdxB = pBeach->GetPolygonIdx(pos);
-
-			// 砂浜の地面の高さを取得
-			fHeightB = pBeach->GetHeight(pos, polygonIdxB);
-
-			// 水面のポリゴン番号を取得
-			polygonIdxW = pWaterSurface->GetPolygonIdx(pos);
-
-			// 水面の地面の高さを取得
-			fHeightW = pWaterSurface->GetHeight(pos, polygonIdxW);
-
-			// 最終的な高さ/ポリゴン番号
-			if (fHeightM >= fHeightB)
-			{// 山
-				fHeight = fHeightM;
-				polygonIdx = polygonIdxM;
-				pMeshField = pMountain;
-			}
-			else
-			{// 砂浜
-				fHeight = fHeightB;
-				polygonIdx = polygonIdxB;
-				pMeshField = pBeach;
-			}
-
-			if (fHeight == ERROR_HEIGHT)
-			{// 無効な高さだったら
-				fHeight = 0.0f;
-			}
-
-			if (pos.y <= fHeight)
-			{// 地面にめり込んだときだけ
-				pos.y = fHeight;
-
-				if (pMeshField->GetSlope(pos, polygonIdx) <= UNCLIMB_SLOPE /*&& pos.y - m_posOld.y > 3.0f*/ && m_bJump == false)
-				{// 傾斜の角度的に登れない/地面にいる
-					pos = m_posOld;
-				}
-			}
+		// 最終的な高さ/ポリゴン番号
+		if (fHeightM >= fHeightB)
+		{// 山
+			fHeight = fHeightM;
+			polygonIdx = polygonIdxM;
+			pMeshField = pMountain;
 		}
-		else if (m_state == STATE_TUTORIAL)
-		{// チュートリアル中
+		else
+		{// 砂浜
+			fHeight = fHeightB;
+			polygonIdx = polygonIdxB;
+			pMeshField = pBeach;
+		}
+
+		if (m_bJump == false)
+		{// 地上にいるときだけ
+			// 傾斜によって進む距離を調整
+			pos = m_posOld + ((pos - m_posOld) * pMeshField->GetSlope(pos, polygonIdx));
+		}
+
+		// 山のポリゴン番号を取得
+		polygonIdxM = pMountain->GetPolygonIdx(pos);
+
+		// 山の地面の高さを取得
+		fHeightM = pMountain->GetHeight(pos, polygonIdxM);
+
+		// 砂浜のポリゴン番号を取得
+		polygonIdxB = pBeach->GetPolygonIdx(pos);
+
+		// 砂浜の地面の高さを取得
+		fHeightB = pBeach->GetHeight(pos, polygonIdxB);
+
+		// 水面のポリゴン番号を取得
+		polygonIdxW = pWaterSurface->GetPolygonIdx(pos);
+
+		// 水面の地面の高さを取得
+		fHeightW = pWaterSurface->GetHeight(pos, polygonIdxW);
+
+		// 最終的な高さ/ポリゴン番号
+		if (fHeightM >= fHeightB)
+		{// 山
+			fHeight = fHeightM;
+			polygonIdx = polygonIdxM;
+			pMeshField = pMountain;
+		}
+		else
+		{// 砂浜
+			fHeight = fHeightB;
+			polygonIdx = polygonIdxB;
+			pMeshField = pBeach;
+		}
+
+		if (fHeight == ERROR_HEIGHT)
+		{// 無効な高さだったら
 			fHeight = 0.0f;
+		}
 
-			if (pos.y <= fHeight)
-			{// 地面にめり込んだときだけ
-				pos.y = fHeight;
+		if (pos.y <= fHeight)
+		{// 地面にめり込んだときだけ
+			pos.y = fHeight;
+
+			if (pMeshField->GetSlope(pos, polygonIdx) <= UNCLIMB_SLOPE /*&& pos.y - m_posOld.y > 3.0f*/ && m_bJump == false)
+			{// 傾斜の角度的に登れない/地面にいる
+				pos = m_posOld;
 			}
 		}
-		else if (pos.x == m_posOld.x && pos.z == m_posOld.z)
-		{// 止まっているとき
-			if (pos.y <= fHeight)
-			{// 地面にめり込んだときだけ
-				pos.y = fHeight;
-			}
+	}
+	else if (m_state == STATE_TUTORIAL)
+	{// チュートリアル中
+		fHeight = 0.0f;
+
+		if (pos.y <= fHeight)
+		{// 地面にめり込んだときだけ
+			pos.y = fHeight;
 		}
+	}
+	else if (pos.x == m_posOld.x && pos.z == m_posOld.z)
+	{// 止まっているとき
+		if (pos.y <= fHeight)
+		{// 地面にめり込んだときだけ
+			pos.y = fHeight;
+		}
+	}
 
 	// 当たり判定
 	CEnergyRock* pEnergyRock = CEnergyRock::Collision(&pos, &m_posOld, &m_move, m_fRadius, m_fHeight);
@@ -614,7 +613,6 @@ void CPlayer::Update(void)
 		m_pMotion->Set(MOTIONTYPE_JUMP, true, 20);
 
 		// ジャンプ量リセット
-		m_fJumpHigh = 0.0f;
 		UpperPos.y = UpperPosOff.y;
 	}
 
@@ -626,7 +624,6 @@ void CPlayer::Update(void)
 			if (m_nCounter % 10 == 0)
 			{// 一定間隔
 				CSpray::Create(D3DXVECTOR3(pos.x, fHeightW + 1.0f, pos.z), D3DXVECTOR3(0.0f, 0.0f, 0.0f), 5.0f);
-				pSound->PlaySound(CSound::SE_SEA);
 			}
 
 			// エネルギーを消費する
@@ -645,7 +642,7 @@ void CPlayer::Update(void)
 	if (pEnergyRock != NULL &&
 		m_bJump == false && (m_state == STATE_NORMAL || m_state == STATE_TUTORIAL))
 	{// エネルギー鉱物と当たっているとき/空中ではないとき
-		if ((pInputKeyboard->GetTrigger(DIK_E) == true || pInputJoypad->GetTrigger(0, CInputJoypad::JOYKEY_B) == true) && 
+		if ((pInputKeyboard->GetTrigger(DIK_E) == true || pInputJoypad->GetTrigger(0, CInputJoypad::JOYKEY_B) == true) &&
 			m_pMotion->GetType() != MOTIONTYPE_ACTION)
 		{// 回収するキーを押した
 			// モーションを設定
@@ -673,6 +670,11 @@ void CPlayer::Update(void)
 	if (pInputKeyboard->GetTrigger(DIK_H) == true)
 	{// エネルギー鉱石生成
 		CEnergyRock::Create(pos, DEFAULT_VECTER3);
+	}
+
+	if (pInputKeyboard->GetTrigger(DIK_O) == true)
+	{
+		m_fEnergy = 0.1f;
 	}
 #endif
 
@@ -730,9 +732,6 @@ void CPlayer::Update(void)
 	{// 通常状態/チュートリアル中のみ
 		// エネルギー量をUIに設定
 		pEnergyUI->SetEnergy(m_fEnergy);
-
-		// ジャンプ量をUIに設定
-		pJumpMeterUI->SetJumpMeter(m_fJumpHigh);
 
 		// 使用エネルギー量を設定
 		CUsedEnergy::SetUsedEnergy((int)(m_fUsedEnergy * 1000.0f));
@@ -921,6 +920,9 @@ bool CPlayer::Movement(const D3DXVECTOR3 rot)
 	D3DXVECTOR3 UnderRotDest = { 0.0f,0.0f,0.0f };			// 下半身の目的の傾き
 	D3DXVECTOR3 UpperRotDest = { 0.0f,0.0f,0.0f };			// 上半身の目的の傾き
 
+	CJumpMeterUI* pJumpMeterUI = (CManager::GetMode() == CScene::MODE_GAME) ?
+		CGame::GetJumpMeterUI() : CTitle::GetJumpMeterUI();	// ジャンプメーターUIの取得
+
 	bool bMove = false;
 	int nValueH = 0, nValueV = 0, nValueL = 0, nValueR = 0;
 	static float fRotCounterX = 0.0f;		// 傾きの追加角度X
@@ -933,7 +935,31 @@ bool CPlayer::Movement(const D3DXVECTOR3 rot)
 	if (pInputKeyboard->GetPress(DIK_SPACE) == true ||
 		pInputJoypad->GetShoulder(0, CInputJoypad::JOYKEY_RIGHTTRIGGER, &nValueR, &nValueL))
 	{// ダッシュキーが押された
-		fCustomSpeed *= 3.0f;
+		m_fAddSpeed += 0.02f;
+
+		if (m_fAddSpeed > 3.0f)
+		{// 最大値
+			m_fAddSpeed = 3.0f;
+		}
+	}
+	else if (pInputKeyboard->GetPress(DIK_SPACE) == false ||
+		pInputJoypad->GetShoulder(0, CInputJoypad::JOYKEY_RIGHTTRIGGER, &nValueR, &nValueL) == false)
+	{// 押してない
+		m_fAddSpeed -= 0.04f;		// リセット
+
+		if (m_fAddSpeed < 1.0f)
+		{// 最小値
+			m_fAddSpeed = 1.0f;
+		}
+	}
+
+	// 加速を計算
+	fCustomSpeed *= m_fAddSpeed;
+
+	if (m_state == STATE_NORMAL || m_state == STATE_TUTORIAL || m_state == STATE_APPEAR || m_state == STATE_DEATH)
+	{// 通常状態/チュートリアル中のみ
+		// ジャンプ量をUIに設定
+		pJumpMeterUI->SetJumpMeter((m_fAddSpeed - 1.0f) * 5.0f);
 	}
 
 	float fSpeedX = (m_bJump ? AIR_MOVEMENT.x : LAND_MOVEMENT.x) * fCustomSpeed;

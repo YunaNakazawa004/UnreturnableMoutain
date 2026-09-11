@@ -103,7 +103,7 @@ private:
 	D3DXCOLOR m_col;				// 色
 	float m_fRadius;				// 半径
 	float m_fHeight;				// 高さ
-	float m_fJumpHigh;				// ジャンプ量
+	float m_fAddSpeed;				// 加速量
 	int m_nCounter;					// 色々なものに使えるカウンター
 
 	float m_fEnergy;				// エネルギー

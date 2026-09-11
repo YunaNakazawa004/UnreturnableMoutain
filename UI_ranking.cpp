@@ -84,7 +84,7 @@ CRankingUI* CRankingUI::Create(const D3DXVECTOR3 pos, const float fWidth, const 
 		}
 
 		// オブジェクトの種類を設定
-		pRankingUI->SetType(TYPE_RESULTUI);
+		pRankingUI->SetType(TYPE_RANKINGUI);
 
 		// テクスチャの割り当て
 		pRankingUI->BindTexture(m_nIdxTexture);
@@ -124,7 +124,9 @@ HRESULT CRankingUI::Init(const D3DXVECTOR3 pos, const float fWidth, const float 
 		return E_FAIL;
 	}
 
-	// ランキングUIクラスの値を初期化
+	// ランキング順位UIを生成
+	CObject2D::Create(D3DXVECTOR3(320.0f, 360.0f, 0.0f), 80.0f, 240.0f, TYPE_RANKINGUI,
+		"data\\TEXTURE\\UI\\ranking_rank.png", PRIORITY_6);
 
 	return S_OK;
 }
