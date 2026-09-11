@@ -29,6 +29,7 @@
 #include "UI_jump_meter.h"
 #include "UI_energy.h"
 #include "UI_item.h"
+#include "locater.h"
 #include "frame.h"
 #include "tutorial_txt.h"
 #include "score.h"
@@ -181,6 +182,8 @@ void CShip::Update(void)
 		CGame::GetActionUI() : CTitle::GetActionUI();		// アクションUIの取得
 	CJumpMeterUI* pJumpMeterUI = (CManager::GetMode() == CScene::MODE_GAME) ?
 		CGame::GetJumpMeterUI() : CTitle::GetJumpMeterUI();	// ジャンプUIの取得	
+	CLocater* pLocater = (CManager::GetMode() == CScene::MODE_GAME) ?
+		CGame::GetLocater() : CTitle::GetLocater();			// ロケーターの取得
 	CFrame* pFrame = (CManager::GetMode() == CScene::MODE_GAME) ?
 		CGame::GetFrame() : CTitle::GetFrame();				// 枠の取得
 	CEnergyUI* pEnergyUI = (CManager::GetMode() == CScene::MODE_GAME) ?
@@ -304,6 +307,7 @@ void CShip::Update(void)
 			pJumpMeterUI->SetDispAll(false);
 			pEnergyUI->SetDisp(false);
 			pEnergyUI->SetState(0);
+			pLocater->SetDisp(false);
 			pFrame->SetDisp(false);
 
 			if (pItemUI != NULL && pScore != NULL)
@@ -443,6 +447,7 @@ void CShip::Update(void)
 				pActionUI->SetDisp(true);
 				pJumpMeterUI->SetDispAll(true);
 				pEnergyUI->SetDisp(true);
+				pLocater->SetDisp(true);
 				pFrame->SetDisp(true);
 				pItemUI->SetDispWOCheck(true);
 				pScore->SetDisp(true);

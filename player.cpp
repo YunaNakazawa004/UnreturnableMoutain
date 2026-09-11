@@ -34,6 +34,7 @@
 #include "mountain.h"
 #include "beach.h"
 #include "watersurface.h"
+#include "locater.h"
 #include "UI_energy.h"
 #include "UI_jump_meter.h"
 #include "score.h"
@@ -63,7 +64,7 @@
 #define MAX_ENERGY		(100.0f)								// 最大所持エネルギー
 #define ONE_ENERGY		(10.0f)									// 鉱石ひとつあたりのエネルギー
 #define MINUS_ENERGY	(200)									// エネルギー減少の間隔
-#define UNCLIMB_SLOPE	(0.4f)									// 登れない傾斜の角度
+#define UNCLIMB_SLOPE	(0.35f)									// 登れない傾斜の角度
 #define OUTMAP			(3000.0f)								// マップ外
 
 //========================================================================
@@ -235,6 +236,8 @@ void CPlayer::Update(void)
 		CGame::GetEnergyUI() : CTitle::GetEnergyUI();		// エネルギーUIの取得
 	CJumpMeterUI* pJumpMeterUI = (CManager::GetMode() == CScene::MODE_GAME) ?
 		CGame::GetJumpMeterUI() : CTitle::GetJumpMeterUI();	// ジャンプメーターUIの取得
+	CLocater* pLocater = (CManager::GetMode() == CScene::MODE_GAME) ?
+		CGame::GetLocater() : CTitle::GetLocater();			// ロケーターの取得
 	CShip* pShip =
 		(CManager::GetMode() == CScene::MODE_GAME) ?
 		CGame::GetShip() : CTitle::GetShip();				// 船の取得
@@ -457,104 +460,104 @@ void CPlayer::Update(void)
 	// 角度を慣性ありで加算
 	rot.y += (m_rotDest.y - rot.y) * 0.1f;
 
-	if ((m_state == STATE_NORMAL && pos.x != m_posOld.x && pos.z != m_posOld.z) ||
-		m_state == STATE_APPEAR || m_state == STATE_DEATH)
-	{// 通常状態のみ
-		// 山のポリゴン番号を取得
-		polygonIdxM = pMountain->GetPolygonIdx(pos);
+		if ((m_state == STATE_NORMAL && pos.x != m_posOld.x && pos.z != m_posOld.z) ||
+			m_state == STATE_APPEAR || m_state == STATE_DEATH)
+		{// 通常状態のみ
+			// 山のポリゴン番号を取得
+			polygonIdxM = pMountain->GetPolygonIdx(pos);
 
-		// 山の地面の高さを取得
-		fHeightM = pMountain->GetHeight(pos, polygonIdxM);
+			// 山の地面の高さを取得
+			fHeightM = pMountain->GetHeight(pos, polygonIdxM);
 
-		// 砂浜のポリゴン番号を取得
-		polygonIdxB = pBeach->GetPolygonIdx(pos);
+			// 砂浜のポリゴン番号を取得
+			polygonIdxB = pBeach->GetPolygonIdx(pos);
 
-		// 砂浜の地面の高さを取得
-		fHeightB = pBeach->GetHeight(pos, polygonIdxB);
+			// 砂浜の地面の高さを取得
+			fHeightB = pBeach->GetHeight(pos, polygonIdxB);
 
-		// 最終的な高さ/ポリゴン番号
-		if (fHeightM >= fHeightB)
-		{// 山
-			fHeight = fHeightM;
-			polygonIdx = polygonIdxM;
-			pMeshField = pMountain;
-		}
-		else
-		{// 砂浜
-			fHeight = fHeightB;
-			polygonIdx = polygonIdxB;
-			pMeshField = pBeach;
-		}
+			// 最終的な高さ/ポリゴン番号
+			if (fHeightM >= fHeightB)
+			{// 山
+				fHeight = fHeightM;
+				polygonIdx = polygonIdxM;
+				pMeshField = pMountain;
+			}
+			else
+			{// 砂浜
+				fHeight = fHeightB;
+				polygonIdx = polygonIdxB;
+				pMeshField = pBeach;
+			}
 
-		if (m_bJump == false)
-		{// 地上にいるときだけ
-			// 傾斜によって進む距離を調整
-			pos = m_posOld + ((pos - m_posOld) * pMeshField->GetSlope(pos, polygonIdx));
-		}
+			if (m_bJump == false)
+			{// 地上にいるときだけ
+				// 傾斜によって進む距離を調整
+				pos = m_posOld + ((pos - m_posOld) * pMeshField->GetSlope(pos, polygonIdx));
+			}
 
-		// 山のポリゴン番号を取得
-		polygonIdxM = pMountain->GetPolygonIdx(pos);
+			// 山のポリゴン番号を取得
+			polygonIdxM = pMountain->GetPolygonIdx(pos);
 
-		// 山の地面の高さを取得
-		fHeightM = pMountain->GetHeight(pos, polygonIdxM);
+			// 山の地面の高さを取得
+			fHeightM = pMountain->GetHeight(pos, polygonIdxM);
 
-		// 砂浜のポリゴン番号を取得
-		polygonIdxB = pBeach->GetPolygonIdx(pos);
+			// 砂浜のポリゴン番号を取得
+			polygonIdxB = pBeach->GetPolygonIdx(pos);
 
-		// 砂浜の地面の高さを取得
-		fHeightB = pBeach->GetHeight(pos, polygonIdxB);
+			// 砂浜の地面の高さを取得
+			fHeightB = pBeach->GetHeight(pos, polygonIdxB);
 
-		// 水面のポリゴン番号を取得
-		polygonIdxW = pWaterSurface->GetPolygonIdx(pos);
+			// 水面のポリゴン番号を取得
+			polygonIdxW = pWaterSurface->GetPolygonIdx(pos);
 
-		// 水面の地面の高さを取得
-		fHeightW = pWaterSurface->GetHeight(pos, polygonIdxW);
+			// 水面の地面の高さを取得
+			fHeightW = pWaterSurface->GetHeight(pos, polygonIdxW);
 
-		// 最終的な高さ/ポリゴン番号
-		if (fHeightM >= fHeightB)
-		{// 山
-			fHeight = fHeightM;
-			polygonIdx = polygonIdxM;
-			pMeshField = pMountain;
-		}
-		else
-		{// 砂浜
-			fHeight = fHeightB;
-			polygonIdx = polygonIdxB;
-			pMeshField = pBeach;
-		}
+			// 最終的な高さ/ポリゴン番号
+			if (fHeightM >= fHeightB)
+			{// 山
+				fHeight = fHeightM;
+				polygonIdx = polygonIdxM;
+				pMeshField = pMountain;
+			}
+			else
+			{// 砂浜
+				fHeight = fHeightB;
+				polygonIdx = polygonIdxB;
+				pMeshField = pBeach;
+			}
 
-		if (fHeight == ERROR_HEIGHT)
-		{// 無効な高さだったら
-			fHeight = 0.0f;
-		}
+			if (fHeight == ERROR_HEIGHT)
+			{// 無効な高さだったら
+				fHeight = 0.0f;
+			}
 
-		if (pos.y <= fHeight)
-		{// 地面にめり込んだときだけ
-			pos.y = fHeight;
+			if (pos.y <= fHeight)
+			{// 地面にめり込んだときだけ
+				pos.y = fHeight;
 
-			if (pMeshField->GetSlope(pos, polygonIdx) <= UNCLIMB_SLOPE && m_bJump == false)
-			{// 傾斜の角度的に登れない/地面にいる
-				pos = m_posOld;
+				if (pMeshField->GetSlope(pos, polygonIdx) <= UNCLIMB_SLOPE /*&& pos.y - m_posOld.y > 3.0f*/ && m_bJump == false)
+				{// 傾斜の角度的に登れない/地面にいる
+					pos = m_posOld;
+				}
 			}
 		}
-	}
-	else if (m_state == STATE_TUTORIAL)
-	{// チュートリアル中
-		fHeight = 0.0f;
+		else if (m_state == STATE_TUTORIAL)
+		{// チュートリアル中
+			fHeight = 0.0f;
 
-		if (pos.y <= fHeight)
-		{// 地面にめり込んだときだけ
-			pos.y = fHeight;
+			if (pos.y <= fHeight)
+			{// 地面にめり込んだときだけ
+				pos.y = fHeight;
+			}
 		}
-	}
-	else if (pos.x == m_posOld.x && pos.z == m_posOld.z)
-	{// 止まっているとき
-		if (pos.y <= fHeight)
-		{// 地面にめり込んだときだけ
-			pos.y = fHeight;
+		else if (pos.x == m_posOld.x && pos.z == m_posOld.z)
+		{// 止まっているとき
+			if (pos.y <= fHeight)
+			{// 地面にめり込んだときだけ
+				pos.y = fHeight;
+			}
 		}
-	}
 
 	// 当たり判定
 	CEnergyRock* pEnergyRock = CEnergyRock::Collision(&pos, &m_posOld, &m_move, m_fRadius, m_fHeight);
@@ -733,6 +736,10 @@ void CPlayer::Update(void)
 
 		// 使用エネルギー量を設定
 		CUsedEnergy::SetUsedEnergy((int)(m_fUsedEnergy * 1000.0f));
+
+		// ロケーターを設定
+		D3DXVECTOR3 locatePos = D3DXVECTOR3(pos.x, pos.y + 10.0f, pos.z);
+		pLocater->Locate(locatePos);
 	}
 
 	if (CManager::GetMode() == CScene::MODE_GAME)
@@ -752,7 +759,7 @@ void CPlayer::Update(void)
 		}
 	}
 
-	if (m_nCounter % (rand() % 5000 + 1) == 0 && m_bJump == false)
+	if (m_nCounter % (rand() % 10000 + 1) == 0 && m_bJump == false && m_state == STATE_NORMAL)
 	{// 歩行時ランダム音声
 		if (m_nCounter % 2 == 0)
 		{// 50%

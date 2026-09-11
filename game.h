@@ -21,6 +21,7 @@ class CBeach;
 class CWaterSurface;
 class CMapObject;
 class CFrame;
+class CLocater;
 class CEnergyUI;
 class CJumpMeterUI;
 class CItemUI;
@@ -49,6 +50,7 @@ public:
 	static CWaterSurface* GetWaterSurface(void) { return m_pWaterSurface; }
 	static CMapObject* GetMapObject(void) { return m_pMapObject; }
 	static CFrame* GetFrame(void) { return m_pFrame; }
+	static CLocater* GetLocater(void) { return m_pLocater; }
 	static CEnergyUI* GetEnergyUI(void) { return m_pEnergyUI; }
 	static CJumpMeterUI* GetJumpMeterUI(void) { return m_pJumpMeterUI; }
 	static CItemUI* GetItemUI(void) { return m_pItemUI; }
@@ -64,6 +66,7 @@ private:
 	static CWaterSurface* m_pWaterSurface;			// 海のインスタンス
 	static CMapObject* m_pMapObject;				// マップオブジェクトのインスタンス
 	static CFrame* m_pFrame;						// 枠のインスタンス
+	static CLocater* m_pLocater;					// ロケーターのインスタンス
 	static CEnergyUI* m_pEnergyUI;					// エネルギーUIのインスタンス
 	static CJumpMeterUI* m_pJumpMeterUI;			// ジャンプメーターUIのインスタンス
 	static CItemUI* m_pItemUI;						// アイテムUIのインスタンス

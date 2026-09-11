@@ -21,7 +21,7 @@
 // オブジェクト3Dクラスの生成処理
 //========================================================================
 CObject3D* CObject3D::Create(const D3DXVECTOR3 pos, const float fWidth, const float fHeight, const float fDepth,
-	const CObject::TYPE type, const char* pFilename, const int nPriority)
+	const CObject::TYPE type, const char* pFilename, const int nPriority, const MAINPOS mainpos)
 {
 #ifndef LIST
 	if (CObject::GetNumAll() >= MAX_OBJECT)
@@ -43,7 +43,7 @@ CObject3D* CObject3D::Create(const D3DXVECTOR3 pos, const float fWidth, const fl
 	if (pObject3D != NULL)
 	{// NULLチェック
 		// 初期化処理
-		if (FAILED(pObject3D->Init(pos, fWidth, fHeight, fDepth)))
+		if (FAILED(pObject3D->Init(pos, fWidth, fHeight, fDepth, mainpos)))
 		{// もし失敗した場合
 			OutputDebugStringA("! ! ! オブジェクト3Dの初期化に失敗しました ! ! !\n");
 
@@ -252,6 +252,11 @@ void CObject3D::Draw(void)
 	CTexture* pTexture = CManager::GetTexture();			// テクスチャへのポインタ
 	D3DXMATRIX mtxRot, mtxTrans, mtxScale;		// 計算用マトリックス
 
+	// アルファテストを有効にする
+	pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
+	pDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATER);
+	pDevice->SetRenderState(D3DRS_ALPHAREF, 100);
+
 	// ワールドマトリックスの初期化
 	D3DXMatrixIdentity(&m_mtxWorld);
 
@@ -283,6 +288,11 @@ void CObject3D::Draw(void)
 	pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP,
 		0,		// 描画する最初の頂点インデックス
 		2);		// 描画するプリミティブ数
+
+	// アルファテストを無効にする
+	pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
+	pDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_ALWAYS);
+	pDevice->SetRenderState(D3DRS_ALPHAREF, 100);
 }
 
 //========================================================================

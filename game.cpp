@@ -27,6 +27,7 @@
 #include "ship.h"
 #include "energyrock.h"
 #include "frame.h"
+#include "locater.h"
 #include "UI_energy.h"
 #include "UI_jump_meter.h"
 #include "UI_item.h"
@@ -44,6 +45,7 @@ CBeach* CGame::m_pBeach = NULL;						// 砂浜のインスタンス
 CWaterSurface* CGame::m_pWaterSurface = NULL;		// 海のインスタンス
 CMapObject* CGame::m_pMapObject = NULL;				// マップオブジェクトのインスタンス
 CFrame* CGame::m_pFrame = NULL;						// 枠のインスタンス
+CLocater* CGame::m_pLocater = NULL;					// ロケーターのインスタンス
 CEnergyUI* CGame::m_pEnergyUI = NULL;				// エネルギーUIのインスタンス
 CJumpMeterUI* CGame::m_pJumpMeterUI = NULL;			// ジャンプメーターUIのインスタンス
 CItemUI* CGame::m_pItemUI = NULL;					// アイテムUIのインスタンス
@@ -64,6 +66,7 @@ CGame::CGame() : CScene(CScene::MODE_GAME)
 	m_pWaterSurface = NULL;
 	m_pMapObject = NULL;
 	m_pFrame = NULL;
+	m_pLocater = NULL;
 	m_pEnergyUI = NULL;
 	m_pJumpMeterUI = NULL;
 	m_pItemUI = NULL;
@@ -90,6 +93,7 @@ HRESULT CGame::Init(void)
 
 	// テクスチャを読み込み
 	CFrame::Load();
+	CLocater::Load();
 	CEnergyUI::Load();
 	CJumpMeterUI::Load();
 	CItemUI::Load();
@@ -126,6 +130,21 @@ HRESULT CGame::Init(void)
 		}
 
 		m_pFrame->SetDisp(false);
+	}
+	
+	// ロケーターを生成
+	if (m_pLocater == NULL)
+	{// NULLチェック
+		m_pLocater = CLocater::Create(D3DXVECTOR3(1180.0f, 70.0f, 0.0f), 50.0f, 50.0f);
+
+		if (m_pLocater == NULL)
+		{// NULLチェック
+			OutputDebugStringA("! ! ! ロケーターの生成に失敗しました ! ! !\n");
+
+			return E_FAIL;
+		}
+
+		m_pLocater->SetDisp(false);
 	}
 	
 	// エネルギーUIを生成
@@ -346,6 +365,7 @@ void CGame::Uninit(void)
 	CItemUI::Unload();
 	CJumpMeterUI::Unload();
 	CEnergyUI::Unload();
+	CLocater::Unload();
 	CFrame::Unload();
 
 	// アクションUIの破棄
@@ -376,6 +396,12 @@ void CGame::Uninit(void)
 	if (m_pEnergyUI != NULL)
 	{// NULLチェック
 		m_pEnergyUI = NULL;
+	}
+	
+	// ロケーターの破棄
+	if (m_pLocater != NULL)
+	{// NULLチェック
+		m_pLocater = NULL;
 	}
 	
 	// 枠の破棄

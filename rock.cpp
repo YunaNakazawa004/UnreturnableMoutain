@@ -192,16 +192,13 @@ CRock* CRock::Collision(D3DXVECTOR3* pPos, D3DXVECTOR3* posOld, D3DXVECTOR3* mov
 				// ãóó£ÇåvéZ
 				dist = *pPos - posRock;
 
-				if ((D3DXVec3Length(&dist) < ROCK_RADIUS + fRadius) &&
-					pPos->y < posRock.y + ROCK_HEIGHT && pPos->y + fHeight > posRock.y)
+				if ((D3DXVec3Length(&dist) < ROCK_RADIUS + fRadius))
 				{// ä‚Ç∆èdÇ»Ç¡ÇΩ
 					// ìñÇΩÇËîªíË
 					if (dynamic_cast<CObjectX*>(pObj)->Collision(pPos, posOld, move, fRadius, fHeight, pHead) == true)
 					{// èÊÇ¡ÇƒÇ¢ÇÈ
 						*pLand = true;
 					}
-
-					return dynamic_cast<CRock*>(pObj);
 				}
 			}
 

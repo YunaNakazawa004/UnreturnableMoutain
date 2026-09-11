@@ -23,6 +23,7 @@
 #include "UI_item.h"
 #include "score.h"
 #include "collect_num.h"
+#include "locater.h"
 
 #include "player.h"
 
@@ -214,6 +215,7 @@ void CMapObject::Update(void)
 {
 	CDebugProc* pDebugProc = CManager::GetDebugProc();					// デバッグ表示の取得
 	CInputKeyboard* pInputKeyboard = CManager::GetInputKeyboard();		// キーボード入力の取得
+	CLocater* pLocater = CGame::GetLocater();							// ロケーターの取得
 
 	static int nCounter = 0;
 
@@ -233,6 +235,7 @@ void CMapObject::Update(void)
 				}
 
 				CollectCollision(m_aMapObject[nCnt].apObject->GetPosition(), nCnt);
+				pLocater->SetArrow(pos, m_aMapObject[nCnt].nItemIdx);
 			}
 		}
 	}
@@ -259,6 +262,7 @@ bool CMapObject::CollectCollision(const D3DXVECTOR3 pos, const int nIdx)
 	CItemUI* pItemUI = CGame::GetItemUI();		// アイテムUIを取得
 	CScore* pScore = CGame::GetScore();			// スコアを取得
 	CSound* pSound = CManager::GetSound();		// サウンドを取得
+	CLocater* pLocater = CGame::GetLocater();	// ロケーターの取得
 	D3DXVECTOR3 posPlayer = CGame::GetPlayer()->GetPosition();
 	D3DXVECTOR3 dist;
 
@@ -275,6 +279,9 @@ bool CMapObject::CollectCollision(const D3DXVECTOR3 pos, const int nIdx)
 
 		// アイテムをチェックする
 		pItemUI->Check(m_aMapObject[nIdx].nItemIdx);
+
+		// ロケーターの矢印
+		pLocater->DeleteArrow(m_aMapObject[nIdx].nItemIdx);
 
 		// スコア加算
 		pScore->Add(20000);

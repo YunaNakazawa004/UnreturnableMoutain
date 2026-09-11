@@ -12,6 +12,7 @@
 #include "texture.h"
 
 #include "camera.h"
+#include "line.h"
 
 //************************************************************************
 // マクロ定義
@@ -447,6 +448,7 @@ bool CObjectX::Collision(D3DXVECTOR3* pPos, D3DXVECTOR3* pPosOld, D3DXVECTOR3* p
 	{
 		D3DXVECTOR3 start, end;			// 始点/終点
 		float fXS, fZS, fXE, fZE;		// 始点のXZ座標/終点のXZ座標
+		float fMinY, fMaxY;				// Y座標の最低値と最大値
 
 		D3DXVECTOR3 vecLine, vecMove, vecToPos, vecToPosOld, vecNor, vecMoveRef, vecMoveDest;		// 各ベクトル
 		D3DXVECTOR3 vecLineW, posDest;
@@ -474,6 +476,10 @@ bool CObjectX::Collision(D3DXVECTOR3* pPos, D3DXVECTOR3* pPosOld, D3DXVECTOR3* p
 		fXE = fOffXE * fCos - fOffZE * fSin;
 		fZE = fOffXE * fSin + fOffZE * fCos;
 
+		// Y座標の最低値/最大値
+		fMinY = m_pos.y + (m_VtxMin.y * m_scale.y) - fHeight;
+		fMaxY = m_pos.y + (m_VtxMax.y * m_scale.y);
+
 		// 始点
 		start.x = m_pos.x + fXS;
 		start.y = 0.0f;
@@ -483,6 +489,11 @@ bool CObjectX::Collision(D3DXVECTOR3* pPos, D3DXVECTOR3* pPosOld, D3DXVECTOR3* p
 		end.x = m_pos.x + fXE;
 		end.y = 0.0f;
 		end.z = m_pos.z + fZE;
+
+#ifdef _DEBUG
+		CLine::Create(D3DXVECTOR3(start.x, fMinY, start.z), D3DXVECTOR3(end.x, fMinY, end.z));
+		CLine::Create(D3DXVECTOR3(start.x, fMaxY, start.z), D3DXVECTOR3(end.x, fMaxY, end.z));
+#endif
 
 		// 境界線ベクトル
 		vecLine.x = (end.x) - (start.x);

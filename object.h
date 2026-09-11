@@ -63,6 +63,7 @@ public:
 		TYPE_LISTUI,			// リザルト内訳UI
 		TYPE_JUMPUI,			// ジャンプUI
 		TYPE_ITEMUI,			// アイテムUI
+		TYPE_LOCATER,			// ロケーター
 		TYPE_SCORE,				// スコア
 		TYPE_RANKINGSCORE,		// ランキングスコア
 		TYPE_USED_ENERGY,		// 使用エネルギー量

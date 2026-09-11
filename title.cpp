@@ -21,6 +21,7 @@
 #include "ship.h"
 #include "lab.h"
 #include "frame.h"
+#include "locater.h"
 #include "UI_energy.h"
 #include "UI_jump_meter.h"
 #include "UI_action.h"
@@ -35,6 +36,7 @@ CPlayer* CTitle::m_pPlayer = NULL;					// プレイヤーのインスタンス
 CShip* CTitle::m_pShip = NULL;						// 船のインスタンス
 CLab* CTitle::m_pLab = NULL;						// 研究所のインスタンス
 CFrame* CTitle::m_pFrame = NULL;					// 枠のインスタンス
+CLocater* CTitle::m_pLocater = NULL;				// ロケーターのインスタンス
 CEnergyUI* CTitle::m_pEnergyUI = NULL;				// エネルギーUIのインスタンス
 CJumpMeterUI* CTitle::m_pJumpMeterUI = NULL;		// ジャンプメーターUIのインスタンス
 CActionUI* CTitle::m_pActionUI = NULL;				// アクションUIのインスタンス
@@ -54,6 +56,7 @@ CTitle::CTitle() : CScene(CScene::MODE_TITLE)
 	m_pShip = NULL;
 	m_pLab = NULL;
 	m_pFrame = NULL;
+	m_pLocater = NULL;
 	m_pEnergyUI = NULL;
 	m_pJumpMeterUI = NULL;
 	m_pActionUI = NULL;
@@ -82,6 +85,7 @@ HRESULT CTitle::Init(void)
 	CTitleLogo::Load();
 	CEnterUI::Load();
 	CFrame::Load();
+	CLocater::Load();
 	CEnergyUI::Load();
 	CJumpMeterUI::Load();
 	CActionUI::Load();
@@ -132,6 +136,21 @@ HRESULT CTitle::Init(void)
 		m_pFrame->SetDisp(false);
 	}
 
+	// ロケーターを生成
+	if (m_pLocater == NULL)
+	{// NULLチェック
+		m_pLocater = CLocater::Create(D3DXVECTOR3(0.0f, 7.0f, -130.0f), 100.0f, 100.0f);
+
+		if (m_pLocater == NULL)
+		{// NULLチェック
+			OutputDebugStringA("! ! ! ロケーターの生成に失敗しました ! ! !\n");
+
+			return E_FAIL;
+		}
+
+		m_pLocater->SetDisp(false);
+	}
+	
 	// エネルギーUIを生成
 	if (m_pEnergyUI == NULL)
 	{// NULLチェック
@@ -250,6 +269,7 @@ void CTitle::Uninit(void)
 	CActionUI::Unload();
 	CJumpMeterUI::Unload();
 	CEnergyUI::Unload();
+	CLocater::Unload();
 	CFrame::Unload();
 	CEnterUI::Unload();
 	CTitleLogo::Unload();
@@ -294,6 +314,12 @@ void CTitle::Uninit(void)
 	if (m_pEnergyUI != NULL)
 	{// NULLチェック
 		m_pEnergyUI = NULL;
+	}
+	
+	// ロケーターの破棄
+	if (m_pLocater != NULL)
+	{// NULLチェック
+		m_pLocater = NULL;
 	}
 
 	// 枠の破棄
@@ -342,6 +368,7 @@ void CTitle::Update(void)
 	{// チュートリアル中
 		// チュートリアル状態に設定
 		m_pFrame->SetDisp(true);
+		m_pLocater->SetDisp(true);
 		m_pEnergyUI->SetDisp(true);
 		m_pEnterUI->SetDisp(false);
 		m_pJumpMeterUI->SetDispAll(true);
