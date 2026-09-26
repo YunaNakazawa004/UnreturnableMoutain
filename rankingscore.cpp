@@ -21,7 +21,7 @@
 //*****************************************************************************
 #define RANKINGSCORE_WIDTH	(40.0f)									// ランキングスコアの幅
 #define RANKINGSCORE_HEIGHT	(75.0f)									// ランキングスコアの高さ
-#define FIRST_SCORE			(1000000)								// 初期スコア
+#define FIRST_SCORE			(900000)								// 初期スコア
 #define FIRST_SCORE_DIFF	(150000)								// 初期スコアの差
 #define SCORE_POS_X			(471.0f)								// スコア全体の基準位置X座標
 #define SCORE_POS_X_FIRST	(430.0f)								// スコア全体最初の基準位置X座標

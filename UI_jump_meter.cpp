@@ -134,7 +134,7 @@ HRESULT CJumpMeterUI::Init(const D3DXVECTOR3 pos, const float fWidth, const floa
 	m_fHeight = fHeight;
 
 	m_pFrame = CObject2D::Create(pos, fWidth, fHeight, TYPE_JUMPUI, 
-		"data\\TEXTURE\\UI\\jumpmeter000.png", PRIORITY_5, CObject2D::POS_MID_BOTTOM);
+		"data\\TEXTURE\\UI\\jumpmeter000.png", PRIORITY_4, CObject2D::POS_MID_BOTTOM);
 
 	return S_OK;
 }

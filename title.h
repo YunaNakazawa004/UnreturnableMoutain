@@ -23,6 +23,7 @@ class CLocater;
 class CEnergyUI;
 class CJumpMeterUI;
 class CActionUI;
+class CSelect;
 class CTutorialJump;
 class CTutorialTxt;
 
@@ -55,6 +56,7 @@ public:
 	static CEnergyUI* GetEnergyUI(void) { return m_pEnergyUI; }
 	static CJumpMeterUI* GetJumpMeterUI(void) { return m_pJumpMeterUI; }
 	static CActionUI* GetActionUI(void) { return m_pActionUI; }
+	static CSelect* GetSelect(void) { return m_pSelect; }
 	static CTutorialTxt* GetTutorialTxt(const int nIdx) { return m_apTutorialTxt[nIdx]; }
 
 	static bool isTutorial(void) { return m_bTutorial; }
@@ -70,6 +72,7 @@ private:
 	static CEnergyUI* m_pEnergyUI;					// エネルギーUIのインスタンス
 	static CJumpMeterUI* m_pJumpMeterUI;			// ジャンプメーターUIのインスタンス
 	static CActionUI* m_pActionUI;					// アクションUIのインスタンス
+	static CSelect* m_pSelect;						// 選択肢のインスタンス
 	static CTutorialTxt* m_apTutorialTxt[NUM_TUTORIALTXT];			// チュートリアル文のインスタンス
 
 	static bool m_bTutorial;		// チュートリアル中かどうかのフラグ

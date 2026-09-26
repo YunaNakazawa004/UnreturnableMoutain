@@ -148,12 +148,6 @@ void CMapObject::Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot, const int 
 		{// 生成できた
 			// 総数をカウントアップ
 			m_nNumObject++;
-
-			if (bCollect == true)
-			{// 収集アイテムなら
-				// 収集アイテムの総数をカウントアップ
-				m_nNumCollectObj++;
-			}
 		}
 	}
 }
@@ -370,6 +364,9 @@ HRESULT CMapObject::ReadData(const char* pFilename)
 		// ファイルから読み込む
 		file.read((char*)&nNumObject, sizeof(nNumObject));
 
+		int aCollect[8] = { -1 };
+		int nNumCollect = 0;
+
 		for (int nCnt = 0; nCnt < nNumObject; nCnt++)
 		{
 			D3DXVECTOR3 pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
@@ -385,9 +382,36 @@ HRESULT CMapObject::ReadData(const char* pFilename)
 
 			if (m_aMapObject[nCnt].bCollect == true)
 			{// 収集アイテムだった場合
+				aCollect[nNumCollect] = nCnt;
+				nNumCollect++;
+			}
+		}
+
+		// 収集アイテムを調整
+		for (int nCnt = 0; nNumCollect > COLLECT_ITEM; nCnt++)
+		{
+			int nRand = rand() % 8;
+
+			if (aCollect[nRand] >= 0)
+			{// 範囲内
+				if (m_aMapObject[aCollect[nRand]].bCollect == true)
+				{// 収集アイテムだったら
+					m_aMapObject[aCollect[nRand]].bCollect = false;
+					nNumCollect--;
+					aCollect[nRand] = -1;
+				}
+			}
+		}
+
+		// 収集アイテムを設定
+		for (int nCnt = 0; nCnt < 8; nCnt++)
+		{
+			if (aCollect[nCnt] != -1)
+			{// 範囲内
 				if (pItemUI != NULL)
 				{// NULLチェック
-					m_aMapObject[nCnt].nItemIdx = pItemUI->SetItem(m_aMapObject[nCnt].aObjType);
+					m_aMapObject[aCollect[nCnt]].nItemIdx = pItemUI->SetItem(m_aMapObject[aCollect[nCnt]].aObjType);
+					m_nNumCollectObj++;
 				}
 			}
 		}

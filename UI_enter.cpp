@@ -14,7 +14,7 @@
 #include "texture.h"
 
 #include "title.h"
-#include "player.h"
+#include "UI_select.h"
 
 //************************************************************************
 // マクロ定義
@@ -162,7 +162,7 @@ void CEnterUI::Update(void)
 	CInputJoypad* pInputJoypad = CManager::GetInputJoypad();			// ジョイパッド入力の取得
 	CInputMouse* pInputMouse = CManager::GetInputMouse();				// マウス入力の取得
 	CSound* pSound = CManager::GetSound();								// サウンドを取得
-	CPlayer* pPlayer = CTitle::GetPlayer();
+	CSelect* pSelect = CTitle::GetSelect();
 	D3DXCOLOR col = GetColor();
 
 	switch (m_state)
@@ -203,10 +203,11 @@ void CEnterUI::Update(void)
 		}
 
 		if (m_nCounterState > FADE_COUNT)
-		{// すこし経ってからチュートリアルに進む
-			pPlayer->SetState(CPlayer::STATE_TUTORIAL);
-
+		{// すこし経ってから選択肢を出す
 			m_state = STATE_NONE;
+			SetDisp(false);
+
+			pSelect->SetDisp(true);
 		}
 
 		break;

@@ -137,20 +137,20 @@ HRESULT CItemUI::Init(const D3DXVECTOR3 pos, const float fWidth, const float fHe
 	}
 
 	// アイテムUIクラスの値を初期化
-	for (int nCnt = 0; nCnt < TYPE_MAX; nCnt++)
+	for (int nCnt = 0; nCnt < COLLECT_ITEM; nCnt++)
 	{
 		if (m_Item[nCnt].pItem == NULL)
 		{// NULLチェック
 			m_Item[nCnt].pItem =
 				CObject2D::Create(D3DXVECTOR3(pos.x + 40.0f + nCnt * 70.0f, pos.y + (fHeight), 0.0f), 30.0f, 30.0f,
-					CObject::TYPE_ITEMUI, "data\\TEXTURE\\UI\\item000.png", PRIORITY_6);
+					CObject::TYPE_ITEMUI, "data\\TEXTURE\\UI\\item000.png", PRIORITY_5);
 		}
 
 		if (m_Item[nCnt].pCheck == NULL)
 		{// NULLチェック
 			m_Item[nCnt].pCheck =
 				CObject2D::Create(D3DXVECTOR3(pos.x + 40.0f + nCnt * 70.0f, pos.y + (fHeight), 0.0f), 30.0f, 30.0f,
-					CObject::TYPE_ITEMUI, "data\\TEXTURE\\UI\\check.png", PRIORITY_6);
+					CObject::TYPE_ITEMUI, "data\\TEXTURE\\UI\\check.png", PRIORITY_5);
 		}
 
 		if (m_Item[nCnt].pCheck != NULL)
@@ -169,7 +169,7 @@ HRESULT CItemUI::Init(const D3DXVECTOR3 pos, const float fWidth, const float fHe
 //========================================================================
 void CItemUI::Uninit(void)
 {
-	for (int nCnt = 0; nCnt < TYPE_MAX; nCnt++)
+	for (int nCnt = 0; nCnt < COLLECT_ITEM; nCnt++)
 	{
 		if (m_Item[nCnt].pItem != NULL)
 		{// NULLチェック
@@ -228,7 +228,7 @@ void CItemUI::Draw(void)
 //========================================================================
 int CItemUI::SetItem(const int Item)
 {
-	if (m_nNumItem >= TYPE_MAX)
+	if (m_nNumItem >= COLLECT_ITEM)
 	{// 要素数を越えている
 		return -1;
 	}
@@ -258,7 +258,7 @@ int CItemUI::SetItem(const int Item)
 //========================================================================
 void CItemUI::Check(const int nIdx)
 {
-	if (nIdx >= TYPE_MAX)
+	if (nIdx >= COLLECT_ITEM)
 	{// 要素数を越えている
 		return;
 	}
@@ -278,7 +278,7 @@ void CItemUI::SetDispWOCheck(const bool bDisp)
 	SetDisp(bDisp);
 
 	// アイテムの設定
-	for (int nCnt = 0; nCnt < TYPE_MAX; nCnt++)
+	for (int nCnt = 0; nCnt < COLLECT_ITEM; nCnt++)
 	{
 		if (m_Item[nCnt].pItem != NULL)
 		{// NULLチェック
@@ -296,7 +296,7 @@ void CItemUI::SetDispAll(const bool bDisp)
 	SetDisp(bDisp);
 
 	// アイテムの設定
-	for (int nCnt = 0; nCnt < TYPE_MAX; nCnt++)
+	for (int nCnt = 0; nCnt < COLLECT_ITEM; nCnt++)
 	{
 		if (m_Item[nCnt].pItem != NULL)
 		{// NULLチェック

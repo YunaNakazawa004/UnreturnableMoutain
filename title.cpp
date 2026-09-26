@@ -25,6 +25,7 @@
 #include "UI_energy.h"
 #include "UI_jump_meter.h"
 #include "UI_action.h"
+#include "UI_select.h"
 #include "tutorial_txt.h"
 
 //************************************************************************
@@ -40,6 +41,7 @@ CLocater* CTitle::m_pLocater = NULL;				// ロケーターのインスタンス
 CEnergyUI* CTitle::m_pEnergyUI = NULL;				// エネルギーUIのインスタンス
 CJumpMeterUI* CTitle::m_pJumpMeterUI = NULL;		// ジャンプメーターUIのインスタンス
 CActionUI* CTitle::m_pActionUI = NULL;				// アクションUIのインスタンス
+CSelect* CTitle::m_pSelect = NULL;					// 選択肢のインスタンス
 CTutorialTxt* CTitle::m_apTutorialTxt[NUM_TUTORIALTXT] = {};		// チュートリアル文のインスタンス
 bool CTitle::m_bTutorial = false;					// チュートリアル中かどうかのフラグ
 bool CTitle::m_bReady = false;						// チュートリアル完了フラグ
@@ -60,6 +62,7 @@ CTitle::CTitle() : CScene(CScene::MODE_TITLE)
 	m_pEnergyUI = NULL;
 	m_pJumpMeterUI = NULL;
 	m_pActionUI = NULL;
+	m_pSelect = NULL;
 	memset(&m_apTutorialTxt[0], NULL, sizeof m_apTutorialTxt);
 	m_bTutorial = false;
 	m_bReady = false;
@@ -79,7 +82,7 @@ HRESULT CTitle::Init(void)
 {
 	// カメラの設定
 	CCamera* pCamera = CManager::GetCamera();
-	pCamera->SetPosition(D3DXVECTOR3(0.0f, 30.0f, -200.0f), DEFAULT_VECTER3, DEFAULT_VECTER3, CCamera::TYPE_STOP);
+	pCamera->SetPosition(D3DXVECTOR3(0.0f, 30.0f, -170.0f), DEFAULT_VECTER3, DEFAULT_VECTER3, CCamera::TYPE_STOP);
 
 	// テクスチャを読み込み
 	CTitleLogo::Load();
@@ -196,11 +199,26 @@ HRESULT CTitle::Init(void)
 
 		m_pActionUI->SetDisp(false);
 	}
+	
+	// 選択肢を生成
+	if (m_pSelect == NULL)
+	{// NULLチェック
+		m_pSelect = CSelect::Create(CSelect::MENU_START);
+
+		if (m_pSelect == NULL)
+		{// NULLチェック
+			OutputDebugStringA("! ! ! 選択肢の生成に失敗しました ! ! !\n");
+
+			return E_FAIL;
+		}
+
+		m_pSelect->SetDisp(false);
+	}
 
 	// プレイヤーを生成
 	if (m_pPlayer == NULL)
 	{// NULLチェック
-		m_pPlayer = CPlayer::Create(D3DXVECTOR3(0.0f, 7.0f, -130.0f), DEFAULT_VECTER3, 40.0f);
+		m_pPlayer = CPlayer::Create(D3DXVECTOR3(0.0f, 7.0f, -100.0f), DEFAULT_VECTER3, 40.0f);
 
 		if (m_pPlayer == NULL)
 		{// NULLチェック
@@ -215,7 +233,7 @@ HRESULT CTitle::Init(void)
 	// 船を生成
 	if (m_pShip == NULL)
 	{// NULLチェック
-		m_pShip = CShip::Create(D3DXVECTOR3(0.0f, -4.0f, -130.0f), DEFAULT_VECTER3);
+		m_pShip = CShip::Create(D3DXVECTOR3(0.0f, -4.0f, -100.0f), DEFAULT_VECTER3);
 
 		if (m_pShip == NULL)
 		{// NULLチェック
@@ -230,7 +248,7 @@ HRESULT CTitle::Init(void)
 	// 研究所を生成
 	if (m_pLab == NULL)
 	{// NULLチェック
-		m_pLab = CLab::Create(D3DXVECTOR3(0.0f, 0.0f, -130.0f), DEFAULT_VECTER3);
+		m_pLab = CLab::Create(D3DXVECTOR3(0.0f, 0.0f, -615.0f), DEFAULT_VECTER3);
 
 		if (m_pLab == NULL)
 		{// NULLチェック
@@ -243,10 +261,10 @@ HRESULT CTitle::Init(void)
 	// チュートリアル文を生成
 	if (m_apTutorialTxt[0] == NULL && m_apTutorialTxt[1] == NULL && m_apTutorialTxt[2] == NULL && m_apTutorialTxt[3] == NULL)
 	{// NULLチェック
-		m_apTutorialTxt[0] = CTutorialTxt::Create(D3DXVECTOR3(0.0f, 50.0f, -65.0f), D3DXVECTOR3(0.0f, D3DX_PI, 0.0f), 0);
-		m_apTutorialTxt[1] = CTutorialTxt::Create(D3DXVECTOR3(-240.0f, 50.0f, -120.0f), D3DXVECTOR3(0.0f, D3DX_PI * 1.5f, 0.0f), 1);
-		m_apTutorialTxt[2] = CTutorialTxt::Create(D3DXVECTOR3(0.0f, 50.0f, 110.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), 2);
-		m_apTutorialTxt[3] = CTutorialTxt::Create(D3DXVECTOR3(0.0f, 50.0f, -370.0f), D3DXVECTOR3(0.0f, D3DX_PI, 0.0f), 3);
+		m_apTutorialTxt[0] = CTutorialTxt::Create(D3DXVECTOR3(0.0f, 30.0f, -345.0f), 2);
+		m_apTutorialTxt[1] = CTutorialTxt::Create(D3DXVECTOR3(0.0f, 30.0f, -800.0f), 1);
+		m_apTutorialTxt[2] = CTutorialTxt::Create(D3DXVECTOR3(170.0f, 30.0f, -930.0f), 3);
+		m_apTutorialTxt[3] = CTutorialTxt::Create(D3DXVECTOR3(0.0f, 30.0f, -1100.0f), 0);
 
 		if (m_apTutorialTxt[0] == NULL || m_apTutorialTxt[1] == NULL || m_apTutorialTxt[2] == NULL || m_apTutorialTxt[3] == NULL)
 		{// NULLチェック
@@ -298,6 +316,12 @@ void CTitle::Uninit(void)
 		m_pPlayer = NULL;
 	}
 
+	// 選択肢の破棄
+	if (m_pSelect != NULL)
+	{// NULLチェック
+		m_pSelect = NULL;
+	}
+	
 	// アクションUIの破棄
 	if (m_pActionUI != NULL)
 	{// NULLチェック
@@ -374,6 +398,7 @@ void CTitle::Update(void)
 		m_pJumpMeterUI->SetDispAll(true);
 		m_pTitleLogo->SetDisp(false);
 		m_pActionUI->SetDisp(true);
+		m_pSelect->SetDisp(false);
 		pCamera->SetType(CCamera::TYPE_PLAYER);
 
 		// フラグON

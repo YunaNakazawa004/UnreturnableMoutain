@@ -117,13 +117,8 @@ HRESULT CLab::Init(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot)
 		return E_FAIL;
 	}
 
-	D3DXVECTOR3 posE;
-	posE.x = m_apModel[5]->GetMtxWorld()._41;
-	posE.y = m_apModel[5]->GetMtxWorld()._42 + 4.0f;
-	posE.z = m_apModel[5]->GetMtxWorld()._43 + 70.0f;
-
 	// チュートリアル用のエネルギー鉱石
-	CEnergyRock::Create(posE, DEFAULT_VECTER3);
+	CEnergyRock::Create(D3DXVECTOR3(0.0f, 0.0f, -345.0f), DEFAULT_VECTER3);
 
 	return S_OK;
 }

@@ -47,13 +47,13 @@
 //************************************************************************
 // マクロ定義
 //************************************************************************
-#define LAND_MOVEMENT	(D3DXVECTOR3(0.6f, 0.6f, 0.6f))			// 移動量(地上)
-#define AIR_MOVEMENT	(D3DXVECTOR3(0.1f, 0.1f, 0.1f))			// 移動量(空中)
+#define LAND_MOVEMENT	(D3DXVECTOR3(0.42f, 0.42f, 0.42f))		// 移動量(地上)
+#define AIR_MOVEMENT	(D3DXVECTOR3(0.075f, 0.075f, 0.075f))	// 移動量(空中)
 #define MOVE_INERTIA	(0.05f)									// 移動量の慣性
 #define ROT				(D3DXVECTOR3(0.05f, 0.05f, 0.05f))		// 向き移動量
 #define MODEL_ROT		(D3DX_PI * 0.05f)						// モデルの傾き具合
 #define MODEL_ROT_X		(0.04f)									// モデルの傾きカウントX方向
-#define MODEL_ROT_Z		(0.005f)								// モデルの傾きカウントZ方向
+#define MODEL_ROT_Z		(0.002f)								// モデルの傾きカウントZ方向
 #define MAX_ROTADD		(1.0f)									// 最大追加角度
 #define MIN_ROTADD		(-1.0f)									// 最小追加角度
 #define TIRE_ROT		(0.15f)									// タイヤの回り具合
@@ -64,7 +64,7 @@
 #define MAX_ENERGY		(100.0f)								// 最大所持エネルギー
 #define ONE_ENERGY		(10.0f)									// 鉱石ひとつあたりのエネルギー
 #define MINUS_ENERGY	(200)									// エネルギー減少の間隔
-#define UNCLIMB_SLOPE	(0.35f)									// 登れない傾斜の角度
+#define UNCLIMB_SLOPE	(0.3f)									// 登れない傾斜の角度
 #define OUTMAP			(3000.0f)								// マップ外
 
 //========================================================================
@@ -441,9 +441,9 @@ void CPlayer::Update(void)
 		{// Zの範囲
 			pos.z = 112.0f;
 		}
-		else if (pos.z < -372.0f)
+		else if (pos.z < -1345.0f)
 		{// Zの範囲
-			pos.z = -372.0f;
+			pos.z = -1345.0f;
 		}
 	}
 
@@ -853,6 +853,7 @@ void CPlayer::SetRotation(const D3DXVECTOR3 rot)
 {
 	// 向きを変更
 	m_rot = rot;
+	m_rotDest = rot;
 
 	// X向きを調整
 	CorrectAngle(&m_rot.x, m_rot.x);
@@ -929,7 +930,7 @@ bool CPlayer::Movement(const D3DXVECTOR3 rot)
 	static float fRotCounterZ = 0.0f;		// 傾きの追加角度Z
 
 	// 8方向移動時のスピード
-	float fCustomSpeed = (1.5f - (m_fEnergy * 0.01f)) * ((fRotCounterZ >= MAX_ROTADD || fRotCounterZ <= MIN_ROTADD) ? 0.1f : 1.0f) * 0.5f;
+	float fCustomSpeed = (1.5f - (m_fEnergy * 0.01f)) * ((fRotCounterZ >= MAX_ROTADD || fRotCounterZ <= MIN_ROTADD) ? 0.5f : 1.0f) * 0.5f;
 
 	// ダッシュ
 	if (pInputKeyboard->GetPress(DIK_SPACE) == true ||
@@ -959,7 +960,7 @@ bool CPlayer::Movement(const D3DXVECTOR3 rot)
 	if (m_state == STATE_NORMAL || m_state == STATE_TUTORIAL || m_state == STATE_APPEAR || m_state == STATE_DEATH)
 	{// 通常状態/チュートリアル中のみ
 		// ジャンプ量をUIに設定
-		pJumpMeterUI->SetJumpMeter((m_fAddSpeed - 1.0f) * 5.0f);
+		pJumpMeterUI->SetJumpMeter((m_fAddSpeed - 1.0f) / 2.0f);
 	}
 
 	float fSpeedX = (m_bJump ? AIR_MOVEMENT.x : LAND_MOVEMENT.x) * fCustomSpeed;
@@ -967,7 +968,11 @@ bool CPlayer::Movement(const D3DXVECTOR3 rot)
 
 	if (pInputJoypad->GetStick(0, CInputJoypad::JOYKEY_LEFTSTICK, &nValueH, &nValueV) == true)
 	{// スティック移動
-		float fSpeed = (m_bJump ? -(float)nValueV * 0.0000183f / 6.0f : -(float)nValueV * 0.0000183f) * fCustomSpeed;		// スピード
+		float fSpeed = (m_bJump ? -(float)nValueV * 0.0000183f / 6.0f : -(float)nValueV * 0.0000183f) * fCustomSpeed;
+		fSpeed += 0.3f * ((nValueV < 0) ? 1 : -1);
+		fSpeed /= 1.75f;
+
+		pDebugProc->Print("Speed : %f\n", fSpeed);
 
 		m_move.x += sinf(rot.y) * fSpeed;
 		m_move.z += cosf(rot.y) * fSpeed;
@@ -979,8 +984,11 @@ bool CPlayer::Movement(const D3DXVECTOR3 rot)
 		UpperRotDest.z = MODEL_ROT * ((nValueH < 0) ? -1 : 1);
 		TireRot.x += TIRE_ROT * ((nValueV < 0) ? 1 : -1);
 
-		// 進んだ方向に角度を向ける
-		m_rotDest.y = rot.y + ((float)nValueH * 0.00001f * ((nValueV < 0) ? -1 : 1));
+		if (nValueH > XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE * 2 || nValueH < -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE * 2)
+		{
+			// 進んだ方向に角度を向ける
+			m_rotDest.y = rot.y + ((float)nValueH * 0.00001f * ((nValueV < 0) ? -1 : 1));
+		}
 
 		if (nValueV != 0 && m_bJump == true)
 		{// 前後にも動いている/空中

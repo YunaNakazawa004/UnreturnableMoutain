@@ -69,6 +69,7 @@ public:
 	static void SetPause(const bool bPause) { m_bPause = bPause; }
 
 	template <class T> static HRESULT CreateInstance(T** instance);
+	static void Quit(void);
 
 private:
 	static CRenderer* m_pRenderer;					// レンダラーのインスタンス
@@ -87,6 +88,7 @@ private:
 		
 	static int m_nCountFPS;							// FPSカウンター
 	static bool m_bPause;							// ポーズするかしないか
+	static HWND m_hWnd;								// 保存用
 };
 
 //************************************************************************

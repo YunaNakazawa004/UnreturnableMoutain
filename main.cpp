@@ -86,6 +86,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hInstancePrev, LPSTR lpCmdLine
 		hInstance,				// インスタンスハンドル
 		NULL);					// ウィンドウ作成データ
 
+#ifdef _DEBUG
 	// 初期化処理
 	if (FAILED(pManager->Init(hInstance, hWnd, TRUE)))
 	{// 初期化処理が失敗した場合
@@ -93,6 +94,17 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hInstancePrev, LPSTR lpCmdLine
 
 		return -1;
 	}
+
+#else
+	// 初期化処理
+	if (FAILED(pManager->Init(hInstance, hWnd, TRUE)))
+	{// 初期化処理が失敗した場合
+		OutputDebugStringA("! ! ! マネージャーの初期化に失敗しました ! ! !\n");
+
+		return -1;
+	}
+
+#endif
 
 	// 分解能を設定
 	timeBeginPeriod(1);

@@ -15,6 +15,7 @@
 //************************************************************************
 #define ITEMUI_WIDTH		(150.0f)				// アイテムUIの幅
 #define ITEMUI_HEIGHT		(150.0f)				// アイテムUIの高さ
+#define COLLECT_ITEM		(4)						// 収集アイテム数
 
 //************************************************************************
 // アイテムUIクラス
@@ -44,7 +45,7 @@ public:
 		int type;				// アイテムの種類
 	}Item;
 
-	CItemUI(const int nPriority = PRIORITY_6);
+	CItemUI(const int nPriority = PRIORITY_5);
 	~CItemUI();
 
 	static HRESULT Load(void);
@@ -63,7 +64,7 @@ public:
 
 private:
 	static int m_aIdxTexture[TYPE_MAX + 1];		// テクスチャのインデックス
-	Item m_Item[TYPE_MAX];			// アイテム情報
+	Item m_Item[COLLECT_ITEM];		// アイテム情報
 	static int m_nNumItem;			// アイテムの総数
 };
 

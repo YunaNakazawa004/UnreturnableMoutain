@@ -181,7 +181,7 @@ HRESULT CGame::Init(void)
 	// アイテムUIを生成
 	if (m_pItemUI == NULL)
 	{// NULLチェック
-		m_pItemUI = CItemUI::Create(D3DXVECTOR3(360.0f, 640.0f, 0.0f), 310.0f, 40.0f);
+		m_pItemUI = CItemUI::Create(D3DXVECTOR3(500.0f, 640.0f, 0.0f), 155.0f, 40.0f);
 
 		if (m_pItemUI == NULL)
 		{// NULLチェック

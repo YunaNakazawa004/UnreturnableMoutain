@@ -125,7 +125,7 @@ HRESULT CRanking::Init(void)
 	// 研究所を生成
 	if (m_pLab == NULL)
 	{// NULLチェック
-		m_pLab = CLab::Create(D3DXVECTOR3(0.0f, 0.0f, -130.0f), DEFAULT_VECTER3);
+		m_pLab = CLab::Create(D3DXVECTOR3(0.0f, 0.0f, -615.0f), DEFAULT_VECTER3);
 
 		if (m_pLab == NULL)
 		{// NULLチェック

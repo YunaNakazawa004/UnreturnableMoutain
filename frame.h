@@ -20,7 +20,7 @@
 class CFrame : public CObject2D
 {
 public:
-	CFrame(const int nPriority = PRIORITY_5);
+	CFrame(const int nPriority = PRIORITY_4);
 	~CFrame();
 
 	static HRESULT Load(void);

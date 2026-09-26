@@ -8,12 +8,12 @@
 #define _TUTORIAL_TXT_H_		// 2重インクルード防止のマクロを定義する
 
 #include "main.h"
-#include "object3D.h"
+#include "ObjectBillboard.h"
 
 //************************************************************************
 // チュートリアル文クラス
 //************************************************************************
-class CTutorialTxt : public CObject3D
+class CTutorialTxt : public CObjectBillboard
 {
 public:
 	// 種類
@@ -31,8 +31,8 @@ public:
 
 	static HRESULT Load(void);
 	static void Unload(void);
-	static CTutorialTxt* Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot, const int type);
-	HRESULT Init(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot);
+	static CTutorialTxt* Create(const D3DXVECTOR3 pos, const int type);
+	HRESULT Init(const D3DXVECTOR3 pos);
 	void Uninit(void);
 	void Update(void);
 	void Draw(void);

@@ -21,6 +21,7 @@
 #define COLOR_YELLOW		(D3DXCOLOR(1.0f,1.0f,0.0f,1.0f))				// â©
 #define COLOR_WHITE			(D3DXCOLOR(1.0f,1.0f,1.0f,1.0f))				// îí
 #define COLOR_BLACK			(D3DXCOLOR(0.0f,0.0f,0.0f,0.0f))				// çï
+#define COLOR_GRAY			(D3DXCOLOR(0.6f,0.6f,0.6f,1.0f))				// îñäD
 #define COLOR_DARKGRAY		(D3DXCOLOR(0.3f,0.3f,0.3f,1.0f))				// äD
 #define COLOR_BLUEGRAY		(D3DXCOLOR(0.439f,0.501f,0.564f,1.0f))			// ê¬äD
 #define COLOR_CYAN			(D3DXCOLOR(0.0f,1.0f,1.0f,1.0f))				// ÉVÉAÉì

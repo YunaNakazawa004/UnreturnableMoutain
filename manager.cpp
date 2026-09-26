@@ -52,6 +52,7 @@ CTransition* CManager::m_pTransition = NULL;			// 画面遷移のインスタンス
 CScreen* CManager::m_pScreen = NULL;					// 画面のインスタンス
 int CManager::m_nCountFPS = 0;							// FPSカウンター
 bool CManager::m_bPause = false;						// ポーズするかしないか
+HWND CManager::m_hWnd = NULL;							// 保存用
 
 //========================================================================
 // マネージャークラスのコンストラクタ
@@ -74,6 +75,7 @@ CManager::CManager()
 	m_pScreen = NULL;
 	m_nCountFPS = 0;
 	m_bPause = false;
+	m_hWnd = NULL;
 }
 
 //========================================================================
@@ -92,7 +94,7 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	if (SUCCEEDED(CreateInstance(&m_pRenderer)))
 	{// レンダラーの生成に成功
 		// 初期化処理
-		if (FAILED(m_pRenderer->Init(hWnd, TRUE)))
+		if (FAILED(m_pRenderer->Init(hWnd, bWindow)))
 		{// 初期化処理が失敗した場合
 			OutputDebugStringA("! ! ! レンダラーの初期化に失敗しました ! ! !\n");
 
@@ -251,6 +253,7 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 
 	// FPSカウンタを初期化
 	m_nCountFPS = 0;
+	m_hWnd = hWnd;
 
 	return S_OK;
 }
@@ -570,4 +573,12 @@ void CManager::SetMode(const CScene::MODE mode)
 	}
 
 	SetPause(false);
+}
+
+//========================================================================
+// ウィンドウ破棄
+//========================================================================
+void CManager::Quit(void)
+{
+	DestroyWindow(m_hWnd);
 }

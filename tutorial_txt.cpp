@@ -59,7 +59,7 @@ void CTutorialTxt::Unload(void)
 //========================================================================
 // チュートリアル文クラスの生成処理
 //========================================================================
-CTutorialTxt* CTutorialTxt::Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot, const int type)
+CTutorialTxt* CTutorialTxt::Create(const D3DXVECTOR3 pos, const int type)
 {
 #ifndef LIST
 	if (CObject::GetNumAll() >= MAX_OBJECT)
@@ -81,7 +81,7 @@ CTutorialTxt* CTutorialTxt::Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot,
 	if (pTutorialTxt != NULL)
 	{// NULLチェック
 		// 初期化処理
-		if (FAILED(pTutorialTxt->Init(pos, rot)))
+		if (FAILED(pTutorialTxt->Init(pos)))
 		{// もし失敗した場合
 			OutputDebugStringA("! ! ! チュートリアル文の初期化に失敗しました ! ! !\n");
 
@@ -105,7 +105,7 @@ CTutorialTxt* CTutorialTxt::Create(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot,
 //========================================================================
 // チュートリアル文クラスのコンストラクタ
 //========================================================================
-CTutorialTxt::CTutorialTxt(const int nPriority) :CObject3D(nPriority)
+CTutorialTxt::CTutorialTxt(const int nPriority) :CObjectBillboard(nPriority)
 {
 	// 値をクリア
 }
@@ -120,13 +120,10 @@ CTutorialTxt::~CTutorialTxt()
 //========================================================================
 // チュートリアル文クラスの初期化処理
 //========================================================================
-HRESULT CTutorialTxt::Init(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot)
+HRESULT CTutorialTxt::Init(const D3DXVECTOR3 pos)
 {
 	// 初期化処理
-	CObject3D::Init(pos, TUTORIAL_TXT_WIDTH, TUTORIAL_TXT_HEIGHT, 0.0f, CObject3D::MAINPOS_CENTER);
-
-	// 角度を設定
-	SetRotation(rot);
+	CObjectBillboard::Init(pos, TUTORIAL_TXT_WIDTH, TUTORIAL_TXT_HEIGHT);
 
 	return S_OK;
 }
@@ -137,7 +134,7 @@ HRESULT CTutorialTxt::Init(const D3DXVECTOR3 pos, const D3DXVECTOR3 rot)
 void CTutorialTxt::Uninit(void)
 {
 	// 終了処理
-	CObject3D::Uninit();
+	CObjectBillboard::Uninit();
 }
 
 //========================================================================
@@ -156,19 +153,22 @@ void CTutorialTxt::Draw(void)
 	CRenderer* pRenderer = CManager::GetRenderer();			// レンダラーへのポインタ
 	LPDIRECT3DDEVICE9 pDevice = pRenderer->GetDevice();			// デバイスへのポインタ
 
+	// ライティングオフ
+	pDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
+
 	// アルファテストを有効にする
 	pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
 	pDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATER);
 	pDevice->SetRenderState(D3DRS_ALPHAREF, 0);
 
 	// 描画処理
-	CObject3D::Draw();
+	CObjectBillboard::Draw();
 
 	// アルファテストを無効にする
 	pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
 	pDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_ALWAYS);
 	pDevice->SetRenderState(D3DRS_ALPHAREF, 0);
 
-	// カリングの設定
-	pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
+	// ライティングオン
+	pDevice->SetRenderState(D3DRS_LIGHTING, TRUE);
 }
